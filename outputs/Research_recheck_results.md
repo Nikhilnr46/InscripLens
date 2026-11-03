@@ -1,6 +1,6 @@
 # Research recheck and targeted experiments — 3 November 2026
 
-No new accuracy improvement established. Retain mask-HOG/SVM21% on supplied boxes; automatic localized-and-correct reference recall remains14%. Do not promote weaker models to satisfy a progress target.
+Update: the broader cleaned-data experiment subsequently improved supplied-box accuracy to77/300 (25.67%) and automatic localized-and-correct reference recall to52/300 (17.33%). Earlier negative experiments remain below. These reused diagnostic results do not establish reliable full-text OCR.
 
 ## What the papers support
 
@@ -26,3 +26,7 @@ Use broader public training annotations **after applying the same pretrained cle
 For localization, separately evaluate EpiSAM using automatically generated prompts versus explicit user prompts. Its public weights alone do not establish an automatic, accurate pipeline.
 
 Bibliographic clarification: the Wiley page displays first-online24February2021 while its volume/citation metadata uses2020. Earlier notes calling2021 simply incorrect were too categorical. Use the publisher's exported citation consistently; the journal is IET Image Processing, not IEEE Transactions on Image Processing.
+
+## Broader cleaned-data experiment completed
+
+After correcting the Begur filename exclusion, trained on9,925 crops/109 images/764 classes. Hero baseline reproduced63/300 exactly; broader cleaned model77/300, corrected broad originals43/300. Matched hero development improved50/308 to63/308. Automatic-region evaluation improved42/300 to52/300 with unchanged detection. The app prefers the new model when installed. All masks are cached; no new manual transcriptions or pseudo-labels were used. See `broad_clean_study/README.md` and summaries for details and limitations.

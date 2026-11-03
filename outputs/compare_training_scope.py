@@ -13,6 +13,10 @@ from run_character_benchmark import features
 def site(name):
     return re.split(r'\d',name,maxsplit=1)[0].strip().lower()
 
+def excluded_site(name, sites):
+    group=site(name)
+    return any(group==s or group.startswith(s+' ') for s in sites)
+
 def run(archive,hero,out):
     out.mkdir(parents=True,exist_ok=True)
     rows=json.loads((hero/'manifest.json').read_text(encoding='utf-8'))
@@ -25,7 +29,7 @@ def run(archive,hero,out):
         files=sorted(n for n in z.namelist() if '/images/train/' in n and n.endswith('.png'))
         for k,n in enumerate(files,1):
             stem=Path(n).stem
-            if site(stem) in sites:
+            if excluded_site(stem,sites):
                 excluded_images.append(stem);continue
             im=Image.open(io.BytesIO(z.read(n))).convert('RGB')
             chars=json.loads(z.read(f'episam_dataset/chars/train/{stem}/character_polygons.json'))

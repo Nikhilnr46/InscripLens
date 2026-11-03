@@ -11,6 +11,8 @@ from segment_candidates import candidates,overlay
 from recognize_regions import recognize
 
 ROOT=Path(__file__).resolve().parent.parent
+MASK_MODELS=[ROOT/'outputs/broad_clean_study/mask_svm_bundle.joblib',ROOT/'outputs/matched_mask_study/mask_svm_bundle.joblib']
+CLEAN_MODEL=next((p for p in MASK_MODELS if p.is_file()),MASK_MODELS[-1])
 DATA=ROOT/'work/app_data';DATA.mkdir(parents=True,exist_ok=True)
 st.set_page_config(page_title='InscripLens',layout='wide')
 st.title('InscripLens')
@@ -60,11 +62,12 @@ if page=='Analyse an image':
             st.download_button('Download predicted mask',Path(record['mask_path']).read_bytes(),'inscriplens_mask.png','image/png')
             st.download_button('Download analysis record',json.dumps(record,indent=2),'inscriplens_analysis.json','application/json')
             st.subheader('Experimental character recognition')
+            if CLEAN_MODEL.is_file():st.caption('Recognizer: '+('broader cleaned-data model' if CLEAN_MODEL==MASK_MODELS[0] else 'hero-only baseline'))
             boxes=candidates(mask)
             st.write(f'Automatic connected-component detector found {len(boxes)} candidate regions. These may split a letter or combine several; their order is not a verified reading order.')
             st.image(overlay(original,boxes),caption='Automatic candidate boxes',width=600)
             st.download_button('Download candidate boxes',json.dumps({'boxes_xyxy':boxes,'verified':False,'method':'connected_components'}),'candidate_boxes.json')
-            batch_model=ROOT/'outputs/matched_mask_study/mask_svm_bundle.joblib'
+            batch_model=CLEAN_MODEL
             if st.button('Predict all detected regions',disabled=not batch_model.is_file()):
                 with st.spinner('Predicting detected candidate labels…'):
                     batch=recognize(mask,joblib.load(batch_model))
@@ -80,7 +83,7 @@ if page=='Analyse an image':
             initial=boxes[chosen-1] if chosen else [0,0,min(original.width,100),min(original.height,100)]
             st.write('Review or adjust the rectangle before predicting. A candidate is not necessarily one complete character.')
             w,h=original.size
-            recognizer_available=any((ROOT/p).is_file() for p in ['outputs/matched_mask_study/mask_svm_bundle.joblib','outputs/training_scope_study/broader_inscriptions_svm_bundle.joblib'])
+            recognizer_available=CLEAN_MODEL.is_file() or (ROOT/'outputs/training_scope_study/broader_inscriptions_svm_bundle.joblib').is_file()
             if not recognizer_available:setup_message('No recognition model is installed. Enhancement and candidate downloads remain available.')
             with st.form('crop'):
                 cols=st.columns(4)
@@ -90,7 +93,7 @@ if page=='Analyse an image':
             if submitted:
                 if x2<=x1 or y2<=y1:st.error('Right and bottom must exceed left and top.')
                 else:
-                    model_path=ROOT/'outputs/matched_mask_study/mask_svm_bundle.joblib'
+                    model_path=CLEAN_MODEL
                     clean=model_path.exists()
                     if not clean:model_path=ROOT/'outputs/training_scope_study/broader_inscriptions_svm_bundle.joblib'
                     crop=(mask if clean else original).crop((x1,y1,x2,y2));path=DATA/record['id']/'character.png';crop.save(path)
@@ -134,7 +137,7 @@ elif page=='Dataset explorer':
 elif page=='Experiment results':
     st.subheader('Recorded experiments')
     st.write('Recognition accuracy counts exact agreement with raw source labels. It is not project completion.')
-    for title,path in [('Automatic localization plus recognition','pipeline_study/summary.json'),('Original versus mask inputs, unchanged classifier','full_binarizer/recognition_comparison.json'),('Matched training experiment','matched_mask_study/summary.json'),('Learned CNN experiment','cnn_study/summary.json'),('Frozen pretrained features','transfer_study/summary.json')]:
+    for title,path in [('Automatic localization plus recognition — hero baseline','pipeline_study/summary.json'),('Automatic localization plus recognition — broader model','broad_pipeline_study/summary.json'),('Original versus mask inputs, unchanged classifier','full_binarizer/recognition_comparison.json'),('Matched training experiment','matched_mask_study/summary.json'),('Broader cleaned training experiment','broad_clean_study/summary.json'),('Learned CNN experiment','cnn_study/summary.json'),('Frozen pretrained features','transfer_study/summary.json')]:
         p=ROOT/'outputs'/path
         if p.exists():
             st.write('**'+title+'**');st.json(json.loads(p.read_text(encoding='utf-8')))
@@ -159,7 +162,7 @@ elif page=='Saved analyses':
 
 else:
     st.subheader('Local setup status')
-    paths=enhancement_files+['outputs/full_binarizer/HS027_original.png','outputs/matched_mask_study/mask_svm_bundle.joblib','work/hero_pilot/manifest.json','outputs/full_binarizer/recognition_predictions.json']
+    paths=enhancement_files+['outputs/broad_clean_study/mask_svm_bundle.joblib','outputs/full_binarizer/HS027_original.png','outputs/matched_mask_study/mask_svm_bundle.joblib','work/hero_pilot/manifest.json','outputs/full_binarizer/recognition_predictions.json']
     st.dataframe([{'Asset':p,'Status':'Present' if (ROOT/p).is_file() else 'Missing'} for p in paths],hide_index=True)
     st.caption('Presence checks do not verify installed Python packages or model compatibility. Actual enhancement tests those at runtime.')
     st.markdown('[Setup instructions and runtime-pack guidance](https://github.com/Nikhilnr46/InscripLens/blob/main/COLLABORATOR_HANDOVER.md)')

@@ -55,6 +55,7 @@
     "Site groups are conservative filename-derived groups, not verified stone identities.",
     "Broader corpus script/language composition and label conventions remain unaudited.",
     "Source annotation boxes supplied; no automatic segmentation tested.",
-    "Recognition labels are raw source transliteration strings."
+    "Recognition labels are raw source transliteration strings.",
+    "Audit correction, 3 November 2026: the original filename-derived site rule retained 61 characters from Begur Nagareshwara Temple. The broader result is not fully location-excluded. broad_clean_study removes this image and reruns the original-image control; hero-only results are unaffected."
   ]
 }

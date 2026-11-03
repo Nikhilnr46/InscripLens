@@ -97,3 +97,11 @@ Follow root README's dataset preparation and experiment commands. The runtime pa
 ## Attribution and contribution
 
 Shilalekhya code is MIT, copyright2025 ihdia; retain its LICENSE. Public EpiSAM data and checkpoint repository declare CC BY-SA4.0. Authors: Arnav Sharma, Pratyush Jena, Amal Joseph and Ravi Kiran Sarvadevabhatla; imagery acknowledged to The Mythic Society Bengaluru. Derived previews/masks in the pack retain CC BY-SA4.0 attribution/share-alike terms. See THIRD_PARTY.md and outputs/EpiSAM_source_README.md. The project integrates and evaluates established methods; it does not claim to have invented the pretrained enhancer. Preserve truthful assistance and authorship disclosures.
+
+## Latest recognizer update — 3 November 2026
+
+Pull main, extract the separate `InscripLens_recognizer_update.zip` into the repository root, then restart Streamlit. This approximately77MiB update contains the broader model and checksums; retain the previous runtime pack. Without the update, the app falls back to the hero-only model and identifies it on the recognition screen. No inference-environment changes are required.
+
+New model: 77/300 (25.67%) with supplied boxes; automatic localization plus correct label:52/300 (17.33%). Earlier hero-only results remain63/300 and42/300 respectively. The same hero development subset improved50/308 to63/308. These are reused diagnostic results, not verified full-text OCR.
+
+A location-filter bug retained61 characters from a Begur temple image in the older broad experiment. It is now fixed; the corrected broad original-image control scores43/300. The hero-only baseline was unaffected. See `outputs/broad_clean_study/README.md`. Binary models remain excluded from Git; code pull alone does not install this update.

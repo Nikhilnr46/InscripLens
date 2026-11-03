@@ -7,12 +7,12 @@ An experimental local application for analysing historical Kannada inscription i
 - Upload a PNG/JPEG or select a public demonstration image.
 - Predict foreground strokes with the credited Shilalekhya model.
 - Inspect automatically proposed regions, adjust a character box and obtain an unverified transliteration-label prediction.
-- Predict all detected regions in one action and save/export their labels and boxes. This is not sentence transcription. The combined localization-and-label diagnostic recovers42/300 reference characters (14%).
+- Predict all detected regions in one action and save/export their labels and boxes. This is not sentence transcription. The combined localization-and-label diagnostic recovers52/300 reference characters (17.33%) with the broader model (hero-only fallback:42/300,14%).
 - Download masks, candidate boxes and analysis records; reopen saved analyses from SQLite.
 - Save character predictions with optional reviewer suggestions/notes and export them with model/source provenance. Suggestions remain unverified and never automatically enter training.
 - Explore source annotations and recorded experiments separately from predictions.
 
-Reliable full-stone OCR, historical-to-modern Kannada conversion and English translation are **not implemented**. Current diagnostic recognition is weak: matched cleaned-image HOG/SVM63/300 (21%), small CNN44/300 (14.67%), frozen ResNet18-feature classifier46/300 (15.33%). These use supplied reference boxes, reused validation, and incompletely documented binarizer pretraining overlap. They are not independent end-to-end accuracy results.
+Reliable full-stone OCR, historical-to-modern Kannada conversion and English translation are **not implemented**. Current diagnostic recognition is weak: broader cleaned-image HOG/SVM77/300 (25.67%), matched hero-only HOG/SVM63/300 (21%), small CNN44/300 (14.67%), frozen ResNet18-feature classifier46/300 (15.33%). These use supplied reference boxes, reused validation, and incompletely documented binarizer pretraining overlap. They are not independent end-to-end accuracy results.
 
 ## Local start
 
@@ -49,3 +49,9 @@ These require prepared local assets. The backend test runs real inference in tem
 ## Contribution and attribution
 
 Project work covers data auditing/filtering, controlled comparisons, candidate detection and application integration. It does not claim a new enhancement architecture. The pretrained enhancer and public data are credited to their authors. See `THIRD_PARTY.md`, `outputs/Contribution_and_reuse.md` and the experiment READMEs. This project was developed with AI coding assistance; the student should understand and verify the implementation and follow institutional disclosure requirements.
+
+## Broader recognizer update — 3 November 2026
+
+The app prefers `outputs/broad_clean_study/mask_svm_bundle.joblib` when installed. Existing runtime packs continue to work with the hero-only fallback. Git does not distribute the new model: extract `outputs/InscripLens_recognizer_update.zip` into the repository root after pulling main, then restart Streamlit. Keep the earlier runtime pack.
+
+The experiment used 9,925 training crops from 109 images, a corrected location exclusion, fixed model parameters and the existing diagnostic validation. See `outputs/broad_clean_study/README.md` for commands, comparisons and limitations. Rebuild the update ZIP with `python outputs/package_recognizer_update.py` after training and automatic-region evaluation.

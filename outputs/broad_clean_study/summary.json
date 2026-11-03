@@ -1,0 +1,71 @@
+{
+  "train_n": 9925,
+  "train_images": 109,
+  "train_classes": 764,
+  "hero_baseline_correct": 63,
+  "constant_mask_crops_retained": 292,
+  "additional_location_exclusions": {
+    "Begur Nagareshwara Temple 1400CE Gowdu Sonnappa Inscription1400 Bn90 Begurdoorpost": 61
+  },
+  "singleton_classes": 299,
+  "classes_below_five_examples": 480,
+  "checkpoint_sha256": "1f111bcf21fe9b0723ee4a0fe513422c2f3969b1445ddfba7c383ed648e85e3d",
+  "training_records_sha256": "52884c87b7229c4841363a00001dd4a1d69934afed367228e24df33006cda62d",
+  "development_sites": [
+    "aradeshanahalli",
+    "sadahalli",
+    "srinivagilu",
+    "t dasarahalli"
+  ],
+  "development_n": 359,
+  "development_correct": 78,
+  "matched_hero_development_n": 308,
+  "matched_hero_development_correct": 63,
+  "corrected_broad_original_validation_correct": 43,
+  "validation_n": 300,
+  "validation_correct": 77,
+  "accuracy": 0.25666666666666665,
+  "validation_unseen_n": 7,
+  "excluded_validation_sites": [
+    "begur",
+    "bisanahalli",
+    "kumbalahalli",
+    "kurudusonnenahalli",
+    "malurpatna",
+    "nagavara"
+  ],
+  "per_image": {
+    "HS022": {
+      "n": 11,
+      "correct": 2
+    },
+    "HS023": {
+      "n": 21,
+      "correct": 4
+    },
+    "HS024": {
+      "n": 98,
+      "correct": 26
+    },
+    "HS025": {
+      "n": 34,
+      "correct": 12
+    },
+    "HS026": {
+      "n": 14,
+      "correct": 2
+    },
+    "HS027": {
+      "n": 122,
+      "correct": 31
+    }
+  },
+  "protocol": "9925 broad original-training annotations after removing 61 additional Begur-location records missed by the previous filename rule; predicted masks, median HOG, fixed SVM C10. Same development-site names; broader development population. No tuning.",
+  "limitations": [
+    "Reused validation, not a fresh final test.",
+    "Source boxes supplied, not automatic OCR.",
+    "Binarizer pretraining overlap incompletely known.",
+    "Broad corpus script/period and raw transliteration labels unaudited.",
+    "More classes as well as more examples; not a pure sample-count ablation."
+  ]
+}

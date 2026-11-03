@@ -24,11 +24,15 @@ def match_boxes(reference,predicted,threshold=.5):
     return [(int(i),int(j),float(scores[i,j])) for i,j in zip(ii,jj) if scores[i,j]>=threshold]
 
 if __name__=='__main__':
-    import json,joblib,time
+    import argparse,hashlib,json,joblib,time
     from pathlib import Path
     from PIL import Image
-    root=Path(__file__).resolve().parent.parent;out=root/'outputs/pipeline_study';out.mkdir(exist_ok=True)
-    bundle=joblib.load(root/'outputs/matched_mask_study/mask_svm_bundle.joblib')
+    root=Path(__file__).resolve().parent.parent
+    parser=argparse.ArgumentParser()
+    parser.add_argument('--model',type=Path,default=root/'outputs/matched_mask_study/mask_svm_bundle.joblib')
+    parser.add_argument('--output',type=Path,default=root/'outputs/pipeline_study')
+    args=parser.parse_args();out=args.output;out.mkdir(parents=True,exist_ok=True)
+    bundle=joblib.load(args.model)
     rows=json.loads((root/'work/hero_pilot/manifest.json').read_text(encoding='utf-8'));reports=[];records=[]
     for image_id in sorted({r['image_id'] for r in rows if r['source_split']=='val'}):
         start=time.perf_counter()
@@ -40,7 +44,8 @@ if __name__=='__main__':
         records.append({'image_id':image_id,'predictions':pred,'matched_pairs':matches})
     ref=sum(r['reference_n'] for r in reports);n=sum(r['candidate_n'] for r in reports);localized=sum(r['localized_n'] for r in reports);correct=sum(r['localized_and_correct_n'] for r in reports)
     assert ref==300 and n==330 and localized==196
-    summary={'reference_n':ref,'candidate_n':n,'localized_n':localized,'localized_and_correct_n':correct,'joint_precision':correct/n,'joint_recall':correct/ref,'recognition_accuracy_on_localized_candidates':correct/localized,'per_image':reports,'protocol':'Full-image predicted masks -> fixed connected components -> maskHOG/SVM. No reference boxes used for prediction. Geometry-only one-to-one IoU>=0.5 matching, then exact source-label agreement.','limitations':['Not a line/full-text transcription metric: no verified reading order.','Validation reused and pretrained binarizer overlap incompletely known.','Filtered source annotations may omit legitimate glyphs.','Not directly comparable to21% recognition using supplied boxes.']}
+    summary={'reference_n':ref,'candidate_n':n,'localized_n':localized,'localized_and_correct_n':correct,'joint_precision':correct/n,'joint_recall':correct/ref,'recognition_accuracy_on_localized_candidates':correct/localized,'per_image':reports,'protocol':'Full-image predicted masks -> fixed connected components -> maskHOG/SVM. No reference boxes used for prediction. Geometry-only one-to-one IoU>=0.5 matching, then exact source-label agreement.','limitations':['Not a line/full-text transcription metric: no verified reading order.','Validation reused and pretrained binarizer overlap incompletely known.','Filtered source annotations may omit legitimate glyphs.','Not directly comparable to recognition using supplied boxes.']}
+    summary['model_sha256']=hashlib.sha256(args.model.read_bytes()).hexdigest()
     (out/'summary.json').write_text(json.dumps(summary,indent=2))
     (out/'predictions.json').write_text(json.dumps(records,ensure_ascii=False,indent=2),encoding='utf-8')
     print(json.dumps(summary,indent=2))

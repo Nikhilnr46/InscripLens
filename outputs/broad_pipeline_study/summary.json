@@ -1,0 +1,67 @@
+{
+  "reference_n": 300,
+  "candidate_n": 330,
+  "localized_n": 196,
+  "localized_and_correct_n": 52,
+  "joint_precision": 0.15757575757575756,
+  "joint_recall": 0.17333333333333334,
+  "recognition_accuracy_on_localized_candidates": 0.2653061224489796,
+  "per_image": [
+    {
+      "image_id": "HS022",
+      "reference_n": 11,
+      "candidate_n": 22,
+      "localized_n": 3,
+      "localized_and_correct_n": 1,
+      "seconds": 0.3684341000007407
+    },
+    {
+      "image_id": "HS023",
+      "reference_n": 21,
+      "candidate_n": 27,
+      "localized_n": 13,
+      "localized_and_correct_n": 4,
+      "seconds": 0.4118860000016866
+    },
+    {
+      "image_id": "HS024",
+      "reference_n": 98,
+      "candidate_n": 95,
+      "localized_n": 73,
+      "localized_and_correct_n": 15,
+      "seconds": 1.4509727000004204
+    },
+    {
+      "image_id": "HS025",
+      "reference_n": 34,
+      "candidate_n": 39,
+      "localized_n": 29,
+      "localized_and_correct_n": 15,
+      "seconds": 0.6163094000003184
+    },
+    {
+      "image_id": "HS026",
+      "reference_n": 14,
+      "candidate_n": 14,
+      "localized_n": 7,
+      "localized_and_correct_n": 3,
+      "seconds": 0.24117580000165617
+    },
+    {
+      "image_id": "HS027",
+      "reference_n": 122,
+      "candidate_n": 133,
+      "localized_n": 71,
+      "localized_and_correct_n": 14,
+      "seconds": 1.9614022999994631
+    }
+  ],
+  "protocol": "Full-image predicted masks -> fixed connected components -> maskHOG/SVM. No reference boxes used for prediction. Geometry-only one-to-one IoU>=0.5 matching, then exact source-label agreement.",
+  "limitations": [
+    "Not a line/full-text transcription metric: no verified reading order.",
+    "Validation reused and pretrained binarizer overlap incompletely known.",
+    "Filtered source annotations may omit legitimate glyphs.",
+    "Not directly comparable to recognition using supplied boxes."
+  ],
+  "model_sha256": "c5aa7ea00fc493f610d4947a79f80fa72d45a7dbf720ccb2dd9f603079674295"
+}
