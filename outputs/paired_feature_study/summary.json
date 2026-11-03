@@ -1,0 +1,32 @@
+{
+  "fit_n": 9566,
+  "development_n": 359,
+  "hero_development_n": 308,
+  "results": {
+    "mask_only": {
+      "hero_development_correct": 63,
+      "all_development_correct": 78,
+      "feature_dimension": 324,
+      "seconds": 31.383007700002054
+    },
+    "equal_original_plus_mask": {
+      "hero_development_correct": 67,
+      "all_development_correct": 82,
+      "feature_dimension": 648,
+      "seconds": 49.165800599999784
+    }
+  },
+  "hero_fixed_errors": 13,
+  "hero_new_errors": 9,
+  "candidate_beats_baseline": true,
+  "validation_evaluated": false,
+  "production_model_changed": false,
+  "seconds": 103.24129320000065,
+  "protocol": "Fixed equal concatenation of median-filtered original and predicted-mask HOG; SVC C10 gamma scale. No weight or hyperparameter search. Same location exclusions and development split.",
+  "limitations": [
+    "Development reused; not fresh evaluation.",
+    "Supplied character boxes.",
+    "Enhancement pretraining overlap uncertain.",
+    "Equal feature blocks do not guarantee equal useful information."
+  ]
+}
