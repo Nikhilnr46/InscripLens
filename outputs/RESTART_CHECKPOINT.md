@@ -21,6 +21,8 @@ Sources: `outputs/context_reading/README.md` and `HS024_reference.json`. EC IX H
 
 ## Next useful work
 
+Update after reset: `outputs/audit_sequence_data.py` now audits original training annotations without touching validation. `outputs/sequence_data_audit/summary.json` reports 672 fit and 34 development structurally passing line candidates; local ignored `records.json` retains provenance and flags. Candidate fit labels have 661 whole-label types but 54 Roman Unicode codepoints; development has no unseen codepoints. This supports investigating compositional sequence output, not claiming improved recognition. EasyOCR's published Kannada alphabet lacks historical ಱ/ೞ and differs from our Roman labels. See sequence audit README for sources and proposed bounded CNN–BiLSTM–CTC experiment. Next concrete task: export/inspect a deterministic line-crop sample before training; preserve label boundaries and location splits.
+
 1. Verify a tiny printed passage and preserve uncertainty; user can read/enter a few printed characters but cannot decipher stones. Do not request mass manual transcription. The printed opening crop is ready locally.
 2. Establish phrase-to-region correspondence before claiming a complete verified example. Current review page is complete as a source-comparison interface, not a verified transcription.
 3. Assess sequence-recognition feasibility using primary papers/repos: available pretrained historical-Kannada models, compatible character inventory, usable line-level training data, licenses and realistic compute. No sequence model chosen or improvement promised yet. Train only after a feasible, bounded experiment is defined.

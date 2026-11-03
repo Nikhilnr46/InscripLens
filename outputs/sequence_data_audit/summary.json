@@ -1,0 +1,41 @@
+{
+  "counts": {
+    "fit_images": 101,
+    "fit_lines": 862,
+    "fit_annotations": 10157,
+    "fit_structural_candidates": 672,
+    "development_images": 8,
+    "development_lines": 46,
+    "development_annotations": 367,
+    "development_structural_candidates": 34
+  },
+  "flag_counts": {
+    "fit_missing_positions_or_non_one_start": 133,
+    "fit_horizontal_order_reversal": 27,
+    "development_missing_positions_or_non_one_start": 11,
+    "fit_duplicate_position": 16,
+    "fit_missing_line_or_character_number": 20,
+    "fit_empty_or_uncertainty_marker": 20,
+    "fit_missing_line_polygon": 42,
+    "development_empty_or_uncertainty_marker": 1
+  },
+  "candidate_fit_label_types": 661,
+  "candidate_fit_unicode_codepoints": 54,
+  "candidate_development_unseen_codepoints": [],
+  "validation_annotations_read": false,
+  "warning": "Structural candidates are not verified complete transcriptions. Missing unannotated glyphs and unknown token conventions require inspection.",
+  "excluded_validation_sites": [
+    "begur",
+    "bisanahalli",
+    "kumbalahalli",
+    "kurudusonnenahalli",
+    "malurpatna",
+    "nagavara"
+  ],
+  "development_sites": [
+    "aradeshanahalli",
+    "sadahalli",
+    "srinivagilu",
+    "t dasarahalli"
+  ]
+}
