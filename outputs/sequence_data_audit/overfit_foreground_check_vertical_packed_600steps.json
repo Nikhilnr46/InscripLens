@@ -1,0 +1,183 @@
+{
+  "purpose": "training-only tiny-subset learnability check, not generalization",
+  "minimum_foreground_pixels_per_character": 20,
+  "preserve_vertical_features": true,
+  "packed_sequence_lengths": true,
+  "passed": false,
+  "seconds": 30.234601299998758,
+  "maximum_steps": 600,
+  "history": [
+    {
+      "step": 25,
+      "loss": 2.923851251602173,
+      "training_exact": 0,
+      "total": 4
+    },
+    {
+      "step": 50,
+      "loss": 2.731428384780884,
+      "training_exact": 0,
+      "total": 4
+    },
+    {
+      "step": 75,
+      "loss": 2.4861865043640137,
+      "training_exact": 0,
+      "total": 4
+    },
+    {
+      "step": 100,
+      "loss": 2.0658481121063232,
+      "training_exact": 0,
+      "total": 4
+    },
+    {
+      "step": 125,
+      "loss": 1.638089895248413,
+      "training_exact": 0,
+      "total": 4
+    },
+    {
+      "step": 150,
+      "loss": 1.2726080417633057,
+      "training_exact": 0,
+      "total": 4
+    },
+    {
+      "step": 175,
+      "loss": 0.9113509058952332,
+      "training_exact": 0,
+      "total": 4
+    },
+    {
+      "step": 200,
+      "loss": 0.5709328651428223,
+      "training_exact": 1,
+      "total": 4
+    },
+    {
+      "step": 225,
+      "loss": 0.3579433262348175,
+      "training_exact": 2,
+      "total": 4
+    },
+    {
+      "step": 250,
+      "loss": 0.2599163353443146,
+      "training_exact": 3,
+      "total": 4
+    },
+    {
+      "step": 275,
+      "loss": 0.20856837928295135,
+      "training_exact": 3,
+      "total": 4
+    },
+    {
+      "step": 300,
+      "loss": 0.17395491898059845,
+      "training_exact": 3,
+      "total": 4
+    },
+    {
+      "step": 325,
+      "loss": 0.14953289926052094,
+      "training_exact": 3,
+      "total": 4
+    },
+    {
+      "step": 350,
+      "loss": 0.12700891494750977,
+      "training_exact": 3,
+      "total": 4
+    },
+    {
+      "step": 375,
+      "loss": 0.10695763677358627,
+      "training_exact": 3,
+      "total": 4
+    },
+    {
+      "step": 400,
+      "loss": 0.08891819417476654,
+      "training_exact": 3,
+      "total": 4
+    },
+    {
+      "step": 425,
+      "loss": 0.07774278521537781,
+      "training_exact": 3,
+      "total": 4
+    },
+    {
+      "step": 450,
+      "loss": 0.06991641223430634,
+      "training_exact": 3,
+      "total": 4
+    },
+    {
+      "step": 475,
+      "loss": 0.06459920108318329,
+      "training_exact": 3,
+      "total": 4
+    },
+    {
+      "step": 500,
+      "loss": 0.05827324464917183,
+      "training_exact": 3,
+      "total": 4
+    },
+    {
+      "step": 525,
+      "loss": 0.05361964553594589,
+      "training_exact": 3,
+      "total": 4
+    },
+    {
+      "step": 550,
+      "loss": 0.04949895665049553,
+      "training_exact": 3,
+      "total": 4
+    },
+    {
+      "step": 575,
+      "loss": 0.044976551085710526,
+      "training_exact": 3,
+      "total": 4
+    },
+    {
+      "step": 600,
+      "loss": 0.049099233001470566,
+      "training_exact": 3,
+      "total": 4
+    }
+  ],
+  "validation_used": false,
+  "development_used": false,
+  "samples": [
+    {
+      "source_name": "Bidarahalli 1517CE Donation Inscription",
+      "line_number": 8,
+      "target": "0|na",
+      "prediction": "0|na"
+    },
+    {
+      "source_name": "Jinnagara 1700CE Inscription",
+      "line_number": 11,
+      "target": "śrī|śrī",
+      "prediction": "śrī|rī"
+    },
+    {
+      "source_name": "Kamenahalli 1800CE Chamundeshwari Donation Inscription",
+      "line_number": 6,
+      "target": "l̤i|grā",
+      "prediction": "l̤i|grā"
+    },
+    {
+      "source_name": "Atturu 750CE Ereyamma's Herostone With Inscription",
+      "line_number": 3,
+      "target": "ga|vu|ṇḍa",
+      "prediction": "ga|vu|ṇḍa"
+    }
+  ]
+}
