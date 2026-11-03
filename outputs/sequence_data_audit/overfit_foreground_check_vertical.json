@@ -1,0 +1,110 @@
+{
+  "purpose": "training-only tiny-subset learnability check, not generalization",
+  "minimum_foreground_pixels_per_character": 20,
+  "preserve_vertical_features": true,
+  "passed": false,
+  "seconds": 4.683573599999363,
+  "maximum_steps": 300,
+  "history": [
+    {
+      "step": 25,
+      "loss": 2.9171948432922363,
+      "training_exact": 0,
+      "total": 4
+    },
+    {
+      "step": 50,
+      "loss": 2.7339718341827393,
+      "training_exact": 0,
+      "total": 4
+    },
+    {
+      "step": 75,
+      "loss": 2.488054037094116,
+      "training_exact": 0,
+      "total": 4
+    },
+    {
+      "step": 100,
+      "loss": 2.1600165367126465,
+      "training_exact": 0,
+      "total": 4
+    },
+    {
+      "step": 125,
+      "loss": 1.7868088483810425,
+      "training_exact": 0,
+      "total": 4
+    },
+    {
+      "step": 150,
+      "loss": 1.45377779006958,
+      "training_exact": 0,
+      "total": 4
+    },
+    {
+      "step": 175,
+      "loss": 1.1495723724365234,
+      "training_exact": 0,
+      "total": 4
+    },
+    {
+      "step": 200,
+      "loss": 0.850615382194519,
+      "training_exact": 0,
+      "total": 4
+    },
+    {
+      "step": 225,
+      "loss": 0.6086951494216919,
+      "training_exact": 0,
+      "total": 4
+    },
+    {
+      "step": 250,
+      "loss": 0.438535213470459,
+      "training_exact": 0,
+      "total": 4
+    },
+    {
+      "step": 275,
+      "loss": 0.31842875480651855,
+      "training_exact": 1,
+      "total": 4
+    },
+    {
+      "step": 300,
+      "loss": 0.23553185164928436,
+      "training_exact": 2,
+      "total": 4
+    }
+  ],
+  "validation_used": false,
+  "development_used": false,
+  "samples": [
+    {
+      "source_name": "Bidarahalli 1517CE Donation Inscription",
+      "line_number": 8,
+      "target": "0|na",
+      "prediction": "0|n"
+    },
+    {
+      "source_name": "Jinnagara 1700CE Inscription",
+      "line_number": 11,
+      "target": "śrī|śrī",
+      "prediction": "śrī|rī"
+    },
+    {
+      "source_name": "Kamenahalli 1800CE Chamundeshwari Donation Inscription",
+      "line_number": 6,
+      "target": "l̤i|grā",
+      "prediction": "l̤i|grā"
+    },
+    {
+      "source_name": "Atturu 750CE Ereyamma's Herostone With Inscription",
+      "line_number": 3,
+      "target": "ga|vu|ṇḍa",
+      "prediction": "ga|vu|ṇḍa"
+    }
+  ]
+}

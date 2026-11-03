@@ -32,7 +32,7 @@ def main():
             region = Image.new('L',crop.size,0)
             ImageDraw.Draw(region).polygon([(p[0]-box[0],p[1]-box[1]) for p in polygon],fill=255)
             crop = ImageChops.multiply(crop,region)
-            coverage=[]
+            coverage=[];foreground=[]
             for source_key in r['source_keys']:
                 c=character_cache[name][source_key]
                 points=c['polygon_original']
@@ -44,17 +44,24 @@ def main():
                 ImageDraw.Draw(lm).polygon([(p[0]-x0,p[1]-y0) for p in polygon],fill=255)
                 area=sum(cm.histogram()[1:])
                 coverage.append(sum(ImageChops.multiply(cm,lm).histogram()[1:])/max(area,1))
+                visible=im.convert('L').crop((x0,y0,x1,y1))
+                visible=ImageChops.multiply(ImageChops.multiply(visible,cm),lm)
+                foreground.append(sum(visible.histogram()[128:]))
             key = hashlib.sha256(f'{name}|{r["line_number"]}'.encode()).hexdigest()[:20]
             crop.save(crops/f'{key}.png')
             exported.append({**r,'crop_path': f'crops/{key}.png','bbox_xyxy':box,
                              'width':crop.width,'height':crop.height,
                              'minimum_character_polygon_coverage':min(coverage),
+                             'minimum_character_foreground_pixels':min(foreground),
+                             'character_foreground_pixels':foreground,
                              'target':'|'.join(r['labels']),
                              'mask_path':mask.relative_to(ROOT).as_posix(),
                              'localization':'supplied line polygon; neighboring pixels zeroed'})
     (OUT/'prepared_records.json').write_text(json.dumps(exported,ensure_ascii=False,indent=2),encoding='utf-8')
     audit={s:{'candidate_lines':sum(r['split']==s for r in exported),
-              'lines_with_every_character_polygon_at_least_95_percent_inside':sum(r['split']==s and r['minimum_character_polygon_coverage']>=.95 for r in exported)} for s in ['fit','development']}
+              'lines_with_every_character_polygon_at_least_95_percent_inside':sum(r['split']==s and r['minimum_character_polygon_coverage']>=.95 for r in exported),
+              'geometry_candidates_with_any_character_below_20_foreground_pixels':sum(r['split']==s and r['minimum_character_polygon_coverage']>=.95 and r['minimum_character_foreground_pixels']<20 for r in exported),
+              'geometry_and_minimum_foreground_candidates':sum(r['split']==s and r['minimum_character_polygon_coverage']>=.95 and r['minimum_character_foreground_pixels']>=20 for r in exported)} for s in ['fit','development']}
     audit['note']='Polygon geometry agreement only, not proof of complete or correct transcription.'
     (OUT/'crop_audit.json').write_text(json.dumps(audit,indent=2)+'\n',encoding='utf-8')
     archive.close()

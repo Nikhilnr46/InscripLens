@@ -1,11 +1,15 @@
 {
   "fit": {
     "candidate_lines": 672,
-    "lines_with_every_character_polygon_at_least_95_percent_inside": 253
+    "lines_with_every_character_polygon_at_least_95_percent_inside": 253,
+    "geometry_candidates_with_any_character_below_20_foreground_pixels": 46,
+    "geometry_and_minimum_foreground_candidates": 207
   },
   "development": {
     "candidate_lines": 34,
-    "lines_with_every_character_polygon_at_least_95_percent_inside": 23
+    "lines_with_every_character_polygon_at_least_95_percent_inside": 23,
+    "geometry_candidates_with_any_character_below_20_foreground_pixels": 2,
+    "geometry_and_minimum_foreground_candidates": 21
   },
   "note": "Polygon geometry agreement only, not proof of complete or correct transcription."
 }

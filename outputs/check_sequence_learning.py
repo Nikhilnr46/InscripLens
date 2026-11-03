@@ -1,5 +1,6 @@
 """Bounded training-only CTC overfit check; not a recognition benchmark."""
 import itertools
+import argparse
 import json
 import random
 import time
@@ -14,23 +15,31 @@ OUT=ROOT/'outputs/sequence_data_audit'
 
 
 class SequenceRecognizer(nn.Module):
-    def __init__(self, classes):
+    def __init__(self, classes, preserve_height=False):
         super().__init__()
+        self.preserve_height=preserve_height
         self.cnn=nn.Sequential(nn.Conv2d(1,16,3,padding=1),nn.ReLU(),nn.MaxPool2d(2),
                                nn.Conv2d(16,32,3,padding=1),nn.ReLU(),nn.MaxPool2d((2,1)))
-        self.rnn=nn.LSTM(32,64,bidirectional=True,batch_first=True)
+        self.rnn=nn.LSTM(32*12 if preserve_height else 32,64,bidirectional=True,batch_first=True)
         self.head=nn.Linear(128,classes)
 
     def forward(self,x):
-        x=self.cnn(x).mean(2).transpose(1,2)
+        x=self.cnn(x)
+        x=x.flatten(1,2).transpose(1,2) if self.preserve_height else x.mean(2).transpose(1,2)
         x,_=self.rnn(x)
         return self.head(x).log_softmax(-1).transpose(0,1)
 
 
 def main():
+    parser=argparse.ArgumentParser()
+    parser.add_argument('--require-foreground',action='store_true')
+    parser.add_argument('--preserve-height',action='store_true')
+    args=parser.parse_args()
     random.seed(42);np.random.seed(42);torch.manual_seed(42);torch.set_num_threads(4)
     rows=json.loads((OUT/'prepared_records.json').read_text(encoding='utf-8'))
     eligible=[r for r in rows if r['split']=='fit' and r['minimum_character_polygon_coverage']>=.95]
+    if args.require_foreground:
+        eligible=[r for r in eligible if r['minimum_character_foreground_pixels']>=20]
     # Fixed four shortest sequences, distinct sources, before seeing model output.
     chosen=[];seen=set()
     for r in sorted(eligible,key=lambda r:(len(r['target']),r['source_name'],r['line_number'])):
@@ -53,7 +62,7 @@ def main():
     y=torch.tensor([encode[c] for r in chosen for c in r['target']],dtype=torch.long)
     target_lengths=torch.tensor([len(r['target']) for r in chosen])
     lengths=torch.tensor(lengths)
-    model=SequenceRecognizer(len(alphabet)+1);opt=torch.optim.Adam(model.parameters(),lr=.003)
+    model=SequenceRecognizer(len(alphabet)+1,args.preserve_height);opt=torch.optim.Adam(model.parameters(),lr=.003)
     criterion=nn.CTCLoss(blank=0,zero_infinity=False)
     history=[];started=time.perf_counter()
     for step in range(1,301):
@@ -69,11 +78,15 @@ def main():
             history.append(log);print(json.dumps(log),flush=True)
             if exact==len(chosen):break
     result={'purpose':'training-only tiny-subset learnability check, not generalization',
+            'minimum_foreground_pixels_per_character':20 if args.require_foreground else None,
+            'preserve_vertical_features':args.preserve_height,
             'passed':exact==len(chosen),'seconds':time.perf_counter()-started,
             'maximum_steps':300,'history':history,'validation_used':False,'development_used':False,
             'samples':[{'source_name':r['source_name'],'line_number':r['line_number'],
                         'target':r['target'],'prediction':p} for r,p in zip(chosen,predictions)]}
-    (OUT/'overfit_check.json').write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+    filename='overfit_foreground_check.json' if args.require_foreground else 'overfit_check.json'
+    if args.preserve_height:filename=filename.replace('.json','_vertical.json')
+    (OUT/filename).write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
     print('Training-only check passed:',result['passed'],flush=True)
 
 
