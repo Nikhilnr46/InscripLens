@@ -19,7 +19,7 @@ st.set_page_config(page_title='InscripLens',layout='wide')
 st.title('InscripLens')
 st.write('Historical Kannada inscription image analysis')
 st.info('Research prototype: enhancement works; character recognition is experimental. Published/source labels are references, not automatic readings. Modern Kannada conversion and English translation are not available.')
-page=st.sidebar.radio('Workspace',['Analyse an image','Dataset explorer','Experiment results','Saved analyses','Setup status'])
+page=st.sidebar.radio('Workspace',['Analyse an image','Dataset explorer','Published reading review','Experiment results','Saved analyses','Setup status'])
 st.sidebar.caption('Images and analysis history stay on this computer. No cloud OCR service is used.')
 enhancement_files=['work/binarizer_env/Scripts/python.exe','work/shilalekhya/Unet/model.py','work/shilalekhya/binarizer.pth']
 missing_enhancement=[p for p in enhancement_files if not (ROOT/p).is_file()]
@@ -148,6 +148,35 @@ elif page=='Dataset explorer':
     st.caption('Saved frozen-model experiment. Reference labels and crop boxes come from EpiSAM annotations; they are not independently verified readings.')
     st.dataframe(subset,width='stretch')
     st.download_button('Download displayed comparison',json.dumps(subset,ensure_ascii=False,indent=2),'source_label_comparison.json')
+
+elif page=='Published reading review':
+    st.subheader('Kumbalahalli: published reading comparison')
+    folder=ROOT/'outputs/context_reading'
+    reference=folder/'HS024_reference.json'
+    if not reference.is_file():
+        st.info('The reference comparison is not installed. Pull the latest project code and reports.');st.stop()
+    document=json.loads(reference.read_text(encoding='utf-8'))
+    st.warning('Candidate alignment, not expert verified. The displayed labels are existing dataset annotations, not model predictions.')
+    st.write(document['publication'])
+    st.write(document['context_summary'])
+    st.caption('Context is summarized from the published English translation. InscripLens has not translated this inscription.')
+    left,right=st.columns(2)
+    for column,filename,caption in [(left,'HS024_annotated_opening_region.png','Stone region selected from annotation boxes for dataset groups 1–2'),(right,'HS024_printed_opening.png','Published Kannada lines 1–2: candidate phrase correspondence')]:
+        with column:
+            if (folder/filename).is_file():st.image(str(folder/filename),caption=caption)
+            else:st.info(caption+' — local preview unavailable; publication links remain available below.')
+    st.write('The publication has nine numbered lines; the dataset has eight groups. Line numbers cannot be matched automatically.')
+    st.dataframe([{'Dataset group':line['dataset_line'],'Source annotation labels (unreviewed)':' | '.join(line['labels'])} for line in document['dataset_lines']],hide_index=True,width='stretch')
+    st.subheader('Publication sources')
+    for source in document['scans']:
+        st.markdown(f"[{source['section']} — printed page {source['printed_page']}]({source['url']})")
+    with st.expander('Full printed Kannada entry'):
+        if (folder/'HS024_Kannada_entry110.png').is_file():st.image(str(folder/'HS024_Kannada_entry110.png'))
+        else:st.caption('Use the Kannada publication link above.')
+    st.subheader('Still to verify')
+    for issue in document['unresolved']:st.write('• '+issue)
+    st.caption('HS024 is a validation image. Published answers must not be used to retune the recognizer and then claim independent accuracy on this stone.')
+    st.download_button('Download source comparison and uncertainties',reference.read_bytes(),'HS024_reference_comparison.json','application/json')
 
 elif page=='Experiment results':
     st.subheader('Recorded experiments')
