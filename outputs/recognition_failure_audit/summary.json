@@ -1,0 +1,38 @@
+{
+  "frozen_model": "broad_clean_study",
+  "validation_n": 300,
+  "correct": 77,
+  "errors": 223,
+  "by_training_support": {
+    "20+": {
+      "examples": 209,
+      "correct": 73
+    },
+    "unseen": {
+      "examples": 7,
+      "correct": 0
+    },
+    "5-19": {
+      "examples": 61,
+      "correct": 4
+    },
+    "1-4": {
+      "examples": 23,
+      "correct": 0
+    }
+  },
+  "disjoint_error_groups": {
+    "seen_label_at_least_20_examples": 131,
+    "unseen_reference_label": 7,
+    "seen_label_5_to_19_examples": 56,
+    "seen_label_1_to_4_examples": 22,
+    "constant_mask": 7
+  },
+  "all_constant_mask_examples": 7,
+  "limits": [
+    "Descriptive reused-validation audit, not fresh evaluation or causal attribution.",
+    "Nonconstant masks can still lose important strokes.",
+    "Raw labels and source annotations may contain inconsistencies.",
+    "No retraining, tuning or source-label edits performed."
+  ]
+}
