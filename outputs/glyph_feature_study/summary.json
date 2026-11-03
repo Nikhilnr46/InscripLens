@@ -1,0 +1,20 @@
+{
+  "variants_development_correct": {
+    "baseline": 50,
+    "tight32": 50,
+    "tight64": 52,
+    "tight64_pixels": 49
+  },
+  "development_n": 308,
+  "selected_variant": "tight64",
+  "train_n": 949,
+  "validation_correct": 56,
+  "validation_n": 300,
+  "accuracy": 0.18666666666666668,
+  "protocol": "Same949train and300reused validation; training-site development641/308. Four predeclared variants, fixed SVM C10. Earliest maximum development score selects variant; only winner evaluated on validation.",
+  "limitations": [
+    "Supplied reference boxes; no independent test.",
+    "Source labels unreviewed and binarizer pretraining overlap unknown.",
+    "Inspired by preprocessing/feature-fusion research, not a reproduction of published SIFT+HOG retrieval."
+  ]
+}

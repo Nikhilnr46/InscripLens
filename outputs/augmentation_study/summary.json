@@ -1,0 +1,20 @@
+{
+  "development_correct": {
+    "baseline": 50,
+    "rotation": 49,
+    "rotation_balanced": 49
+  },
+  "development_n": 308,
+  "selected_variant": "baseline",
+  "original_training_n": 949,
+  "fitted_examples": 949,
+  "validation_correct": 63,
+  "validation_n": 300,
+  "accuracy": 0.21,
+  "protocol": "Three predeclared conditions; mild +/-7degree rotation of training crops only; no mirrored characters; optional balanced SVM weights. Same training-site development and validation. Select earliest best development condition before validation.",
+  "limitations": [
+    "Synthetic rotations are not new independent inscriptions.",
+    "Validation reused, source labels unreviewed, binarizer overlap unknown.",
+    "Supplied boxes, not full pipeline score."
+  ]
+}
