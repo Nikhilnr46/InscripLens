@@ -1,0 +1,19 @@
+{
+  "training_n": 9925,
+  "classes": 764,
+  "fit_n": 9566,
+  "development_n": 359,
+  "hero_development_n": 308,
+  "best_hero_development_correct": 60,
+  "selected_epochs": 15,
+  "svm_hero_development_correct": 63,
+  "protocol": "Same broad cleaned cohort and previous 3-convolution architecture. Fixed Adam configuration, seed42, 20-epoch budget. Earliest maximum hero development correctness selects epoch. Refit/validation only if development exceeds broad SVM63/308.",
+  "limitations": [
+    "Single seed and reused diagnostic validation.",
+    "Unreviewed source labels, supplied reference boxes.",
+    "Binarizer pretraining overlap unresolved.",
+    "No sequence model or translation."
+  ],
+  "decision": "Do not adopt: development did not beat broad SVM. No validation evaluation or full-data refit.",
+  "seconds": 417.1960091000001
+}

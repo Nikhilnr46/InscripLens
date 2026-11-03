@@ -9,6 +9,7 @@ from run_character_benchmark import features
 from app_backend import analyse,history,save_review,reviews,review_export
 from segment_candidates import candidates,overlay
 from recognize_regions import recognize
+from recognition_alternatives import rank_labels,source_examples
 
 ROOT=Path(__file__).resolve().parent.parent
 MASK_MODELS=[ROOT/'outputs/broad_clean_study/mask_svm_bundle.joblib',ROOT/'outputs/matched_mask_study/mask_svm_bundle.joblib']
@@ -97,14 +98,28 @@ if page=='Analyse an image':
                     clean=model_path.exists()
                     if not clean:model_path=ROOT/'outputs/training_scope_study/broader_inscriptions_svm_bundle.joblib'
                     crop=(mask if clean else original).crop((x1,y1,x2,y2));path=DATA/record['id']/'character.png';crop.save(path)
-                    bundle=joblib.load(model_path);pred=str(bundle['model'].predict([features(path,bundle['preprocessing'])])[0])
+                    bundle=joblib.load(model_path);feature=features(path,bundle['preprocessing'])
+                    alternatives=rank_labels(bundle['model'],feature,3)[0];pred=alternatives[0]
+                    examples=source_examples(bundle['model'],feature,alternatives,model_path,ROOT/'outputs/recognition_references.zip')
+                    st.session_state.reference_examples=examples
                     st.image(crop,caption='Selected model input',width=180)
                     st.write('**Unverified predicted source label:**',pred)
                     st.caption('Raw transliteration label, not a verified Kannada transcription. No calibrated confidence is available.')
-                    st.session_state.character_prediction={'run_id':record['id'],'bbox':[int(x1),int(y1),int(x2),int(y2)],'prediction':pred,'model':model_path.name,'model_sha256':hashlib.sha256(model_path.read_bytes()).hexdigest(),'verified':False}
+                    st.session_state.character_prediction={'run_id':record['id'],'bbox':[int(x1),int(y1),int(x2),int(y2)],'prediction':pred,'alternatives':alternatives,'reference_examples':[{k:v for k,v in e.items() if k!='image_bytes'} for e in examples],'model':model_path.name,'model_sha256':hashlib.sha256(model_path.read_bytes()).hexdigest(),'verified':False}
             prediction=st.session_state.get('character_prediction')
             if prediction and prediction['run_id']==record['id']:
                 st.write('Latest prediction:',prediction['prediction'],'— rectangle',prediction['bbox'])
+                if prediction.get('alternatives'):
+                    st.write('Ranked labels to inspect:',', '.join(prediction['alternatives']))
+                    st.caption('Alternatives are suggestions, not calibrated confidence or verified readings. The original first-choice prediction is preserved.')
+                    examples=st.session_state.get('reference_examples',[])
+                    if examples:
+                        st.write('Annotated training examples for visual comparison')
+                        columns=st.columns(len(examples))
+                        for column,example in zip(columns,examples):
+                            column.image(example['image_bytes'],caption=example['label'],width=140)
+                            column.caption(example['source_name'])
+                        st.caption('These source-labelled training crops are not independent confirmation. Image similarity alone cannot verify an inscription reading.')
                 st.download_button('Download character prediction',json.dumps(prediction,ensure_ascii=False,indent=2),'character_prediction.json')
                 with st.form('review_'+record['id']):
                     st.write('Save this prediction or add a suggested correction. Suggestions are unverified and are not added to training automatically.')
@@ -137,7 +152,7 @@ elif page=='Dataset explorer':
 elif page=='Experiment results':
     st.subheader('Recorded experiments')
     st.write('Recognition accuracy counts exact agreement with raw source labels. It is not project completion.')
-    for title,path in [('Automatic localization plus recognition — hero baseline','pipeline_study/summary.json'),('Automatic localization plus recognition — broader model','broad_pipeline_study/summary.json'),('Original versus mask inputs, unchanged classifier','full_binarizer/recognition_comparison.json'),('Matched training experiment','matched_mask_study/summary.json'),('Broader cleaned training experiment','broad_clean_study/summary.json'),('Learned CNN experiment','cnn_study/summary.json'),('Frozen pretrained features','transfer_study/summary.json')]:
+    for title,path in [('Automatic localization plus recognition — hero baseline','pipeline_study/summary.json'),('Automatic localization plus recognition — broader model','broad_pipeline_study/summary.json'),('Original versus mask inputs, unchanged classifier','full_binarizer/recognition_comparison.json'),('Matched training experiment','matched_mask_study/summary.json'),('Broader cleaned training experiment','broad_clean_study/summary.json'),('Learned CNN experiment','cnn_study/summary.json'),('Broader CNN development test','broad_cnn_study/summary.json'),('Component grouping test','component_grouping_study/summary.json'),('Ranked review suggestions','review_alternatives_study/summary.json'),('Frozen pretrained features','transfer_study/summary.json')]:
         p=ROOT/'outputs'/path
         if p.exists():
             st.write('**'+title+'**');st.json(json.loads(p.read_text(encoding='utf-8')))

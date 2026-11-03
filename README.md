@@ -55,3 +55,9 @@ Project work covers data auditing/filtering, controlled comparisons, candidate d
 The app prefers `outputs/broad_clean_study/mask_svm_bundle.joblib` when installed. Existing runtime packs continue to work with the hero-only fallback. Git does not distribute the new model: extract `outputs/InscripLens_recognizer_update.zip` into the repository root after pulling main, then restart Streamlit. Keep the earlier runtime pack.
 
 The experiment used 9,925 training crops from 109 images, a corrected location exclusion, fixed model parameters and the existing diagnostic validation. See `outputs/broad_clean_study/README.md` for commands, comparisons and limitations. Rebuild the update ZIP with `python outputs/package_recognizer_update.py` after training and automatic-region evaluation.
+
+## Character-review alternatives
+
+Manual character prediction now shows three ranked source-label suggestions and, when `outputs/recognition_references.zip` is installed, source-labelled training crops for comparison. The reference label appeared among three suggestions for122/300 supplied-box validation examples; this is not automatic OCR accuracy or measured reviewer success. The first-choice prediction and review provenance remain separate from any suggested correction.
+
+Build the optional reference library locally with `python outputs/build_recognition_references.py` after preparing the broader model and dataset. Only training support examples are included; every example is checked against its stored model feature vector. The app omits images when the library is missing or belongs to a different model. No new runtime environment is required.

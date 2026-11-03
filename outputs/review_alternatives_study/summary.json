@@ -1,0 +1,17 @@
+{
+  "validation_n": 300,
+  "reference_label_in_suggestions": {
+    "1": 77,
+    "3": 122,
+    "5": 148
+  },
+  "training_reference_examples": 9910,
+  "library_bytes": 4564582,
+  "protocol": "Preserve SVM top-1 prediction, rank remaining labels by its uncalibrated decision scores. Examples are nearest training support vectors within each proposed label, using the existing HOG feature distance. No validation examples enter the reference library.",
+  "limitations": [
+    "Top-k inclusion is not automatic transcription accuracy or reviewer success.",
+    "Reference examples inherit unverified source labels.",
+    "Reused validation and uncertain enhancer pretraining overlap.",
+    "Visual similarity is not proof of character identity."
+  ]
+}

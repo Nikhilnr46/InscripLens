@@ -1,0 +1,259 @@
+{
+  "development": {
+    "none": {
+      "references": 308,
+      "candidates": 324,
+      "matched": 233,
+      "precision": 0.7191358024691358,
+      "recall": 0.7564935064935064,
+      "f1": 0.7373417721518988,
+      "per_image": [
+        {
+          "image_id": "HS001",
+          "references": 124,
+          "candidates": 127,
+          "matched": 97
+        },
+        {
+          "image_id": "HS002",
+          "references": 23,
+          "candidates": 33,
+          "matched": 18
+        },
+        {
+          "image_id": "HS016",
+          "references": 58,
+          "candidates": 53,
+          "matched": 34
+        },
+        {
+          "image_id": "HS018",
+          "references": 27,
+          "candidates": 29,
+          "matched": 21
+        },
+        {
+          "image_id": "HS019",
+          "references": 28,
+          "candidates": 28,
+          "matched": 19
+        },
+        {
+          "image_id": "HS020",
+          "references": 48,
+          "candidates": 54,
+          "matched": 44
+        }
+      ]
+    },
+    "horizontal": {
+      "references": 308,
+      "candidates": 308,
+      "matched": 215,
+      "precision": 0.698051948051948,
+      "recall": 0.698051948051948,
+      "f1": 0.698051948051948,
+      "per_image": [
+        {
+          "image_id": "HS001",
+          "references": 124,
+          "candidates": 114,
+          "matched": 80
+        },
+        {
+          "image_id": "HS002",
+          "references": 23,
+          "candidates": 33,
+          "matched": 18
+        },
+        {
+          "image_id": "HS016",
+          "references": 58,
+          "candidates": 52,
+          "matched": 33
+        },
+        {
+          "image_id": "HS018",
+          "references": 27,
+          "candidates": 29,
+          "matched": 21
+        },
+        {
+          "image_id": "HS019",
+          "references": 28,
+          "candidates": 26,
+          "matched": 19
+        },
+        {
+          "image_id": "HS020",
+          "references": 48,
+          "candidates": 54,
+          "matched": 44
+        }
+      ]
+    },
+    "vertical": {
+      "references": 308,
+      "candidates": 301,
+      "matched": 223,
+      "precision": 0.7408637873754153,
+      "recall": 0.724025974025974,
+      "f1": 0.7323481116584565,
+      "per_image": [
+        {
+          "image_id": "HS001",
+          "references": 124,
+          "candidates": 112,
+          "matched": 87
+        },
+        {
+          "image_id": "HS002",
+          "references": 23,
+          "candidates": 33,
+          "matched": 18
+        },
+        {
+          "image_id": "HS016",
+          "references": 58,
+          "candidates": 50,
+          "matched": 32
+        },
+        {
+          "image_id": "HS018",
+          "references": 27,
+          "candidates": 27,
+          "matched": 21
+        },
+        {
+          "image_id": "HS019",
+          "references": 28,
+          "candidates": 26,
+          "matched": 21
+        },
+        {
+          "image_id": "HS020",
+          "references": 48,
+          "candidates": 53,
+          "matched": 44
+        }
+      ]
+    },
+    "square": {
+      "references": 308,
+      "candidates": 284,
+      "matched": 201,
+      "precision": 0.7077464788732394,
+      "recall": 0.6525974025974026,
+      "f1": 0.6790540540540541,
+      "per_image": [
+        {
+          "image_id": "HS001",
+          "references": 124,
+          "candidates": 100,
+          "matched": 71
+        },
+        {
+          "image_id": "HS002",
+          "references": 23,
+          "candidates": 33,
+          "matched": 18
+        },
+        {
+          "image_id": "HS016",
+          "references": 58,
+          "candidates": 49,
+          "matched": 31
+        },
+        {
+          "image_id": "HS018",
+          "references": 27,
+          "candidates": 27,
+          "matched": 21
+        },
+        {
+          "image_id": "HS019",
+          "references": 28,
+          "candidates": 24,
+          "matched": 19
+        },
+        {
+          "image_id": "HS020",
+          "references": 48,
+          "candidates": 51,
+          "matched": 41
+        }
+      ]
+    }
+  },
+  "development_foreground_audit": {
+    "references": 308,
+    "no_predicted_foreground": 0,
+    "multiple_foreground_components": 214
+  },
+  "selected": "none",
+  "validation": {
+    "none": {
+      "references": 300,
+      "candidates": 330,
+      "matched": 196,
+      "precision": 0.593939393939394,
+      "recall": 0.6533333333333333,
+      "f1": 0.6222222222222222,
+      "per_image": [
+        {
+          "image_id": "HS022",
+          "references": 11,
+          "candidates": 22,
+          "matched": 3,
+          "localized_and_correct": 1
+        },
+        {
+          "image_id": "HS023",
+          "references": 21,
+          "candidates": 27,
+          "matched": 13,
+          "localized_and_correct": 4
+        },
+        {
+          "image_id": "HS024",
+          "references": 98,
+          "candidates": 95,
+          "matched": 73,
+          "localized_and_correct": 15
+        },
+        {
+          "image_id": "HS025",
+          "references": 34,
+          "candidates": 39,
+          "matched": 29,
+          "localized_and_correct": 15
+        },
+        {
+          "image_id": "HS026",
+          "references": 14,
+          "candidates": 14,
+          "matched": 7,
+          "localized_and_correct": 3
+        },
+        {
+          "image_id": "HS027",
+          "references": 122,
+          "candidates": 133,
+          "matched": 71,
+          "localized_and_correct": 14
+        }
+      ],
+      "localized_and_correct": 52,
+      "joint_recall": 0.17333333333333334,
+      "joint_precision": 0.15757575757575756
+    }
+  },
+  "protocol": "Four fixed closing configurations; select geometry F1 on 308 training-location development references. Evaluate baseline and selected variant on reused 300 validation references. Recognition uses unmodified predicted masks and frozen broad SVM. No labels or reference geometry used to propose boxes.",
+  "limitations": [
+    "Filtered references omit some visible symbols.",
+    "Disconnected components are not necessarily errors: a character may naturally have several pieces.",
+    "Fixed pixel-scale morphology may merge neighboring characters.",
+    "Validation reused; enhancer pretraining overlap unresolved.",
+    "Recognition model includes development locations, so recognition was not used for development selection."
+  ]
+}
