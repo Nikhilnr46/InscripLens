@@ -10,22 +10,28 @@ from app_backend import analyse,history
 from segment_candidates import candidates,overlay
 
 ROOT=Path(__file__).resolve().parent.parent
-DATA=ROOT/'work/app_data';DATA.mkdir(exist_ok=True)
+DATA=ROOT/'work/app_data';DATA.mkdir(parents=True,exist_ok=True)
 st.set_page_config(page_title='InscripLens',layout='wide')
 st.title('InscripLens')
 st.write('Historical Kannada inscription image analysis')
 st.info('Research prototype: enhancement works; character recognition is experimental. Published/source labels are references, not automatic readings. Modern Kannada conversion and English translation are not available.')
-page=st.sidebar.radio('Workspace',['Analyse an image','Dataset explorer','Experiment results','Saved analyses'])
+page=st.sidebar.radio('Workspace',['Analyse an image','Dataset explorer','Experiment results','Saved analyses','Setup status'])
 st.sidebar.caption('Images and analysis history stay on this computer. No cloud OCR service is used.')
+enhancement_files=['work/binarizer_env/Scripts/python.exe','work/shilalekhya/Unet/model.py','work/shilalekhya/binarizer.pth']
+missing_enhancement=[p for p in enhancement_files if not (ROOT/p).is_file()]
+def setup_message(message):
+    st.warning(message)
+    st.markdown('Open **Setup status** and follow the [collaborator setup guide](https://github.com/Nikhilnr46/InscripLens/blob/main/COLLABORATOR_HANDOVER.md). Runtime assets must be extracted into the repository root.')
 
 if page=='Analyse an image':
     upload=st.file_uploader('Upload a stone image',type=['png','jpg','jpeg'])
-    if st.checkbox('Use the public Nagavara demonstration image'):
-        sample=ROOT/'outputs/full_binarizer/HS027_original.png'
+    sample=ROOT/'outputs/full_binarizer/HS027_original.png'
+    if not sample.is_file():setup_message('The optional demonstration image is not installed. You can still upload your own image.')
+    if st.checkbox('Use the public Nagavara demonstration image',disabled=not sample.is_file()):
         upload=SimpleNamespace(name='Nagavara_public_demo.png',getvalue=sample.read_bytes)
     if upload:
-        raw=upload.getvalue();digest=hashlib.sha256(raw).hexdigest()
         try:
+            raw=upload.getvalue();digest=hashlib.sha256(raw).hexdigest()
             image=ImageOps.exif_transpose(Image.open(io.BytesIO(raw))).convert('RGB')
             if image.width*image.height>20_000_000:raise ValueError('Please use an image below 20 megapixels.')
         except Exception as exc:
@@ -34,7 +40,8 @@ if page=='Analyse an image':
             st.session_state.digest=digest;st.session_state.pop('run',None)
         st.image(image,caption=f'Uploaded original · {image.width} × {image.height}',width=600)
         st.caption('Analysis uses a copy with longest side at most 1600 pixels. Enhancement predicts foreground strokes; it may omit or alter damaged strokes.')
-        if st.button('Enhance inscription',type='primary'):
+        if missing_enhancement:setup_message('Enhancement runtime is incomplete: '+', '.join(missing_enhancement))
+        if st.button('Enhance inscription',type='primary',disabled=bool(missing_enhancement)):
             try:
                 with st.spinner('Separating likely inscription strokes from the background…'):
                     record=analyse(raw,upload.name)
@@ -44,6 +51,8 @@ if page=='Analyse an image':
                 st.code(str(exc))
         record=st.session_state.get('run')
         if record:
+            if not all(Path(record[k]).is_file() for k in ['image_path','mask_path']):
+                setup_message('This saved analysis refers to image files that are no longer available. Run enhancement again.');st.stop()
             st.success('Enhancement saved locally.')
             mask=Image.open(record['mask_path']);original=Image.open(record['image_path'])
             left,right=st.columns(2);left.image(original,caption='Analysis input');right.image(mask,caption='Predicted foreground mask')
@@ -58,11 +67,13 @@ if page=='Analyse an image':
             initial=boxes[chosen-1] if chosen else [0,0,min(original.width,100),min(original.height,100)]
             st.write('Review or adjust the rectangle before predicting. A candidate is not necessarily one complete character.')
             w,h=original.size
+            recognizer_available=any((ROOT/p).is_file() for p in ['outputs/matched_mask_study/mask_svm_bundle.joblib','outputs/training_scope_study/broader_inscriptions_svm_bundle.joblib'])
+            if not recognizer_available:setup_message('No recognition model is installed. Enhancement and candidate downloads remain available.')
             with st.form('crop'):
                 cols=st.columns(4)
                 x1=cols[0].number_input('Left',0,w-1,initial[0],key=f'left_{chosen}');y1=cols[1].number_input('Top',0,h-1,initial[1],key=f'top_{chosen}')
                 x2=cols[2].number_input('Right',1,w,initial[2],key=f'right_{chosen}');y2=cols[3].number_input('Bottom',1,h,initial[3],key=f'bottom_{chosen}')
-                submitted=st.form_submit_button('Predict this character')
+                submitted=st.form_submit_button('Predict this character',disabled=not recognizer_available)
             if submitted:
                 if x2<=x1 or y2<=y1:st.error('Right and bottom must exceed left and top.')
                 else:
@@ -78,10 +89,16 @@ if page=='Analyse an image':
                     st.download_button('Download character prediction',json.dumps(prediction,ensure_ascii=False,indent=2),'character_prediction.json')
 
 elif page=='Dataset explorer':
+    required=['work/hero_pilot/manifest.json','outputs/full_binarizer/recognition_predictions.json']
+    missing=[p for p in required if not (ROOT/p).is_file()]
+    if missing:setup_message('Dataset explorer assets are missing: '+', '.join(missing));st.stop()
     rows=json.loads((ROOT/'work/hero_pilot/manifest.json').read_text(encoding='utf-8'))
     names={r['image_id']:r['source_name'] for r in rows if r['source_split']=='val'}
+    if not names:st.info('The manifest contains no validation images.');st.stop()
     selected=st.selectbox('Validation image',list(names),format_func=lambda x:names[x])
-    st.image(str(ROOT/f'outputs/full_binarizer/{selected}_comparison.png'),caption='Original / predicted mask')
+    comparison=ROOT/f'outputs/full_binarizer/{selected}_comparison.png'
+    if comparison.is_file():st.image(str(comparison),caption='Original / predicted mask')
+    else:setup_message('The comparison image is not installed for this entry. Saved prediction records are shown below.')
     predictions=json.loads((ROOT/'outputs/full_binarizer/recognition_predictions.json').read_text(encoding='utf-8'))
     subset=[r for r in predictions if r['image_id']==selected]
     st.caption('Saved frozen-model experiment. Reference labels and crop boxes come from EpiSAM annotations; they are not independently verified readings.')
@@ -97,13 +114,23 @@ elif page=='Experiment results':
             st.write('**'+title+'**');st.json(json.loads(p.read_text(encoding='utf-8')))
     st.warning('Validation has been reused. Pretrained-binarizer training overlap is incompletely known. These are diagnostic results, not a fresh independent benchmark.')
 
-else:
+elif page=='Saved analyses':
     records=history()
     if not records:st.write('No uploaded images have been analysed yet.')
     else:
         selected=st.selectbox('Saved analysis',records,format_func=lambda r:r['created']+' · '+r['filename'])
-        st.image(selected['mask_path'],caption='Saved predicted mask')
+        if Path(selected['mask_path']).is_file():st.image(selected['mask_path'],caption='Saved predicted mask')
+        else:st.warning('The saved mask file is missing. The analysis record is still available.')
         st.json({k:v for k,v in selected.items() if k not in ['image_path','mask_path']})
+
+else:
+    st.subheader('Local setup status')
+    paths=enhancement_files+['outputs/full_binarizer/HS027_original.png','outputs/matched_mask_study/mask_svm_bundle.joblib','work/hero_pilot/manifest.json','outputs/full_binarizer/recognition_predictions.json']
+    st.dataframe([{'Asset':p,'Status':'Present' if (ROOT/p).is_file() else 'Missing'} for p in paths],hide_index=True)
+    st.caption('Presence checks do not verify installed Python packages or model compatibility. Actual enhancement tests those at runtime.')
+    st.markdown('[Setup instructions and runtime-pack guidance](https://github.com/Nikhilnr46/InscripLens/blob/main/COLLABORATOR_HANDOVER.md)')
+    st.code('git pull --ff-only origin main',language='powershell')
+    st.write('Pulling updates code and reports. It does not download ignored datasets, model weights or virtual environments.')
 
 st.divider()
 with st.expander('About InscripLens: project work and reused components'):

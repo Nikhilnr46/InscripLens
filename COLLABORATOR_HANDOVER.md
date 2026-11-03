@@ -6,7 +6,7 @@ Prepared 3 November 2026. Repository: https://github.com/Nikhilnr46/InscripLens 
 
 `outputs/full_binarizer/HS027_original.png` is a generated demo image. Images, datasets, trained models and environments are excluded from Git, so cloning the repository does not provide them. `ROOT` is computed from the script location; `C:/nikhil` is your checkout root, not an incorrect hardcoded path.
 
-The demo checkbox currently tries to read the missing image without checking existence. This is an application bug as well as a setup gap. Unchecking the demo avoids that specific read, but enhancement and recognition still require the other runtime assets. Do not create an empty PNG or change the path to the original developer's computer.
+Update: the fresh-clone guards now disable an unavailable demo and show setup guidance. Pull main to receive the fix. Enhancement and recognition still require the runtime assets; missing files disable the relevant action. Dataset explorer handles absent assets, and Setup status lists required files. Do not create an empty PNG or change the path to the original developer's computer.
 
 ## Fastest way to run the current demonstration
 
@@ -74,7 +74,9 @@ The app currently uses the mask-SVM. Automatic candidate detection:196 matches a
 
 `work/app_data` is private local analysis history. Never commit it. The `outputs` name contains both source scripts and artifacts for historical reasons; do not move files without adjusting relative paths/tests.
 
-## Recommended first contribution: fresh-clone reliability
+## Fresh-clone reliability work
+
+Items1–3 below and the asset-status view are now implemented. `python outputs/check_fresh_clone.py` tests an isolated source-only copy without moving real assets. Automated archive import/download remains future work; use the supplied pack and manual setup for now.
 
 1. Disable the demo checkbox with an explanation when its sample is absent; guard Dataset explorer against missing manifest, images and predictions.
 2. Check the worker executable, vendor model source and checkpoint before allowing enhancement. Give actionable setup messages.
@@ -84,7 +86,7 @@ The app currently uses the mask-SVM. Automatic candidate detection:196 matches a
 
 Use a separate branch such as `fix/fresh-clone-setup`, commit only intended changes and open a pull request. Do not force-push main, add virtual environments/weights to Git, or run `git add .` without inspecting status. Coordinate ownership of files with Nikhil to avoid conflicting simultaneous edits.
 
-Existing tests: `python outputs/check_app.py` and `python outputs/check_app_backend.py`. The latter requires `outputs/pretrained_binarizer_test/input_patch.png` (included in the runtime pack) and executes real inference. Tests have passed on the original machine, but the friend-laptop setup has not yet been tested. A fresh clone without assets is currently known to fail some views.
+Existing tests: `python outputs/check_app.py`, `python outputs/check_fresh_clone.py` and `python outputs/check_app_backend.py`. The latter requires `outputs/pretrained_binarizer_test/input_patch.png` (included in the runtime pack) and executes real inference. Tests run on the original machine; the friend-laptop setup must still be verified locally.
 
 ## Rebuilding rather than using the pack
 
