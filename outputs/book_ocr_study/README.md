@@ -12,6 +12,8 @@ Next useful check: independently type a small printed passage, compare raw OCR w
 
 ## Pending checked heading
 
+Update: the user supplied `heading111_user_reference.txt`, preserved verbatim. Against that reference, the fixed OCR output has **7 edits over 55 normalized Unicode codepoints (12.73% codepoint error rate)** and does not match the heading exactly. This includes spaces and punctuation. The reference is a user copy, not expert-certified ground truth; no spelling was silently corrected. This result concerns one manually selected prose heading and cannot be presented as general OCR accuracy, Kannada grapheme accuracy, or stone-model performance.
+
 `evaluate_book_heading.py` now tests a manually cropped, single prose heading above entry111 (same page). It uses fixed single-line PSM7 and saves `heading_evaluation.json`. The user has been asked to type that heading from its displayed image without seeing the OCR prediction. Until a checked reference arrives, metrics remain null. This prose sample is separate from the historical inscription columns tested with PSM6; their results must not be conflated.
 
 Once the user's checked UTF-8 copy is saved locally, run `python outputs/evaluate_book_heading.py --reference <path>`. `[unclear]` or empty references are rejected. Evaluation uses NFC Unicode normalization, collapsed whitespace and preserved punctuation; it reports codepoint edit error and exact heading match, not grapheme accuracy or a general book recognition score. A single chosen heading is a diagnostic demonstration, not a representative evaluation set.

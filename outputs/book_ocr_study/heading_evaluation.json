@@ -15,7 +15,15 @@
     "psm": 7
   },
   "ocr_text": "ಆದೇ ಹೋಬಳ ಕಂವುಸಂದ್ರದಲ್ಲಿ ಪೂಜಾರಿ ನಂಜಪ್ಸನಮನೇ ಹಿತ್ತ ಶಿನಲ್ಲಿ,",
-  "reference_status": "pending independent copy check",
-  "metrics": null,
-  "limits": "One manually selected prose heading; not a book benchmark or historical inscription accuracy."
+  "reference_status": "user-supplied checked transcription",
+  "metrics": {
+    "reference_codepoints": 55,
+    "codepoint_edits": 7,
+    "codepoint_error_rate": 0.12727272727272726,
+    "exact_heading_match": false
+  },
+  "limits": "One manually selected prose heading; not a book benchmark or historical inscription accuracy.",
+  "reference_text": "ಆದೇ ಹೋಬಳಿ ಕಂಮಸಂದ್ರದಲ್ಲಿ ಪೂಜಾರಿ ನಂಜಪ್ಪನಮನೇ ಹಿತ್ತಲಿನಲ್ಲಿ.",
+  "reference_sha256": "37f20407ea46dfdb6c9dfe6d6395cb1f723752b4d6a92d1e6c8387d4614c0634",
+  "normalization": "NFC and collapsed whitespace; punctuation retained"
 }
