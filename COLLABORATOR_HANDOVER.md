@@ -62,6 +62,8 @@ The app currently uses the mask-SVM. Automatic candidate detection:196 matches a
 
 ## Code map
 
+Latest addition: `app_backend.py` stores append-only character review records in SQLite. The app preserves original predictions separately from optional user suggestions and exports source hash, analysis coordinates and model fingerprint. `python outputs/check_review_storage.py` checks Unicode, invalid bounds, persistence and provenance. The new table is created automatically without replacing existing history. No new runtime assets are needed; `git pull --ff-only origin main` and restart Streamlit. User suggestions are not verified ground truth and are not automatically used for training.
+
 - `outputs/inscriplens_app.py`: Streamlit views and user interactions.
 - `outputs/app_backend.py`: image preparation, inference subprocess and SQLite history.
 - `outputs/binarizer_core.py`: single-scale tiled pretrained inference on CPU.

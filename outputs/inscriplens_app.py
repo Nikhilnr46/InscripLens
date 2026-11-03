@@ -6,7 +6,7 @@ import streamlit as st
 from PIL import Image, ImageOps
 import joblib
 from run_character_benchmark import features
-from app_backend import analyse,history
+from app_backend import analyse,history,save_review,reviews,review_export
 from segment_candidates import candidates,overlay
 
 ROOT=Path(__file__).resolve().parent.parent
@@ -37,7 +37,7 @@ if page=='Analyse an image':
         except Exception as exc:
             st.error(f'Cannot open image: {exc}');st.stop()
         if st.session_state.get('digest')!=digest:
-            st.session_state.digest=digest;st.session_state.pop('run',None)
+            st.session_state.digest=digest;st.session_state.pop('run',None);st.session_state.pop('character_prediction',None)
         st.image(image,caption=f'Uploaded original · {image.width} × {image.height}',width=600)
         st.caption('Analysis uses a copy with longest side at most 1600 pixels. Enhancement predicts foreground strokes; it may omit or alter damaged strokes.')
         if missing_enhancement:setup_message('Enhancement runtime is incomplete: '+', '.join(missing_enhancement))
@@ -45,7 +45,7 @@ if page=='Analyse an image':
             try:
                 with st.spinner('Separating likely inscription strokes from the background…'):
                     record=analyse(raw,upload.name)
-                st.session_state.run=record
+                st.session_state.run=record;st.session_state.pop('character_prediction',None)
             except (subprocess.SubprocessError,ValueError,OSError) as exc:
                 st.error('Enhancement could not finish. No successful analysis was saved.')
                 st.code(str(exc))
@@ -85,8 +85,21 @@ if page=='Analyse an image':
                     st.image(crop,caption='Selected model input',width=180)
                     st.write('**Unverified predicted source label:**',pred)
                     st.caption('Raw transliteration label, not a verified Kannada transcription. No calibrated confidence is available.')
-                    prediction={'bbox':[x1,y1,x2,y2],'prediction':pred,'model':model_path.name,'verified':False}
-                    st.download_button('Download character prediction',json.dumps(prediction,ensure_ascii=False,indent=2),'character_prediction.json')
+                    st.session_state.character_prediction={'run_id':record['id'],'bbox':[int(x1),int(y1),int(x2),int(y2)],'prediction':pred,'model':model_path.name,'model_sha256':hashlib.sha256(model_path.read_bytes()).hexdigest(),'verified':False}
+            prediction=st.session_state.get('character_prediction')
+            if prediction and prediction['run_id']==record['id']:
+                st.write('Latest prediction:',prediction['prediction'],'— rectangle',prediction['bbox'])
+                st.download_button('Download character prediction',json.dumps(prediction,ensure_ascii=False,indent=2),'character_prediction.json')
+                with st.form('review_'+record['id']):
+                    st.write('Save this prediction or add a suggested correction. Suggestions are unverified and are not added to training automatically.')
+                    suggestion=st.text_input('Suggested label (optional)')
+                    reviewer=st.text_input('Reviewer name or initials (optional)')
+                    note=st.text_area('Source or review note (optional)')
+                    save=st.form_submit_button('Save review record')
+                if save:
+                    save_review(record['id'],prediction['bbox'],prediction['prediction'],prediction['model'],prediction['model_sha256'],suggestion,reviewer,note)
+                    st.success('Review record saved. The original model prediction is preserved.')
+            st.download_button('Export saved reviews',json.dumps(review_export(record['id']),ensure_ascii=False,indent=2),'inscriplens_reviews.json','application/json')
 
 elif page=='Dataset explorer':
     required=['work/hero_pilot/manifest.json','outputs/full_binarizer/recognition_predictions.json']
@@ -122,6 +135,11 @@ elif page=='Saved analyses':
         if Path(selected['mask_path']).is_file():st.image(selected['mask_path'],caption='Saved predicted mask')
         else:st.warning('The saved mask file is missing. The analysis record is still available.')
         st.json({k:v for k,v in selected.items() if k not in ['image_path','mask_path']})
+        saved=reviews(selected['id'])
+        st.subheader('Saved character reviews')
+        if saved:st.dataframe(saved,hide_index=True)
+        else:st.info('No character reviews saved for this analysis.')
+        st.download_button('Export analysis and reviews',json.dumps(review_export(selected['id']),ensure_ascii=False,indent=2),'inscriplens_reviews.json','application/json')
 
 else:
     st.subheader('Local setup status')
