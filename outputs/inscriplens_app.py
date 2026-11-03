@@ -174,6 +174,20 @@ elif page=='Published reading review':
         if (folder/'HS024_Kannada_entry110.png').is_file():st.image(str(folder/'HS024_Kannada_entry110.png'))
         else:st.caption('Use the Kannada publication link above.')
     st.subheader('Still to verify')
+    book_result=ROOT/'outputs/book_ocr_study/result.json'
+    if book_result.is_file():
+        with st.expander('Printed-page OCR draft — separate Tesseract baseline'):
+            draft=json.loads(book_result.read_text(encoding='utf-8'))
+            st.warning('Unverified draft with visible recognition errors. This uses pretrained Tesseract Kannada OCR, not the InscripLens stone classifier. Editing does not make the text independently verified.')
+            st.caption('Saved run on manually cropped publication columns; this is not live OCR of an uploaded book.')
+            edited={}
+            for region in draft['regions']:
+                if region['region']=='opening_two_lines':continue
+                edited[region['region']]=st.text_area(region['region'].replace('_',' ').title(),region['text'],height=180,key='book_draft_'+region['region'])
+            export={'source':draft['source'],'source_url':draft['source_url'],'engine':draft['engine'],
+                    'status':'user-editable unverified draft','original_ocr':draft['regions'],'edited_columns':edited}
+            st.download_button('Download edited printed-source draft',json.dumps(export,ensure_ascii=False,indent=2),'printed_source_review.json','application/json')
+            st.caption('Edits remain in this session until downloaded. Stone annotations and evaluation results are unchanged.')
     for issue in document['unresolved']:st.write('• '+issue)
     st.caption('HS024 is a validation image. Published answers must not be used to retune the recognizer and then claim independent accuracy on this stone.')
     st.download_button('Download source comparison and uncertainties',reference.read_bytes(),'HS024_reference_comparison.json','application/json')

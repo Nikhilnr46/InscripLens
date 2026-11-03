@@ -1,0 +1,52 @@
+{
+  "engine": "Tesseract Kannada LSTM, separate pretrained engine",
+  "version": "tesseract v5.5.3.20260724",
+  "source": "Epigraphia Carnatica IX, Kannada p224, Hoskote entry110",
+  "source_url": "https://archive.org/download/epigraphiacarnat09myso/page/n729.jpg",
+  "source_sha256": "64f907d02fe643f9f16259d9bb73bd7d3ab5e9fff8f94ea005812fdc9b289d92",
+  "parameters": {
+    "language": "kan",
+    "oem": 1,
+    "psm": 6
+  },
+  "status": "unreviewed OCR drafts; no accuracy measured",
+  "stone_model_used": false,
+  "regions": [
+    {
+      "region": "opening_two_lines",
+      "bbox_xyxy": [
+        435,
+        530,
+        1250,
+        710
+      ],
+      "text": "ಶ್ಯ. 1 |\nಸ್ಮನ್ತಿ ಕ್ರೀಕ್ರೀನೊಅವ್ಪುಂಪೃ\nಥಿನೀರಾಜ್ಯಾಂಗೆಯೆಕೊಯ್ಯೇರಅಜಯಪಾಲ್ಲ",
+      "stderr": "",
+      "image_sha256": "5f59a9bbb65b5055b4f75faf7cc21c70db8c195b2e541de6797082c2741908d9"
+    },
+    {
+      "region": "left_column",
+      "bbox_xyxy": [
+        435,
+        530,
+        1250,
+        965
+      ],
+      "text": "ಸ್ಮಬ್ಪಕ್ರಕ್ರೀನೊಣವ್ಪುಂಪೃ\nಥಿನೀರಾಜ್ಯಾಂಗೆಯೆಕೊಯ್ಯೇರಅಜಯಪಾಲ್ಲ\nಕಗೊರೆವಳೊಳಸೊಡಿಪಳದವುಪರಿವಲ್ಲಿಮು\n*ನ್ಹಾಗಿಬನ್ಹು\n₹ತದರಬಣ್ಣಿ",
+      "stderr": "",
+      "image_sha256": "ab0e40de62226ea14c68cc2adbf0353660ef9e1a5f42d841025e33e6f418e112"
+    },
+    {
+      "region": "right_column",
+      "bbox_xyxy": [
+        1500,
+        530,
+        2490,
+        965
+      ],
+      "text": "ಿಲೆಯರಮಗನೆಲ್ವಲ್ಪಅಣ್ಣ ರ್ಮ್ಮನಟಿಂಯತೋಬ\n?ವನಿಕ್ಠಿಸಿಸಗ್ಗಿ ಯಾದಂಅಯ್ಗೊಳಕಳನಿಸದಿಕೊಳೆಂಅ\n*ರೊತಣ್ಣ ಇದ\n\n9ನಟಿತಿವಪಾತಳಃ",
+      "stderr": "",
+      "image_sha256": "6a5ac75fe347055412921129a9498041dd5bd031cba552634761cd645fc77439"
+    }
+  ]
+}
