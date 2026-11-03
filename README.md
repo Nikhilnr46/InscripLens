@@ -7,6 +7,7 @@ An experimental local application for analysing historical Kannada inscription i
 - Upload a PNG/JPEG or select a public demonstration image.
 - Predict foreground strokes with the credited Shilalekhya model.
 - Inspect automatically proposed regions, adjust a character box and obtain an unverified transliteration-label prediction.
+- Predict all detected regions in one action and save/export their labels and boxes. This is not sentence transcription. The combined localization-and-label diagnostic recovers42/300 reference characters (14%).
 - Download masks, candidate boxes and analysis records; reopen saved analyses from SQLite.
 - Save character predictions with optional reviewer suggestions/notes and export them with model/source provenance. Suggestions remain unverified and never automatically enter training.
 - Explore source annotations and recorded experiments separately from predictions.

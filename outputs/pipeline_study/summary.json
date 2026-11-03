@@ -1,0 +1,66 @@
+{
+  "reference_n": 300,
+  "candidate_n": 330,
+  "localized_n": 196,
+  "localized_and_correct_n": 42,
+  "joint_precision": 0.12727272727272726,
+  "joint_recall": 0.14,
+  "recognition_accuracy_on_localized_candidates": 0.21428571428571427,
+  "per_image": [
+    {
+      "image_id": "HS022",
+      "reference_n": 11,
+      "candidate_n": 22,
+      "localized_n": 3,
+      "localized_and_correct_n": 1,
+      "seconds": 0.07472229999984847
+    },
+    {
+      "image_id": "HS023",
+      "reference_n": 21,
+      "candidate_n": 27,
+      "localized_n": 13,
+      "localized_and_correct_n": 4,
+      "seconds": 0.06788460000097984
+    },
+    {
+      "image_id": "HS024",
+      "reference_n": 98,
+      "candidate_n": 95,
+      "localized_n": 73,
+      "localized_and_correct_n": 13,
+      "seconds": 0.17128060000140977
+    },
+    {
+      "image_id": "HS025",
+      "reference_n": 34,
+      "candidate_n": 39,
+      "localized_n": 29,
+      "localized_and_correct_n": 11,
+      "seconds": 0.0780505999991874
+    },
+    {
+      "image_id": "HS026",
+      "reference_n": 14,
+      "candidate_n": 14,
+      "localized_n": 7,
+      "localized_and_correct_n": 4,
+      "seconds": 0.04502839999986463
+    },
+    {
+      "image_id": "HS027",
+      "reference_n": 122,
+      "candidate_n": 133,
+      "localized_n": 71,
+      "localized_and_correct_n": 9,
+      "seconds": 0.22903109999970184
+    }
+  ],
+  "protocol": "Full-image predicted masks -> fixed connected components -> maskHOG/SVM. No reference boxes used for prediction. Geometry-only one-to-one IoU>=0.5 matching, then exact source-label agreement.",
+  "limitations": [
+    "Not a line/full-text transcription metric: no verified reading order.",
+    "Validation reused and pretrained binarizer overlap incompletely known.",
+    "Filtered source annotations may omit legitimate glyphs.",
+    "Not directly comparable to21% recognition using supplied boxes."
+  ]
+}

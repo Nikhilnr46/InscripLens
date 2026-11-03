@@ -15,7 +15,7 @@ from sklearn.metrics import accuracy_score, classification_report
 
 def features(path, variant='original'):
     """32x32 letterbox; gradient orientation histograms; 2x2-cell normalisation."""
-    im=Image.open(path).convert('L')
+    im=path.convert('L') if isinstance(path,Image.Image) else Image.open(path).convert('L')
     if variant=='median':
         im=im.filter(ImageFilter.MedianFilter(3))
     elif variant=='autocontrast':

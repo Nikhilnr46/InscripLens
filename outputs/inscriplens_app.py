@@ -8,6 +8,7 @@ import joblib
 from run_character_benchmark import features
 from app_backend import analyse,history,save_review,reviews,review_export
 from segment_candidates import candidates,overlay
+from recognize_regions import recognize
 
 ROOT=Path(__file__).resolve().parent.parent
 DATA=ROOT/'work/app_data';DATA.mkdir(parents=True,exist_ok=True)
@@ -63,6 +64,18 @@ if page=='Analyse an image':
             st.write(f'Automatic connected-component detector found {len(boxes)} candidate regions. These may split a letter or combine several; their order is not a verified reading order.')
             st.image(overlay(original,boxes),caption='Automatic candidate boxes',width=600)
             st.download_button('Download candidate boxes',json.dumps({'boxes_xyxy':boxes,'verified':False,'method':'connected_components'}),'candidate_boxes.json')
+            batch_model=ROOT/'outputs/matched_mask_study/mask_svm_bundle.joblib'
+            if st.button('Predict all detected regions',disabled=not batch_model.is_file()):
+                with st.spinner('Predicting detected candidate labels…'):
+                    batch=recognize(mask,joblib.load(batch_model))
+                payload={'run_id':record['id'],'method':'predicted_mask_components_mask_svm','model_sha256':hashlib.sha256(batch_model.read_bytes()).hexdigest(),'verified_transcription':False,'reading_order_verified':False,'regions':batch}
+                path=DATA/record['id']/'automatic_regions.json';path.write_text(json.dumps(payload,ensure_ascii=False,indent=2),encoding='utf-8')
+            batch_path=DATA/record['id']/'automatic_regions.json'
+            if batch_path.exists():
+                payload=json.loads(batch_path.read_text(encoding='utf-8'))
+                st.caption('Automatic region predictions: no reference boxes supplied. These labels are not a verified sentence or reading order.')
+                st.dataframe(payload['regions'],hide_index=True)
+                st.download_button('Download automatic region predictions',json.dumps(payload,ensure_ascii=False,indent=2),'automatic_regions.json','application/json')
             chosen=st.selectbox('Start from a detected region',range(len(boxes)+1),format_func=lambda i:'Manual rectangle' if i==0 else f'Candidate {i}')
             initial=boxes[chosen-1] if chosen else [0,0,min(original.width,100),min(original.height,100)]
             st.write('Review or adjust the rectangle before predicting. A candidate is not necessarily one complete character.')
@@ -121,7 +134,7 @@ elif page=='Dataset explorer':
 elif page=='Experiment results':
     st.subheader('Recorded experiments')
     st.write('Recognition accuracy counts exact agreement with raw source labels. It is not project completion.')
-    for title,path in [('Original versus mask inputs, unchanged classifier','full_binarizer/recognition_comparison.json'),('Matched training experiment','matched_mask_study/summary.json'),('Learned CNN experiment','cnn_study/summary.json'),('Frozen pretrained features','transfer_study/summary.json')]:
+    for title,path in [('Automatic localization plus recognition','pipeline_study/summary.json'),('Original versus mask inputs, unchanged classifier','full_binarizer/recognition_comparison.json'),('Matched training experiment','matched_mask_study/summary.json'),('Learned CNN experiment','cnn_study/summary.json'),('Frozen pretrained features','transfer_study/summary.json')]:
         p=ROOT/'outputs'/path
         if p.exists():
             st.write('**'+title+'**');st.json(json.loads(p.read_text(encoding='utf-8')))
@@ -136,6 +149,9 @@ elif page=='Saved analyses':
         else:st.warning('The saved mask file is missing. The analysis record is still available.')
         st.json({k:v for k,v in selected.items() if k not in ['image_path','mask_path']})
         saved=reviews(selected['id'])
+        batch_path=DATA/selected['id']/'automatic_regions.json'
+        if batch_path.exists():
+            st.download_button('Download saved automatic region predictions',batch_path.read_bytes(),'automatic_regions.json','application/json')
         st.subheader('Saved character reviews')
         if saved:st.dataframe(saved,hide_index=True)
         else:st.info('No character reviews saved for this analysis.')

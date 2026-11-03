@@ -5,7 +5,7 @@ root=Path(__file__).resolve().parent.parent
 (root/'work').mkdir(exist_ok=True)
 with tempfile.TemporaryDirectory(dir=root/'work') as temp:
     dest=Path(temp)/'outputs';dest.mkdir()
-    for name in ['inscriplens_app.py','app_backend.py','segment_candidates.py','run_character_benchmark.py']:
+    for name in ['inscriplens_app.py','app_backend.py','segment_candidates.py','run_character_benchmark.py','recognize_regions.py']:
         shutil.copy2(root/'outputs'/name,dest/name)
     code='''
 import sys
