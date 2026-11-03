@@ -1,0 +1,11 @@
+{
+  "fit": {
+    "candidate_lines": 672,
+    "lines_with_every_character_polygon_at_least_95_percent_inside": 253
+  },
+  "development": {
+    "candidate_lines": 34,
+    "lines_with_every_character_polygon_at_least_95_percent_inside": 23
+  },
+  "note": "Polygon geometry agreement only, not proof of complete or correct transcription."
+}
