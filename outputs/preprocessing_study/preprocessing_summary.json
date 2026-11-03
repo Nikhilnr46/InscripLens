@@ -1,0 +1,63 @@
+{
+  "selection_protocol": "Four predeclared preprocessing variants; fixed SVM; GroupShuffleSplit of training data by filename-derived site, seed 42; validation not used to choose variant.",
+  "fit_crop_n": 820,
+  "dev_crop_n": 279,
+  "fit_sites": [
+    "atturu",
+    "dodda thogur",
+    "gangavara",
+    "hebbal",
+    "kaikondrahalli",
+    "kalatammanahalli",
+    "madhure",
+    "malurpatna",
+    "sadahalli",
+    "srinivagilu",
+    "totagere"
+  ],
+  "dev_sites": [
+    "aradeshanahalli",
+    "maranayakanahalli",
+    "sakalavara",
+    "t dasarahalli"
+  ],
+  "dev_unseen_label_n": 62,
+  "experiments": [
+    {
+      "variant": "original",
+      "dev_correct": 36,
+      "dev_n": 279,
+      "dev_accuracy": 0.12903225806451613
+    },
+    {
+      "variant": "median",
+      "dev_correct": 39,
+      "dev_n": 279,
+      "dev_accuracy": 0.13978494623655913
+    },
+    {
+      "variant": "autocontrast",
+      "dev_correct": 34,
+      "dev_n": 279,
+      "dev_accuracy": 0.12186379928315412
+    },
+    {
+      "variant": "otsu",
+      "dev_correct": 37,
+      "dev_n": 279,
+      "dev_accuracy": 0.13261648745519714
+    }
+  ],
+  "selected_variant": "median",
+  "validation_correct": 48,
+  "validation_n": 300,
+  "validation_accuracy": 0.16,
+  "validation_macro_f1": 0.0482744654851925,
+  "validation_weighted_f1": 0.10449455383225409,
+  "limitations": [
+    "Validation is the same set used for the earlier baseline, not a fresh final test.",
+    "Site groups are inferred from names, not verified physical-stone IDs.",
+    "Feature and classifier parameters remain fixed.",
+    "Labels and bounding boxes come from source annotations."
+  ]
+}

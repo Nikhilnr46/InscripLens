@@ -1,0 +1,60 @@
+{
+  "protocol": "Source train only; exclude all six validation sites using filename-derived site. Exact validation crop pixels excluded. Median + fixed RBF SVM C10 gamma scale for both models. No hyperparameter tuning.",
+  "excluded_validation_sites": [
+    "begur",
+    "bisanahalli",
+    "kumbalahalli",
+    "kurudusonnenahalli",
+    "malurpatna",
+    "nagavara"
+  ],
+  "excluded_training_images": [
+    "Begur 900CE Bydukura Kerega Turugol",
+    "Kurudusonnenahalli 900CE Kabbayya",
+    "Malurpatna 1000CE Herostone Inscription (Not Documented Before)",
+    "Malurpatna 1000CE Herostone Inscription backside",
+    "Malurpatna 770CE Ereyapparasa Inscription",
+    "Malurpatna 900CE Permaluru Herostone With Inscription",
+    "Malurpatna 996CE Kala, Kakkayya, Aiyayya & Tatrapala Herostone With Inscription"
+  ],
+  "excluded_annotations": {
+    "placeholder": 580,
+    "duplicate_position": 18,
+    "invalid_box": 1
+  },
+  "results": {
+    "hero_only": {
+      "train_crops": 949,
+      "train_images": 17,
+      "train_classes": 281,
+      "validation_correct": 45,
+      "validation_n": 300,
+      "accuracy": 0.15,
+      "validation_unseen_n": 29,
+      "known_label_accuracy": 0.16605166051660517,
+      "macro_f1": 0.05242034129612297,
+      "weighted_f1": 0.10583864704818818,
+      "fit_seconds": 0.37404090000200085
+    },
+    "broader_inscriptions": {
+      "train_crops": 9986,
+      "train_images": 110,
+      "train_classes": 768,
+      "validation_correct": 47,
+      "validation_n": 300,
+      "accuracy": 0.15666666666666668,
+      "validation_unseen_n": 7,
+      "known_label_accuracy": 0.16040955631399317,
+      "macro_f1": 0.05632924184166419,
+      "weighted_f1": 0.12172108350586612,
+      "fit_seconds": 24.601992799987784
+    }
+  },
+  "limitations": [
+    "Same 300 validation crops reused; not a fresh final test.",
+    "Site groups are conservative filename-derived groups, not verified stone identities.",
+    "Broader corpus script/language composition and label conventions remain unaudited.",
+    "Source annotation boxes supplied; no automatic segmentation tested.",
+    "Recognition labels are raw source transliteration strings."
+  ]
+}

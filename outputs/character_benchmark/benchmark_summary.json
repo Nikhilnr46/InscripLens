@@ -1,0 +1,176 @@
+{
+  "dataset_manifest_sha256": "c8f4eccfe224bf0ef9a864a3b02e466e52744d5eb66c070318ed7535542fa8a4",
+  "training_n": 1099,
+  "validation_n": 300,
+  "training_classes": 304,
+  "unseen_validation_n": 23,
+  "feature_dimension": 324,
+  "feature_definition": "32x32 grayscale letterbox; 8x8 cells, 9 unsigned orientation bins, overlapping 2x2-cell L2-Hys blocks; no fitted feature transform",
+  "validation_protocol": "Original source train/val split, fixed parameters, no validation tuning. Annotation-supplied character boxes. Raw source labels, no Kannada conversion.",
+  "macro_definition": "Unweighted mean over labels present in reference or predictions; undefined metrics set to zero.",
+  "versions": {
+    "python": "3.14.6",
+    "numpy": "2.4.6",
+    "Pillow": "12.2.0",
+    "scikit-learn": "1.9.0",
+    "joblib": "1.5.3"
+  },
+  "results": {
+    "majority_control": {
+      "accuracy": 0.04,
+      "correct": 12,
+      "n": 300,
+      "known_label_accuracy": 0.04332129963898917,
+      "known_label_n": 277,
+      "macro_precision": 0.00030303030303030303,
+      "macro_recall": 0.007575757575757576,
+      "macro_f1": 0.0005827505827505828,
+      "weighted_f1": 0.003076923076923077,
+      "fit_seconds": 0.0005410000012489036,
+      "predict_seconds": 0.000629400004982017,
+      "per_stone": {
+        "HS022": {
+          "n": 11,
+          "accuracy": 0.0
+        },
+        "HS023": {
+          "n": 21,
+          "accuracy": 0.0
+        },
+        "HS024": {
+          "n": 98,
+          "accuracy": 0.04081632653061224
+        },
+        "HS025": {
+          "n": 34,
+          "accuracy": 0.058823529411764705
+        },
+        "HS026": {
+          "n": 14,
+          "accuracy": 0.0
+        },
+        "HS027": {
+          "n": 122,
+          "accuracy": 0.04918032786885246
+        }
+      }
+    },
+    "knn": {
+      "accuracy": 0.05,
+      "correct": 15,
+      "n": 300,
+      "known_label_accuracy": 0.05415162454873646,
+      "known_label_n": 277,
+      "macro_precision": 0.021711798839458413,
+      "macro_recall": 0.02356678486997636,
+      "macro_f1": 0.02083754351506089,
+      "weighted_f1": 0.04807706820333015,
+      "fit_seconds": 0.0013998000067658722,
+      "predict_seconds": 1.4407685000041965,
+      "per_stone": {
+        "HS022": {
+          "n": 11,
+          "accuracy": 0.0
+        },
+        "HS023": {
+          "n": 21,
+          "accuracy": 0.0
+        },
+        "HS024": {
+          "n": 98,
+          "accuracy": 0.030612244897959183
+        },
+        "HS025": {
+          "n": 34,
+          "accuracy": 0.11764705882352941
+        },
+        "HS026": {
+          "n": 14,
+          "accuracy": 0.0
+        },
+        "HS027": {
+          "n": 122,
+          "accuracy": 0.06557377049180328
+        }
+      }
+    },
+    "svm": {
+      "accuracy": 0.13666666666666666,
+      "correct": 41,
+      "n": 300,
+      "known_label_accuracy": 0.148014440433213,
+      "known_label_n": 277,
+      "macro_precision": 0.03225960227091041,
+      "macro_recall": 0.04657339821573398,
+      "macro_f1": 0.03427674214087274,
+      "weighted_f1": 0.08408462260040504,
+      "fit_seconds": 0.4846741999936057,
+      "predict_seconds": 0.20152349999989383,
+      "per_stone": {
+        "HS022": {
+          "n": 11,
+          "accuracy": 0.18181818181818182
+        },
+        "HS023": {
+          "n": 21,
+          "accuracy": 0.09523809523809523
+        },
+        "HS024": {
+          "n": 98,
+          "accuracy": 0.11224489795918367
+        },
+        "HS025": {
+          "n": 34,
+          "accuracy": 0.2647058823529412
+        },
+        "HS026": {
+          "n": 14,
+          "accuracy": 0.21428571428571427
+        },
+        "HS027": {
+          "n": 122,
+          "accuracy": 0.11475409836065574
+        }
+      }
+    },
+    "random_forest": {
+      "accuracy": 0.043333333333333335,
+      "correct": 13,
+      "n": 300,
+      "known_label_accuracy": 0.04693140794223827,
+      "known_label_n": 277,
+      "macro_precision": 0.01326658531847211,
+      "macro_recall": 0.007152216232404912,
+      "macro_f1": 0.007425385539645481,
+      "weighted_f1": 0.03975256395218209,
+      "fit_seconds": 57.25457179998921,
+      "predict_seconds": 0.05630050000036135,
+      "per_stone": {
+        "HS022": {
+          "n": 11,
+          "accuracy": 0.0
+        },
+        "HS023": {
+          "n": 21,
+          "accuracy": 0.047619047619047616
+        },
+        "HS024": {
+          "n": 98,
+          "accuracy": 0.07142857142857142
+        },
+        "HS025": {
+          "n": 34,
+          "accuracy": 0.11764705882352941
+        },
+        "HS026": {
+          "n": 14,
+          "accuracy": 0.07142857142857142
+        },
+        "HS027": {
+          "n": 122,
+          "accuracy": 0.0
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,67 @@
+{
+  "results": {
+    "original": {
+      "correct": 47,
+      "n": 300,
+      "accuracy": 0.15666666666666668,
+      "per_image": {
+        "HS022": {
+          "correct": 1,
+          "n": 11
+        },
+        "HS023": {
+          "correct": 0,
+          "n": 21
+        },
+        "HS024": {
+          "correct": 17,
+          "n": 98
+        },
+        "HS025": {
+          "correct": 10,
+          "n": 34
+        },
+        "HS026": {
+          "correct": 0,
+          "n": 14
+        },
+        "HS027": {
+          "correct": 19,
+          "n": 122
+        }
+      }
+    },
+    "predicted_mask": {
+      "correct": 42,
+      "n": 300,
+      "accuracy": 0.14,
+      "per_image": {
+        "HS022": {
+          "correct": 1,
+          "n": 11
+        },
+        "HS023": {
+          "correct": 2,
+          "n": 21
+        },
+        "HS024": {
+          "correct": 12,
+          "n": 98
+        },
+        "HS025": {
+          "correct": 5,
+          "n": 34
+        },
+        "HS026": {
+          "correct": 3,
+          "n": 14
+        },
+        "HS027": {
+          "correct": 19,
+          "n": 122
+        }
+      }
+    }
+  },
+  "protocol": "Frozen broader SVM, same median/HOG features and 300 supplied boxes. Only inference input changed. Not a matched retraining comparison; domain shift can hurt. Binarizer pretraining overlap incompletely known."
+}

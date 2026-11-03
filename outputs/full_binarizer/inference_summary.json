@@ -1,0 +1,68 @@
+[
+  {
+    "image_id": "HS022",
+    "source": "Begur 900CE Tondabbe's Husband's Herostone With Inscription",
+    "size": [
+      1043,
+      1080
+    ],
+    "patches": 9,
+    "seconds": 18.853036300002714,
+    "foreground_fraction": 0.009426156741592983
+  },
+  {
+    "image_id": "HS023",
+    "source": "Bisanahalli 900CE Saanta's Turugol Herostone With Inscription",
+    "size": [
+      1337,
+      1080
+    ],
+    "patches": 9,
+    "seconds": 19.46023399999831,
+    "foreground_fraction": 0.023758968392476244
+  },
+  {
+    "image_id": "HS024",
+    "source": "Kumbalahalli 900CE Nelmalli Herostone With Inscription",
+    "size": [
+      826,
+      1080
+    ],
+    "patches": 6,
+    "seconds": 15.549609699999564,
+    "foreground_fraction": 0.06629113980808896
+  },
+  {
+    "image_id": "HS025",
+    "source": "Kurudusonnenahalli 900CE Sambayya Hero Stone with Inscription",
+    "size": [
+      1272,
+      1080
+    ],
+    "patches": 9,
+    "seconds": 24.05340309999883,
+    "foreground_fraction": 0.018651729559748427
+  },
+  {
+    "image_id": "HS026",
+    "source": "Malurpatna 1000CE Kashayya's Herostone With Inscription",
+    "size": [
+      901,
+      1080
+    ],
+    "patches": 6,
+    "seconds": 15.593651799994404,
+    "foreground_fraction": 0.022334237678299833
+  },
+  {
+    "image_id": "HS027",
+    "source": "Nagavara 971CE Herostone With Inscription",
+    "size": [
+      525,
+      1080
+    ],
+    "patches": 6,
+    "seconds": 14.903754200000549,
+    "foreground_fraction": 0.08792063492063493
+  }
+]

@@ -1,0 +1,93 @@
+{
+  "train_n": 949,
+  "train_classes": 281,
+  "excluded_validation_sites": [
+    "begur",
+    "bisanahalli",
+    "kumbalahalli",
+    "kurudusonnenahalli",
+    "malurpatna",
+    "nagavara"
+  ],
+  "development_sites": [
+    "aradeshanahalli",
+    "sadahalli",
+    "srinivagilu",
+    "t dasarahalli"
+  ],
+  "results": {
+    "original": {
+      "development_correct": 35,
+      "development_n": 308,
+      "validation_correct": 45,
+      "validation_n": 300,
+      "accuracy": 0.15,
+      "per_image": {
+        "HS022": {
+          "n": 11,
+          "correct": 2
+        },
+        "HS023": {
+          "n": 21,
+          "correct": 2
+        },
+        "HS024": {
+          "n": 98,
+          "correct": 15
+        },
+        "HS025": {
+          "n": 34,
+          "correct": 8
+        },
+        "HS026": {
+          "n": 14,
+          "correct": 3
+        },
+        "HS027": {
+          "n": 122,
+          "correct": 15
+        }
+      }
+    },
+    "mask": {
+      "development_correct": 50,
+      "development_n": 308,
+      "validation_correct": 63,
+      "validation_n": 300,
+      "accuracy": 0.21,
+      "per_image": {
+        "HS022": {
+          "n": 11,
+          "correct": 1
+        },
+        "HS023": {
+          "n": 21,
+          "correct": 7
+        },
+        "HS024": {
+          "n": 98,
+          "correct": 22
+        },
+        "HS025": {
+          "n": 34,
+          "correct": 11
+        },
+        "HS026": {
+          "n": 14,
+          "correct": 4
+        },
+        "HS027": {
+          "n": 122,
+          "correct": 18
+        }
+      }
+    }
+  },
+  "protocol": "Fixed median+HOG+SVM(C10), identical 949 hero training crops and 300 validation crops. Grouped training-only development, seed42. Both variants evaluated; no hyperparameter sweep. Annotation boxes used.",
+  "limitations": [
+    "Validation reused, not a fresh final test.",
+    "Binarizer pretraining overlap incompletely known, including training-only development.",
+    "Raw source labels unreviewed.",
+    "No automatic segmentation or translation tested."
+  ]
+}

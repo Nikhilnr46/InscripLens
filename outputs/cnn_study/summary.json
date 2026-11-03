@@ -1,0 +1,22 @@
+{
+  "model": "Small three-convolution CNN trained from scratch",
+  "training_n": 949,
+  "classes": 281,
+  "development_n": 308,
+  "development_best_correct": 39,
+  "selected_epochs": 11,
+  "validation_correct": 44,
+  "validation_n": 300,
+  "validation_accuracy": 0.14666666666666667,
+  "unseen_validation_labels_n": 29,
+  "seconds": 54.362462300021434,
+  "seed": 42,
+  "torch": "2.5.1+cpu",
+  "protocol": "Same excluded-site949 training crops and300 validation crops as matched SVM. Epoch budget30; earliest maximum development correctness selects refit duration. Architecture/optimizer fixed before validation. No pretrained recognition backbone.",
+  "limitations": [
+    "Validation reused; not fresh final test.",
+    "Pretrained binarizer training overlap incompletely known.",
+    "Source labels unreviewed; supplied boxes used.",
+    "Single seed and small training set; this does not rule out stronger pretrained recognition models."
+  ]
+}

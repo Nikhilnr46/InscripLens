@@ -1,0 +1,19 @@
+{
+  "encoder": "Frozen ImageNet ResNet18, 512 features",
+  "development_correct": {
+    "original": 20,
+    "mask": 37
+  },
+  "development_n": 308,
+  "selected_input": "mask",
+  "training_n": 949,
+  "validation_correct": 46,
+  "validation_n": 300,
+  "accuracy": 0.15333333333333332,
+  "protocol": "Same949train/300val as maskSVM; fit641/dev308 sites. Fixed L2-normalized features+RBF SVM C10. Choose only original vs mask input on development; evaluate selected variant on reused validation. 224px aspect-preserving letterbox with median fill, ImageNet normalization; differs from standard resize/centre-crop to preserve glyph edges.",
+  "limitations": [
+    "Generic ImageNet features, not Kannada-pretrained recognition.",
+    "Validation reused and binarizer pretraining overlap unknown.",
+    "Supplied annotation boxes; source labels unreviewed."
+  ]
+}
