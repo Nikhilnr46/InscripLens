@@ -10,4 +10,10 @@ Defensible demonstration claim: “InscripLens provides experimental inscription
 
 Next useful check: independently type a small printed passage, compare raw OCR without silently modernizing historical letters, and report codepoint edit error with the transcription conventions. If trying modern book text, use a separate clearly identified sample and report its results separately from this historical edition.
 
+## Pending checked heading
+
+`evaluate_book_heading.py` now tests a manually cropped, single prose heading above entry111 (same page). It uses fixed single-line PSM7 and saves `heading_evaluation.json`. The user has been asked to type that heading from its displayed image without seeing the OCR prediction. Until a checked reference arrives, metrics remain null. This prose sample is separate from the historical inscription columns tested with PSM6; their results must not be conflated.
+
+Once the user's checked UTF-8 copy is saved locally, run `python outputs/evaluate_book_heading.py --reference <path>`. `[unclear]` or empty references are rejected. Evaluation uses NFC Unicode normalization, collapsed whitespace and preserved punctuation; it reports codepoint edit error and exact heading match, not grapheme accuracy or a general book recognition score. A single chosen heading is a diagnostic demonstration, not a representative evaluation set.
+
 Sources: [Tesseract command-line documentation](https://tesseract-ocr.github.io/tessdoc/Command-Line-Usage.html), [publication scan](https://archive.org/download/epigraphiacarnat09myso/page/n729.jpg). Tesseract is third-party software; no bundled weights or executable are redistributed in this change.

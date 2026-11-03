@@ -1,0 +1,21 @@
+{
+  "source": "EC IX Kannada p224, prose heading above entry111",
+  "source_url": "https://archive.org/download/epigraphiacarnat09myso/page/n729.jpg",
+  "bbox_xyxy": [
+    660,
+    1095,
+    2130,
+    1210
+  ],
+  "crop_sha256": "a8f3ae1577507dacc5b5861e94126991b71ef1db60a4a0ac6147760e83629f7a",
+  "engine": "Tesseract pretrained Kannada LSTM, separate from stone model",
+  "parameters": {
+    "language": "kan",
+    "oem": 1,
+    "psm": 7
+  },
+  "ocr_text": "ಆದೇ ಹೋಬಳ ಕಂವುಸಂದ್ರದಲ್ಲಿ ಪೂಜಾರಿ ನಂಜಪ್ಸನಮನೇ ಹಿತ್ತ ಶಿನಲ್ಲಿ,",
+  "reference_status": "pending independent copy check",
+  "metrics": null,
+  "limits": "One manually selected prose heading; not a book benchmark or historical inscription accuracy."
+}
