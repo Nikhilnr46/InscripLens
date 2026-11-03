@@ -1,0 +1,20 @@
+{
+  "development_n": 308,
+  "development_correct": {
+    "none": 63,
+    "period": 63,
+    "period_and_genre": 63
+  },
+  "selected": "none",
+  "period_window_years": 150,
+  "prior_weight": 0.25,
+  "context_source": "Year and hero/non-hero type from source filenames; approximate metadata, not independently dated or classified by this project.",
+  "protocol": "Fixed three-label candidate list, two fixed metadata priors and unchanged baseline. Prior counts and development SVM exclude development locations and all validation locations. Select on 308 hero development examples; no stone names or published readings used as answer hints.",
+  "limitations": [
+    "This tests coarse date/genre priors, not verified historical narratives or a language model.",
+    "SVM scores and rank penalties are not calibrated probabilities.",
+    "Filename dates and categories may be approximate.",
+    "Validation reused and binarizer pretraining overlap uncertain."
+  ],
+  "decision": "Do not adopt metadata reranking; no validation retuning. Existing validation baseline remains77/300."
+}

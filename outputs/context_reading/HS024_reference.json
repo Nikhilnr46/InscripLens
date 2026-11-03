@@ -1,0 +1,314 @@
+{
+  "image_id": "HS024",
+  "source_name": "Kumbalahalli 900CE Nelmalli Herostone With Inscription",
+  "publication": "Epigraphia Carnatica IX, Hoskote 110",
+  "status": "candidate_reference_alignment_not_expert_verified",
+  "allowed_use": "reference-assisted review only; not independent OCR ground truth",
+  "source_annotation_status": "unreviewed",
+  "context_summary": "The edition describes cattle protection and a subsequent land grant; it dates the inscription approximately 900 CE.",
+  "context_origin": "published English translation, not model-generated translation",
+  "scans": [
+    {
+      "section": "Roman transcription",
+      "printed_page": 125,
+      "url": "https://archive.org/download/epigraphiacarnat09myso/page/n204.jpg",
+      "local_file": "EC9_leaf204.jpg",
+      "sha256": "fe67577b8c4a4080dbfb1bda28f53c47e9e22b02b08aab1435a424f0b7ffe17c"
+    },
+    {
+      "section": "English translation",
+      "printed_page": 102,
+      "url": "https://archive.org/download/epigraphiacarnat09myso/page/n419.jpg",
+      "local_file": "EC9_leaf419.jpg",
+      "sha256": "52f39254f28dd54bd1f25386ef92c06486e41f33d5dac01e67a039acc8be7fca"
+    },
+    {
+      "section": "Kannada reading",
+      "printed_page": 224,
+      "url": "https://archive.org/download/epigraphiacarnat09myso/page/n729.jpg",
+      "local_file": "EC9_leaf729.jpg",
+      "sha256": "64f907d02fe643f9f16259d9bb73bd7d3ab5e9fff8f94ea005812fdc9b289d92"
+    }
+  ],
+  "printed_line_count": 9,
+  "dataset_line_count": 8,
+  "dataset_lines": [
+    {
+      "dataset_line": 1,
+      "labels": [
+        "sva",
+        "sti",
+        "śrī",
+        "śrī",
+        "nŏ",
+        "ḻa",
+        "mbaṃ",
+        "pṛ"
+      ],
+      "source_keys": [
+        "900_HT110_Kumbalahalli_1_1_sva.JPG",
+        "900_HT110_Kumbalahalli_1_2_sti.JPG",
+        "900_HT110_Kumbalahalli_1_3_śrī.JPG",
+        "900_HT110_Kumbalahalli_1_4_śrī.JPG",
+        "900_HT110_Kumbalahalli_1_5_nŏ.JPG",
+        "900_HT110_Kumbalahalli_1_6_ḻa.JPG",
+        "900_HT110_Kumbalahalli_1_7_mbaṃ.JPG",
+        "900_HT110_Kumbalahalli_1_8_pṛ.JPG"
+      ]
+    },
+    {
+      "dataset_line": 2,
+      "labels": [
+        "thu",
+        "vī",
+        "rā",
+        "jyaṃ",
+        "gĕ",
+        "yĕ",
+        "kŏ",
+        "yya",
+        "ra",
+        "a",
+        "ja",
+        "ya",
+        "pā",
+        "lla"
+      ],
+      "source_keys": [
+        "900_HT110_Kumbalahalli_2_1_thu.JPG",
+        "900_HT110_Kumbalahalli_2_2_vī.JPG",
+        "900_HT110_Kumbalahalli_2_3_rā.JPG",
+        "900_HT110_Kumbalahalli_2_4_jyaṃ.JPG",
+        "900_HT110_Kumbalahalli_2_5_gĕ.JPG",
+        "900_HT110_Kumbalahalli_2_6_yĕ.JPG",
+        "900_HT110_Kumbalahalli_2_7_kŏ.JPG",
+        "900_HT110_Kumbalahalli_2_8_yya.JPG",
+        "900_HT110_Kumbalahalli_2_9_ra.JPG",
+        "900_HT110_Kumbalahalli_2_10_a.JPG",
+        "900_HT110_Kumbalahalli_2_11_ja.JPG",
+        "900_HT110_Kumbalahalli_2_12_ya.JPG",
+        "900_HT110_Kumbalahalli_2_13_pā.JPG",
+        "900_HT110_Kumbalahalli_2_14_lla.JPG"
+      ]
+    },
+    {
+      "dataset_line": 3,
+      "labels": [
+        "gŏ",
+        "ra",
+        "va",
+        "raṃ",
+        "kŏ",
+        "du",
+        "sū",
+        "ḍi",
+        "pa",
+        "ri",
+        "da",
+        "vu",
+        "pa",
+        "ri",
+        "va",
+        "lli",
+        "mu",
+        "ndā",
+        "gi",
+        "ba",
+        "ndu"
+      ],
+      "source_keys": [
+        "900_HT110_Kumbalahalli_3_1_gŏ.JPG",
+        "900_HT110_Kumbalahalli_3_2_ra.JPG",
+        "900_HT110_Kumbalahalli_3_3_va.JPG",
+        "900_HT110_Kumbalahalli_3_4_raṃ.JPG",
+        "900_HT110_Kumbalahalli_3_5_kŏ.JPG",
+        "900_HT110_Kumbalahalli_3_6_du.JPG",
+        "900_HT110_Kumbalahalli_3_7_sū.JPG",
+        "900_HT110_Kumbalahalli_3_8_ḍi.JPG",
+        "900_HT110_Kumbalahalli_3_9_pa.JPG",
+        "900_HT110_Kumbalahalli_3_10_ri.JPG",
+        "900_HT110_Kumbalahalli_3_11_da.JPG",
+        "900_HT110_Kumbalahalli_3_12_vu.JPG",
+        "900_HT110_Kumbalahalli_3_13_pa.JPG",
+        "900_HT110_Kumbalahalli_3_14_ri.JPG",
+        "900_HT110_Kumbalahalli_3_15_va.JPG",
+        "900_HT110_Kumbalahalli_3_16_lli.JPG",
+        "900_HT110_Kumbalahalli_3_17_mu.JPG",
+        "900_HT110_Kumbalahalli_3_18_ndā.JPG",
+        "900_HT110_Kumbalahalli_3_19_gi.JPG",
+        "900_HT110_Kumbalahalli_3_20_ba.JPG",
+        "900_HT110_Kumbalahalli_3_21_ndu.JPG"
+      ]
+    },
+    {
+      "dataset_line": 4,
+      "labels": [
+        "ta",
+        "l̤a",
+        "ra",
+        "ba",
+        "ṇḍi"
+      ],
+      "source_keys": [
+        "900_HT110_Kumbalahalli_4_1_ta.JPG",
+        "900_HT110_Kumbalahalli_4_2_l̤a.JPG",
+        "900_HT110_Kumbalahalli_4_3_ra.JPG",
+        "900_HT110_Kumbalahalli_4_4_ba.JPG",
+        "900_HT110_Kumbalahalli_4_5_ṇḍi.JPG"
+      ]
+    },
+    {
+      "dataset_line": 5,
+      "labels": [
+        "a",
+        "ṇi",
+        "lĕ",
+        "ya",
+        "ra",
+        "ma",
+        "gaṃ",
+        "nĕ",
+        "lma",
+        "lli",
+        "a",
+        "ṇna",
+        "mma",
+        "na",
+        "l̤i",
+        "ya",
+        "tŏ",
+        "ṟu"
+      ],
+      "source_keys": [
+        "900_HT110_Kumbalahalli_5_1_a.JPG",
+        "900_HT110_Kumbalahalli_5_2_ṇi.JPG",
+        "900_HT110_Kumbalahalli_5_3_lĕ.JPG",
+        "900_HT110_Kumbalahalli_5_4_ya.JPG",
+        "900_HT110_Kumbalahalli_5_5_ra.JPG",
+        "900_HT110_Kumbalahalli_5_6_ma.JPG",
+        "900_HT110_Kumbalahalli_5_7_gaṃ.JPG",
+        "900_HT110_Kumbalahalli_5_8_nĕ.JPG",
+        "900_HT110_Kumbalahalli_5_9_lma.JPG",
+        "900_HT110_Kumbalahalli_5_10_lli.JPG",
+        "900_HT110_Kumbalahalli_5_11_a.JPG",
+        "900_HT110_Kumbalahalli_5_12_ṇna.JPG",
+        "900_HT110_Kumbalahalli_5_13_mma.JPG",
+        "900_HT110_Kumbalahalli_5_14_na.JPG",
+        "900_HT110_Kumbalahalli_5_15_l̤i.JPG",
+        "900_HT110_Kumbalahalli_5_16_ya.JPG",
+        "900_HT110_Kumbalahalli_5_17_tŏ.JPG",
+        "900_HT110_Kumbalahalli_5_18_ṟu.JPG"
+      ]
+    },
+    {
+      "dataset_line": 6,
+      "labels": [
+        "va",
+        "ni",
+        "kki",
+        "si",
+        "sa",
+        "ggi",
+        "yā",
+        "daṃ",
+        "a",
+        "ygŏ",
+        "l̤aṃ",
+        "ka",
+        "ḻa",
+        "ni",
+        "pa",
+        "di",
+        "kŏ",
+        "l̤aṃ",
+        "a",
+        "ḍu",
+        "vu"
+      ],
+      "source_keys": [
+        "900_HT110_Kumbalahalli_6_1_va.JPG",
+        "900_HT110_Kumbalahalli_6_2_ni.JPG",
+        "900_HT110_Kumbalahalli_6_3_kki.JPG",
+        "900_HT110_Kumbalahalli_6_4_si.JPG",
+        "900_HT110_Kumbalahalli_6_5_sa.JPG",
+        "900_HT110_Kumbalahalli_6_6_ggi.JPG",
+        "900_HT110_Kumbalahalli_6_7_yā.JPG",
+        "900_HT110_Kumbalahalli_6_8_daṃ.JPG",
+        "900_HT110_Kumbalahalli_6_9_a.JPG",
+        "900_HT110_Kumbalahalli_6_10_ygŏ.JPG",
+        "900_HT110_Kumbalahalli_6_11_l̤aṃ.JPG",
+        "900_HT110_Kumbalahalli_6_12_ka.JPG",
+        "900_HT110_Kumbalahalli_6_13_ḻa.JPG",
+        "900_HT110_Kumbalahalli_6_14_ni.JPG",
+        "900_HT110_Kumbalahalli_6_15_pa.JPG",
+        "900_HT110_Kumbalahalli_6_16_di.JPG",
+        "900_HT110_Kumbalahalli_6_17_kŏ.JPG",
+        "900_HT110_Kumbalahalli_6_18_l̤aṃ.JPG",
+        "900_HT110_Kumbalahalli_6_19_a.JPG",
+        "900_HT110_Kumbalahalli_6_20_ḍu.JPG",
+        "900_HT110_Kumbalahalli_6_21_vu.JPG"
+      ]
+    },
+    {
+      "dataset_line": 7,
+      "labels": [
+        "kŏ",
+        "ḍa",
+        "gĕ",
+        "i",
+        "da"
+      ],
+      "source_keys": [
+        "900_HT110_Kumbalahalli_7_1_kŏ.JPG",
+        "900_HT110_Kumbalahalli_7_2_ḍa.JPG",
+        "900_HT110_Kumbalahalli_7_3_gĕ.JPG",
+        "900_HT110_Kumbalahalli_7_4_i.JPG",
+        "900_HT110_Kumbalahalli_7_5_da.JPG"
+      ]
+    },
+    {
+      "dataset_line": 8,
+      "labels": [
+        "na",
+        "ḻi",
+        "vŏṃ",
+        "pā",
+        "ta",
+        "kaḥ"
+      ],
+      "source_keys": [
+        "900_HT110_Kumbalahalli_8_1_na.JPG",
+        "900_HT110_Kumbalahalli_8_2_ḻi.JPG",
+        "900_HT110_Kumbalahalli_8_3_vŏṃ.JPG",
+        "900_HT110_Kumbalahalli_8_4_pā.JPG",
+        "900_HT110_Kumbalahalli_8_5_ta.JPG",
+        "900_HT110_Kumbalahalli_8_6_kaḥ.JPG"
+      ]
+    }
+  ],
+  "candidate_opening_alignment": {
+    "printed_lines": [
+      1,
+      2
+    ],
+    "dataset_lines": [
+      1,
+      2
+    ],
+    "status": "phrase-level candidate, character correspondence unverified",
+    "anchor": "opening svasti / sri formula followed by royal-rule wording",
+    "stone_crop_bounds_xyxy": [
+      46,
+      4,
+      672,
+      237
+    ]
+  },
+  "unresolved": [
+    "Printed line numbering differs from dataset grouping.",
+    "Roman publication Nelmalla differs from dataset nĕlmalli.",
+    "Historical characters and vowel conventions need explicit review.",
+    "No missing or uncertain stone characters may be filled from context alone."
+  ],
+  "evaluation_changed": false
+}
