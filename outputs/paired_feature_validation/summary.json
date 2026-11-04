@@ -1,0 +1,99 @@
+{
+  "totals": {
+    "reference_n": 300,
+    "candidate_n": 330,
+    "localized_n": 196,
+    "baseline_reference_correct": 77,
+    "paired_reference_correct": 78,
+    "fixed_errors": 15,
+    "new_errors": 14,
+    "baseline_joint_correct": 52,
+    "paired_joint_correct": 50
+  },
+  "per_image": [
+    {
+      "image_id": "HS022",
+      "reference_n": 11,
+      "candidate_n": 22,
+      "localized_n": 3,
+      "baseline_reference_correct": 2,
+      "paired_reference_correct": 2,
+      "fixed_errors": 0,
+      "new_errors": 0,
+      "baseline_joint_correct": 1,
+      "paired_joint_correct": 1
+    },
+    {
+      "image_id": "HS023",
+      "reference_n": 21,
+      "candidate_n": 27,
+      "localized_n": 13,
+      "baseline_reference_correct": 4,
+      "paired_reference_correct": 4,
+      "fixed_errors": 1,
+      "new_errors": 1,
+      "baseline_joint_correct": 4,
+      "paired_joint_correct": 3
+    },
+    {
+      "image_id": "HS024",
+      "reference_n": 98,
+      "candidate_n": 95,
+      "localized_n": 73,
+      "baseline_reference_correct": 26,
+      "paired_reference_correct": 28,
+      "fixed_errors": 4,
+      "new_errors": 2,
+      "baseline_joint_correct": 15,
+      "paired_joint_correct": 16
+    },
+    {
+      "image_id": "HS025",
+      "reference_n": 34,
+      "candidate_n": 39,
+      "localized_n": 29,
+      "baseline_reference_correct": 12,
+      "paired_reference_correct": 14,
+      "fixed_errors": 4,
+      "new_errors": 2,
+      "baseline_joint_correct": 15,
+      "paired_joint_correct": 13
+    },
+    {
+      "image_id": "HS026",
+      "reference_n": 14,
+      "candidate_n": 14,
+      "localized_n": 7,
+      "baseline_reference_correct": 2,
+      "paired_reference_correct": 1,
+      "fixed_errors": 0,
+      "new_errors": 1,
+      "baseline_joint_correct": 3,
+      "paired_joint_correct": 3
+    },
+    {
+      "image_id": "HS027",
+      "reference_n": 122,
+      "candidate_n": 133,
+      "localized_n": 71,
+      "baseline_reference_correct": 31,
+      "paired_reference_correct": 29,
+      "fixed_errors": 6,
+      "new_errors": 8,
+      "baseline_joint_correct": 14,
+      "paired_joint_correct": 14
+    }
+  ],
+  "fit_n": 9925,
+  "feature_dimension": 648,
+  "baseline_sha256": "c5aa7ea00fc493f610d4947a79f80fa72d45a7dbf720ccb2dd9f603079674295",
+  "production_model_changed": false,
+  "seconds": 91.8141220999969,
+  "protocol": "Fixed median mask HOG then original HOG concatenation; SVC C10 gamma scale. No validation tuning. Automatic boxes are fixed connected components; geometry-only one-to-one IoU >=0.5 matching.",
+  "limitations": [
+    "Reused validation: 300 source annotations on six images, not a fresh test.",
+    "Binarizer pretraining overlap uncertain.",
+    "Character recognition only; neither full-line OCR nor translation.",
+    "Predictions use raw dataset labels, not verified modern Kannada."
+  ]
+}

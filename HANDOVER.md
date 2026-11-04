@@ -1,5 +1,16 @@
 # InscripLens Studio Handover and Technical Guide
 
+## 4 November: fixed paired validation and line-data audit
+
+Fetched origin/main: no newer friend commits at the start of this session (f6d55d9). Preserved the user's renamed InscripLensPhase3.pptx and removal of older decks.
+
+Fixed original+mask HOG validation: 78/300 supplied-box labels versus baseline 77/300; 15 errors fixed and 14 introduced. Automatic localization+label recovery declined from 52/300 to 50/300. Same 330 proposals, 196 geometry matches. The application model is unchanged. This is reused six-image validation, not a fresh accuracy estimate. See outputs/paired_feature_validation/summary.json.
+
+Prepared paired original/mask line crops using the union of each supplied line polygon and its character polygons. Added annotated-neighbour overlap checks (>5% excluded), image-boundary checks and minimum mask foreground checks. Of 672 fit / 34 development candidates, 124 / 7 pass; 62 / 1 were recovered, while 145 / 15 formerly eligible records are now flagged. All 706 paired exports have matching dimensions and full in-image target polygon coverage. These are annotation-assisted unverified sequences, not automatic OCR or expert transcriptions. See outputs/paired_line_data/README.md.
+
+Next: visually review a deterministic subset of the stricter set, then repeat a fixed tiny-subset CTC learnability check before larger training. Sparse strokes and incomplete annotations remain risks. Full-line OCR and translation remain unfinished.
+
+
 ## 1. Project Summary
 
 InscripLens Studio is an offline computational research workspace designed for epigraphists, historians, linguists, and academic researchers studying historical Kannada stone inscriptions. The application focuses specifically on hero stones (Veeragallu) and weathered stone tablets found across Karnataka, addressing the challenge of physical granite erosion and raking light degradation.

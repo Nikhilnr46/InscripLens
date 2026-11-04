@@ -1,6 +1,6 @@
 # Presentation 3 — integrated diagrams
 
-Current deliverable: `InscripLens_Presentation3_With_Diagrams.pptx` (53 slides).
+Current deliverable: `InscripLensPhase3.pptx` (53 slides).
 
 - Slide 28: System Architecture, after the implementation architecture explanation.
 - Slide 30: ML Methodology / Process Flow, after the ML process explanation.
