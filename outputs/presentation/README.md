@@ -1,3 +1,23 @@
+# Presentation 3 — integrated diagrams
+
+Current deliverable: `InscripLens_Presentation3_With_Diagrams.pptx` (53 slides).
+
+- Slide 28: System Architecture, after the implementation architecture explanation.
+- Slide 30: ML Methodology / Process Flow, after the ML process explanation.
+- Slide 32: ER Diagram, after the implemented relational schema.
+
+All three use the approved plain-box style. Original editable sources and SVG/PNG exports are in `diagrams/`. The PPT embeds diagram images; edit their draw.io sources and replace the images to make structural changes. Architecture whitespace is compressed for the slide without changing the components or connections.
+
+ML content was checked against the broader training script and recorded experiment summaries. The ER diagram matches the actual two-table SQLite schema and foreign key. It uses one-to-zero-or-many notation; every review belongs to one run. No user, translation or model table was invented.
+
+All 53 slides rendered. The three inserted slides were visually inspected; existing content was retained. Package, geometry, font and re-import checks passed. Draw.io XML and connector endpoint references were checked. Native PowerPoint execution was not tested.
+
+Previous testing slides 42–44 are now 45–47. Reference and test evidence files remain applicable.
+
+---
+
+Previous revision history:
+
 # Presentation 3 — reviewed content, diagrams pending
 
 Current deliverable: `InscripLens_Presentation3_Content_review.pptx` (50 slides). This revision keeps the PES branding and detailed Phase 2 literature format, clarifies background resources and the project contribution, separates application tools from experiments/reused components, and adds 12 concrete expected-versus-observed test cases across slides 42–44.

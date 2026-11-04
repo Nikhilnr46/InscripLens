@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1080" viewBox="0 0 1600 1080">
+<rect width="1600" height="1080" fill="white"/>
+<defs><marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto-start-reverse" markerUnits="userSpaceOnUse"><path d="M0,0 L10,5 L0,10 Z" fill="#42566c"/></marker></defs>
+<text x="800" y="38" text-anchor="middle" font-family="Arial, sans-serif" font-size="30" font-weight="700" fill="#19324b">INSCRIPLENS — IMPLEMENTED SYSTEM ARCHITECTURE</text>
+
+<text x="1320" y="91" text-anchor="middle" font-family="Arial, sans-serif" font-size="20" font-weight="400" fill="#19324b">Local computer • 127.0.0.1:8000</text>
+<polyline points="400,140 610,140" fill="none" stroke="#42566c" stroke-width="2.5" marker-end="url(#arrow)"/>
+<text x="505" y="122" text-anchor="middle" font-family="Arial, sans-serif" font-size="19" font-weight="400" fill="#19324b">Uses Studio</text>
+<polyline points="800,210 800,280" fill="none" stroke="#42566c" stroke-width="2.5" marker-end="url(#arrow)" marker-start="url(#arrow)"/>
+<text x="960" y="247" text-anchor="middle" font-family="Arial, sans-serif" font-size="19" font-weight="400" fill="#19324b">HTTP / JSON / images</text>
+<polyline points="610,320 270,320 270,520" fill="none" stroke="#42566c" stroke-width="2.5" marker-end="url(#arrow)"/>
+<text x="425" y="303" text-anchor="middle" font-family="Arial, sans-serif" font-size="19" font-weight="400" fill="#19324b">Analyse image</text>
+<polyline points="460,592 610,592" fill="none" stroke="#42566c" stroke-width="2.5" marker-end="url(#arrow)"/>
+<text x="535" y="575" text-anchor="middle" font-family="Arial, sans-serif" font-size="19" font-weight="400" fill="#19324b">Binary mask</text>
+<polyline points="800,520 800,410" fill="none" stroke="#42566c" stroke-width="2.5" marker-end="url(#arrow)"/>
+<text x="900" y="470" text-anchor="middle" font-family="Arial, sans-serif" font-size="19" font-weight="400" fill="#19324b">Candidate boxes</text>
+<polyline points="990,320 1330,320 1330,520" fill="none" stroke="#42566c" stroke-width="2.5" marker-end="url(#arrow)" marker-start="url(#arrow)"/>
+<text x="1230" y="303" text-anchor="middle" font-family="Arial, sans-serif" font-size="19" font-weight="400" fill="#19324b">Prediction request / result</text>
+<polyline points="610,375 515,375 515,865 460,865" fill="none" stroke="#42566c" stroke-width="2.5" marker-end="url(#arrow)" marker-start="url(#arrow)"/>
+<text x="355" y="752" text-anchor="middle" font-family="Arial, sans-serif" font-size="19" font-weight="400" fill="#19324b">Save / retrieve records</text>
+<polyline points="990,375 1085,375 1085,865 1140,865" fill="none" stroke="#42566c" stroke-width="2.5" marker-end="url(#arrow)" marker-start="url(#arrow)"/>
+<text x="1280" y="752" text-anchor="middle" font-family="Arial, sans-serif" font-size="19" font-weight="400" fill="#19324b">Read / write / serve files</text>
+<rect x="80" y="90" width="320" height="100" rx="10" fill="#f1f5f9" stroke="#50657a" stroke-width="2"/>
+<text x="240.0" y="122" text-anchor="middle" font-family="Arial, sans-serif" font-size="23" font-weight="700" fill="#19324b">Researcher / reviewer</text>
+<text x="240.0" y="155" text-anchor="middle" font-family="Arial, sans-serif" font-size="19" font-weight="400" fill="#19324b">Upload image or select demo</text>
+<text x="240.0" y="182" text-anchor="middle" font-family="Arial, sans-serif" font-size="19" font-weight="400" fill="#19324b">Inspect and suggest readings</text>
+<rect x="610" y="70" width="380" height="140" rx="10" fill="#e8f0fb" stroke="#50657a" stroke-width="2"/>
+<text x="800.0" y="102" text-anchor="middle" font-family="Arial, sans-serif" font-size="23" font-weight="700" fill="#19324b">React Studio</text>
+<text x="800.0" y="135" text-anchor="middle" font-family="Arial, sans-serif" font-size="19" font-weight="400" fill="#19324b">Original / mask viewer</text>
+<text x="800.0" y="162" text-anchor="middle" font-family="Arial, sans-serif" font-size="19" font-weight="400" fill="#19324b">Candidate inspector and review</text>
+<text x="800.0" y="189" text-anchor="middle" font-family="Arial, sans-serif" font-size="19" font-weight="400" fill="#19324b">Run history</text>
+<rect x="610" y="280" width="380" height="130" rx="10" fill="#e8f0fb" stroke="#50657a" stroke-width="2"/>
+<text x="800.0" y="312" text-anchor="middle" font-family="Arial, sans-serif" font-size="23" font-weight="700" fill="#19324b">FastAPI + Uvicorn</text>
+<text x="800.0" y="345" text-anchor="middle" font-family="Arial, sans-serif" font-size="19" font-weight="400" fill="#19324b">Local API and static frontend</text>
+<text x="800.0" y="372" text-anchor="middle" font-family="Arial, sans-serif" font-size="19" font-weight="400" fill="#19324b">Coordinates existing Python modules</text>
+<rect x="80" y="520" width="380" height="155" rx="10" fill="#edf4ef" stroke="#50657a" stroke-width="2"/>
+<text x="270.0" y="552" text-anchor="middle" font-family="Arial, sans-serif" font-size="23" font-weight="700" fill="#19324b">Preparation &amp; enhancement</text>
+<text x="270.0" y="585" text-anchor="middle" font-family="Arial, sans-serif" font-size="19" font-weight="400" fill="#19324b">Validate, orient, resize</text>
+<text x="270.0" y="612" text-anchor="middle" font-family="Arial, sans-serif" font-size="19" font-weight="400" fill="#19324b">Reused Shilalekhya Attention U-Net</text>
+<text x="270.0" y="639" text-anchor="middle" font-family="Arial, sans-serif" font-size="19" font-weight="400" fill="#19324b">Separate PyTorch CPU worker</text>
+<rect x="610" y="520" width="380" height="155" rx="10" fill="#e8f0fb" stroke="#50657a" stroke-width="2"/>
+<text x="800.0" y="552" text-anchor="middle" font-family="Arial, sans-serif" font-size="23" font-weight="700" fill="#19324b">Candidate localization</text>
+<text x="800.0" y="585" text-anchor="middle" font-family="Arial, sans-serif" font-size="19" font-weight="400" fill="#19324b">Connected components on mask</text>
+<text x="800.0" y="612" text-anchor="middle" font-family="Arial, sans-serif" font-size="19" font-weight="400" fill="#19324b">Proposed character bounding boxes</text>
+<rect x="1140" y="520" width="380" height="155" rx="10" fill="#fff2d8" stroke="#50657a" stroke-width="2"/>
+<text x="1330.0" y="552" text-anchor="middle" font-family="Arial, sans-serif" font-size="23" font-weight="700" fill="#19324b">Character recognition</text>
+<text x="1330.0" y="585" text-anchor="middle" font-family="Arial, sans-serif" font-size="19" font-weight="400" fill="#19324b">Mask crop → HOG → saved SVM</text>
+<text x="1330.0" y="612" text-anchor="middle" font-family="Arial, sans-serif" font-size="19" font-weight="400" fill="#19324b">Labels and ranked alternatives</text>
+<text x="1330.0" y="639" text-anchor="middle" font-family="Arial, sans-serif" font-size="19" font-weight="400" fill="#19324b">Implemented; accuracy experimental</text>
+<rect x="80" y="800" width="380" height="130" rx="10" fill="#f1f5f9" stroke="#50657a" stroke-width="2"/>
+<text x="270.0" y="832" text-anchor="middle" font-family="Arial, sans-serif" font-size="23" font-weight="700" fill="#19324b">SQLite database</text>
+<text x="270.0" y="865" text-anchor="middle" font-family="Arial, sans-serif" font-size="19" font-weight="400" fill="#19324b">runs  •  character_reviews</text>
+<text x="270.0" y="892" text-anchor="middle" font-family="Arial, sans-serif" font-size="19" font-weight="400" fill="#19324b">Original prediction + review provenance</text>
+<rect x="1140" y="800" width="380" height="130" rx="10" fill="#f1f5f9" stroke="#50657a" stroke-width="2"/>
+<text x="1330.0" y="832" text-anchor="middle" font-family="Arial, sans-serif" font-size="23" font-weight="700" fill="#19324b">Local files</text>
+<text x="1330.0" y="865" text-anchor="middle" font-family="Arial, sans-serif" font-size="19" font-weight="400" fill="#19324b">Images, masks and crops</text>
+<text x="1330.0" y="892" text-anchor="middle" font-family="Arial, sans-serif" font-size="19" font-weight="400" fill="#19324b">Batch prediction JSON</text>
+<text x="800" y="1002" text-anchor="middle" font-family="Arial, sans-serif" font-size="22" font-weight="400" fill="#19324b">Reviews remain unverified; corrections do not automatically retrain the model.</text>
+<text x="800" y="1040" text-anchor="middle" font-family="Arial, sans-serif" font-size="20" font-weight="400" fill="#19324b">Offline experiments and planned translation are outside this runtime architecture.</text>
+</svg>

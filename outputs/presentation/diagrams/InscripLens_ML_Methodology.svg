@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900">
+<rect width="100%" height="100%" fill="white"/>
+<defs><marker id="a" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto-start-reverse" markerUnits="userSpaceOnUse"><path d="M0 0 L10 5 L0 10 Z" fill="#42566c"/></marker></defs>
+<text x="800" y="42" text-anchor="middle" font-family="Arial,sans-serif" font-size="32" font-weight="700" fill="#19324b">INSCRIPLENS — ML METHODOLOGY AND PROCESS FLOW</text>
+<polyline points="470,172 590,172" fill="none" stroke="#42566c" stroke-width="2.5" marker-end="url(#a)"/>
+<polyline points="1010,172 1130,172" fill="none" stroke="#42566c" stroke-width="2.5" marker-end="url(#a)"/>
+<polyline points="1340,245 1340,360" fill="none" stroke="#42566c" stroke-width="2.5" marker-end="url(#a)"/>
+<text x="1340" y="305" text-anchor="middle" font-family="Arial,sans-serif" font-size="22" font-weight="400" fill="#19324b">Refit and save</text>
+<polyline points="1130,432 1010,432" fill="none" stroke="#42566c" stroke-width="2.5" marker-end="url(#a)"/>
+<polyline points="1340,505 1340,555 260,555 260,505" fill="none" stroke="#42566c" stroke-width="2.5" marker-end="url(#a)"/>
+<text x="800" y="584" text-anchor="middle" font-family="Arial,sans-serif" font-size="22" font-weight="400" fill="#19324b">Load saved model for inference</text>
+<rect x="50" y="100" width="420" height="145" rx="10" fill="#e8f0fb" stroke="#50657a" stroke-width="2"/>
+<text x="260.0" y="134" text-anchor="middle" font-family="Arial,sans-serif" font-size="26" font-weight="700" fill="#19324b">Annotated inscription data</text>
+<text x="260.0" y="170" text-anchor="middle" font-family="Arial,sans-serif" font-size="23" font-weight="400" fill="#19324b">EpiSAM images and source labels</text>
+<text x="260.0" y="199" text-anchor="middle" font-family="Arial,sans-serif" font-size="23" font-weight="400" fill="#19324b">Filter records and exclude</text>
+<text x="260.0" y="228" text-anchor="middle" font-family="Arial,sans-serif" font-size="23" font-weight="400" fill="#19324b">validation locations from training</text>
+<rect x="590" y="100" width="420" height="145" rx="10" fill="#edf4ef" stroke="#50657a" stroke-width="2"/>
+<text x="800.0" y="134" text-anchor="middle" font-family="Arial,sans-serif" font-size="26" font-weight="700" fill="#19324b">Prepare recognition features</text>
+<text x="800.0" y="170" text-anchor="middle" font-family="Arial,sans-serif" font-size="23" font-weight="400" fill="#19324b">Pretrained foreground masks</text>
+<text x="800.0" y="199" text-anchor="middle" font-family="Arial,sans-serif" font-size="23" font-weight="400" fill="#19324b">Source-box crops → median filter</text>
+<text x="800.0" y="228" text-anchor="middle" font-family="Arial,sans-serif" font-size="23" font-weight="400" fill="#19324b">32 × 32 normalization → HOG</text>
+<rect x="1130" y="100" width="420" height="145" rx="10" fill="#e8f0fb" stroke="#50657a" stroke-width="2"/>
+<text x="1340.0" y="134" text-anchor="middle" font-family="Arial,sans-serif" font-size="26" font-weight="700" fill="#19324b">Fit and assess on development</text>
+<text x="1340.0" y="170" text-anchor="middle" font-family="Arial,sans-serif" font-size="23" font-weight="400" fill="#19324b">Location-based fit / development</text>
+<text x="1340.0" y="199" text-anchor="middle" font-family="Arial,sans-serif" font-size="23" font-weight="400" fill="#19324b">Fixed HOG + SVM baseline</text>
+<text x="1340.0" y="228" text-anchor="middle" font-family="Arial,sans-serif" font-size="23" font-weight="400" fill="#19324b">Record comparisons and errors</text>
+<rect x="1130" y="360" width="420" height="145" rx="10" fill="#e8f0fb" stroke="#50657a" stroke-width="2"/>
+<text x="1340.0" y="394" text-anchor="middle" font-family="Arial,sans-serif" font-size="26" font-weight="700" fill="#19324b">Saved deployed recognizer</text>
+<text x="1340.0" y="430" text-anchor="middle" font-family="Arial,sans-serif" font-size="23" font-weight="400" fill="#19324b">Refit on 9,925 training crops</text>
+<text x="1340.0" y="459" text-anchor="middle" font-family="Arial,sans-serif" font-size="23" font-weight="400" fill="#19324b">Mask HOG + SVM bundle</text>
+<text x="1340.0" y="488" text-anchor="middle" font-family="Arial,sans-serif" font-size="23" font-weight="400" fill="#19324b">Raw source-label predictions</text>
+<rect x="590" y="360" width="420" height="145" rx="10" fill="#e8f0fb" stroke="#50657a" stroke-width="2"/>
+<text x="800.0" y="394" text-anchor="middle" font-family="Arial,sans-serif" font-size="26" font-weight="700" fill="#19324b">Diagnostic validation</text>
+<text x="800.0" y="430" text-anchor="middle" font-family="Arial,sans-serif" font-size="23" font-weight="400" fill="#19324b">Supplied boxes: 77 / 300 correct</text>
+<text x="800.0" y="459" text-anchor="middle" font-family="Arial,sans-serif" font-size="23" font-weight="400" fill="#19324b">Automatic localization + label:</text>
+<text x="800.0" y="488" text-anchor="middle" font-family="Arial,sans-serif" font-size="23" font-weight="400" fill="#19324b">52 / 300 references recovered</text>
+<rect x="50" y="360" width="420" height="145" rx="10" fill="#e8f0fb" stroke="#50657a" stroke-width="2"/>
+<text x="260.0" y="394" text-anchor="middle" font-family="Arial,sans-serif" font-size="26" font-weight="700" fill="#19324b">Application inference</text>
+<text x="260.0" y="430" text-anchor="middle" font-family="Arial,sans-serif" font-size="23" font-weight="400" fill="#19324b">New image → mask → candidates</text>
+<text x="260.0" y="459" text-anchor="middle" font-family="Arial,sans-serif" font-size="23" font-weight="400" fill="#19324b">HOG + saved SVM → suggestions</text>
+<text x="260.0" y="488" text-anchor="middle" font-family="Arial,sans-serif" font-size="23" font-weight="400" fill="#19324b">Human review; no auto-retraining</text>
+<rect x="70" y="625" width="700" height="140" rx="10" fill="#fff2d8" stroke="#50657a" stroke-width="2"/>
+<text x="420.0" y="659" text-anchor="middle" font-family="Arial,sans-serif" font-size="26" font-weight="700" fill="#19324b">Separate offline experiments</text>
+<text x="420.0" y="695" text-anchor="middle" font-family="Arial,sans-serif" font-size="23" font-weight="400" fill="#19324b">CNN / frozen ResNet18 comparisons</text>
+<text x="420.0" y="724" text-anchor="middle" font-family="Arial,sans-serif" font-size="23" font-weight="400" fill="#19324b">Original + mask HOG: development gain; validation pending</text>
+<text x="420.0" y="753" text-anchor="middle" font-family="Arial,sans-serif" font-size="23" font-weight="400" fill="#19324b">CNN–BiLSTM–CTC: 3 / 4 sanity gate; not deployed</text>
+<rect x="850" y="625" width="680" height="140" rx="10" fill="#f1f5f9" stroke="#50657a" stroke-width="2"/>
+<text x="1190.0" y="659" text-anchor="middle" font-family="Arial,sans-serif" font-size="26" font-weight="700" fill="#19324b">Unimplemented objectives</text>
+<text x="1190.0" y="695" text-anchor="middle" font-family="Arial,sans-serif" font-size="23" font-weight="400" fill="#19324b">Reliable full-line transcription and reading order</text>
+<text x="1190.0" y="724" text-anchor="middle" font-family="Arial,sans-serif" font-size="23" font-weight="400" fill="#19324b">Modern Kannada conversion and English interpretation</text>
+<text x="800" y="835" text-anchor="middle" font-family="Arial,sans-serif" font-size="23" font-weight="400" fill="#19324b">Validation is reused; source labels are unreviewed and binarizer pretraining overlap is unresolved.</text>
+<text x="800" y="867" text-anchor="middle" font-family="Arial,sans-serif" font-size="23" font-weight="400" fill="#19324b">Amber = offline experiments. Grey = future objectives. Neither is part of deployed recognition.</text>
+</svg>
