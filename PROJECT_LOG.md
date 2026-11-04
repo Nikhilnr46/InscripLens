@@ -149,3 +149,13 @@ When making significant updates to InscripLens Studio, append a new dated entry 
 - Status: Done.
 - Next step: Review git status, stage intended source and documentation files, and push to the remote repository.
 
+
+
+### [2026-11-04] Local onboarding and Presentation 3 verification
+- Pulled Studio changes through 4b40179 and completed the production frontend build.
+- Verified localhost status/demo/SPA endpoints, real demo analysis (133 candidates), batch and single-region prediction, review round-trip, and three negative API requests.
+- Added missing server dependencies to requirements.txt and fixed analysis-canvas dimensions for resized uploads, with a passing regression test.
+- Measured one demo enhancement at 23.37 s here. No recognition model or benchmark changed.
+- The original Phase 2 translation objective remains unfinished; it has not been silently removed from the presentation scope.
+- Detailed results, local environment command and remaining migration gaps: outputs/STUDIO_STARTUP_VERIFICATION.md.
+- Next: validate paired image/mask features and improve verified sequence supervision.

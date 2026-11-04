@@ -172,6 +172,7 @@ async def run_analyse(request: Request):
     mask_path = Path(record["mask_path"])
     with Image.open(mask_path) as mask:
         boxes = candidates(mask)
+        analysis_width, analysis_height = mask.size
 
     # Clean display name: never expose file names
     display_name = "Nagavara demonstration stone" if is_demo else "Uploaded photograph"
@@ -184,8 +185,8 @@ async def run_analyse(request: Request):
         "sha256": record["sha256"],
         "image_url": f"/app_data/{run_id}/input.png",
         "mask_url": f"/app_data/{run_id}/mask.png",
-        "width": image.width,
-        "height": image.height,
+        "width": analysis_width,
+        "height": analysis_height,
         "boxes": boxes,
         "candidate_count": len(boxes),
         "created": record["created"]
