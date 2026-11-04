@@ -1,0 +1,55 @@
+{
+  "date": "2026-11-04",
+  "api_evidence": "Prior onboarding observations, not rerun during slide review",
+  "health": {
+    "/api/status": {
+      "status": 200,
+      "content_type": "application/json",
+      "bytes": 86,
+      "body": {
+        "ready": true,
+        "demo_available": true,
+        "recognizer_available": true,
+        "advanced_mode": false
+      }
+    },
+    "/api/demo": {
+      "status": 200,
+      "content_type": "application/json",
+      "bytes": 209,
+      "body": {
+        "id": "demo_stone",
+        "name": "Nagavara demonstration stone",
+        "image_url": "/api/demo/image",
+        "width": 525,
+        "height": 1080,
+        "description": "Historical 8th-century Ganga-period inscription stone from Nagavara, Bengaluru."
+      }
+    },
+    "/": {
+      "status": 200,
+      "content_type": "text/html; charset=utf-8",
+      "bytes": 1298
+    },
+    "/studio": {
+      "status": 200,
+      "content_type": "text/html; charset=utf-8",
+      "bytes": 1298
+    },
+    "/api/demo/image": {
+      "status": 200,
+      "content_type": "image/png",
+      "bytes": 1206034
+    }
+  },
+  "demo_candidates": 133,
+  "batch_predictions": 133,
+  "demo_seconds_one_run": 23.37,
+  "review_saved": true,
+  "negative_checks_passed": 3,
+  "checks_rerun_for_review": {
+    "check_review_storage.py": "PASS",
+    "check_studio_api.py": "1 test, OK",
+    "check_app_backend.py": "PASS"
+  }
+}
