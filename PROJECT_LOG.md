@@ -31,7 +31,7 @@ python launch_studio.py
 | Landing site cleanup (Step C1) | Done | `LandingPage.jsx`, `AboutSection.tsx`, `Footer.tsx` | Header button removed, Limitations moved to end, single-column About, clean footer. |
 | Privacy scrub (paths & model names) | Done | `api/server.py`, `App.jsx` | Internal filenames masked to "Experimental recognizer"; file paths masked to web URLs. |
 | Curated demo stone metrics | Done | `TabletIllustration.tsx`, `full_binarizer/HS027_original.png` | Fixed chips ("EPOCH 8th C. CE", "REGIONS 133 localized") reflect Nagavara benchmark stone. |
-| Interactive headline hover color | Not done | Backlog item | Planned dynamic letter hover coloring; deferred to preserve AA contrast and simplicity. |
+| Interactive headline hover color (Step C2) | Done | `frontend/src/index.css`, `frontend/src/pages/LandingPage.jsx` | rAF-throttled layered background-clip text spotlight with dynamic hue shift and 300ms leave transition. |
 | Mobile low-power / lite-mode audit | Not done | Backlog item | Planned battery/GPU reduction tier; deferred as rAF loops already pause when idle. |
 | Automated line transcription / reading order | Not done | `outputs/sequence_data_audit/` | Line-level sequence OCR is not yet implemented. |
 | Historical Kannada to English translation | Not done | Stated in limitations | Outside project scope; unverified for general epigraphy. |
@@ -75,6 +75,7 @@ python launch_studio.py
 - Replaying Reveals (Step N2): Added replaying IntersectionObserver scroll reveals using CSS individual `translate` and `opacity` properties.
 - Scroll Lock Bug Fix: Eliminated scroll blocking on root page by removing `body { overflow: hidden; }` and adopting `overflow-x: clip;`.
 - Cleanup and Restructure (Step C1): Removed redundant header/hero entry links; established "Slide to enter Studio" as sole keyboard-accessible entry; relocated Limitations to final section; cleaned footer attribution.
+- Interactive Headline Spotlight (Step C2): Implemented rAF-throttled layered background-clip text spotlight on 'Read the stone before it fades' with dynamic horizontal hue shift, 300ms leave ease-out, light-mode contrast deepening, and reduced-motion/touch guards.
 - Handover and Repository Hygiene: Generated `HANDOVER.md`, updated `README.md`, and updated root `.gitignore` to protect build artifacts and runtime data.
 
 ---

@@ -36,6 +36,7 @@ export default function LandingPage({ onEnterStudio, onTryDemo }) {
 
   const navTrackRef = useRef(null);
   const linkRefs = useRef({});
+  const headlineRef = useRef(null);
 
   const isReducedMotion = () => {
     return typeof window !== 'undefined' &&
@@ -74,6 +75,98 @@ export default function LandingPage({ onEnterStudio, onTryDemo }) {
     window.history.replaceState(null, '', window.location.pathname);
     setActiveSection('overview');
   };
+
+  // Interactive Headline Spotlight (Step C2)
+  useEffect(() => {
+    const el = headlineRef.current;
+    if (!el) return;
+
+    // Disabled on touch devices and when prefers-reduced-motion is set
+    const mediaFine = window.matchMedia('(hover: hover) and (pointer: fine)');
+    const mediaMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+    if (!mediaFine.matches || mediaMotion.matches) {
+      return;
+    }
+
+    let rafMoveId = null;
+    let rafFadeId = null;
+    let latestEvent = null;
+    const FADE_DURATION = 300;
+
+    const onPointerMove = (e) => {
+      latestEvent = e;
+      if (rafMoveId === null) {
+        rafMoveId = requestAnimationFrame(() => {
+          rafMoveId = null;
+          if (!latestEvent || !el) return;
+          const rect = el.getBoundingClientRect();
+          const x = latestEvent.clientX - rect.left;
+          const y = latestEvent.clientY - rect.top;
+          const normX = Math.max(0, Math.min(1, x / rect.width));
+          // Hue shift between about -20deg and 20deg
+          const hue = Math.round((normX - 0.5) * 40);
+
+          el.style.setProperty('--mx', `${x.toFixed(1)}px`);
+          el.style.setProperty('--my', `${y.toFixed(1)}px`);
+          el.style.setProperty('--hue', `${hue}deg`);
+        });
+      }
+    };
+
+    const onPointerEnter = (e) => {
+      if (rafFadeId !== null) {
+        cancelAnimationFrame(rafFadeId);
+        rafFadeId = null;
+      }
+      el.style.setProperty('--spotlight-opacity', '1');
+      el.addEventListener('pointermove', onPointerMove, { passive: true });
+      onPointerMove(e);
+    };
+
+    const onPointerLeave = () => {
+      el.removeEventListener('pointermove', onPointerMove);
+      if (rafMoveId !== null) {
+        cancelAnimationFrame(rafMoveId);
+        rafMoveId = null;
+      }
+      latestEvent = null;
+
+      // Smoothly ease spotlight out over 300ms so text settles back to resting gradient
+      const startVal = parseFloat(el.style.getPropertyValue('--spotlight-opacity')) || 1;
+      const startTime = performance.now();
+
+      const fadeStep = (now) => {
+        const elapsed = now - startTime;
+        const progress = Math.min(1, elapsed / FADE_DURATION);
+        // ease-out cubic curve
+        const ease = 1 - Math.pow(1 - progress, 3);
+        const currentOpacity = startVal * (1 - ease);
+
+        el.style.setProperty('--spotlight-opacity', currentOpacity.toFixed(3));
+
+        if (progress < 1) {
+          rafFadeId = requestAnimationFrame(fadeStep);
+        } else {
+          el.style.setProperty('--spotlight-opacity', '0');
+          rafFadeId = null;
+        }
+      };
+
+      rafFadeId = requestAnimationFrame(fadeStep);
+    };
+
+    el.addEventListener('pointerenter', onPointerEnter);
+    el.addEventListener('pointerleave', onPointerLeave);
+
+    return () => {
+      el.removeEventListener('pointerenter', onPointerEnter);
+      el.removeEventListener('pointerleave', onPointerLeave);
+      el.removeEventListener('pointermove', onPointerMove);
+      if (rafMoveId !== null) cancelAnimationFrame(rafMoveId);
+      if (rafFadeId !== null) cancelAnimationFrame(rafFadeId);
+    };
+  }, []);
 
   // Update sliding underline indicator position
   useEffect(() => {
@@ -270,7 +363,7 @@ export default function LandingPage({ onEnterStudio, onTryDemo }) {
             </Reveal>
 
             <Reveal initialShown variant="up" delay={60}>
-              <h1 className="landing-headline">
+              <h1 className="landing-headline" ref={headlineRef}>
                 Read the stone <span className="headline-gradient">before it fades</span>
               </h1>
             </Reveal>

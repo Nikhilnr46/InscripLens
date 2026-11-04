@@ -74,6 +74,9 @@
   --scrollbar-thumb-hover: #3A3A42;
   --shadow-elevated: 0 8px 30px rgba(0, 0, 0, 0.6);
   --headline-gradient: linear-gradient(135deg, #FFFFFF 0%, #C9A66B 50%, #818CF8 100%);
+  --headline-resting-layer: linear-gradient(135deg, #EDEDEC 0%, #EDEDEC 38%, #C9A66B 68%, #818CF8 100%);
+  --headline-spotlight-gold: hsl(calc(42deg + var(--hue, 0deg)) 85% 68% / var(--spotlight-opacity, 0));
+  --headline-spotlight-violet: hsl(calc(245deg + var(--hue, 0deg)) 90% 74% / calc(var(--spotlight-opacity, 0) * 0.85));
   --slide-track-bg: #141419;
 }
 
@@ -113,6 +116,9 @@
   --scrollbar-thumb-hover: #BAAF9D;
   --shadow-elevated: 0 8px 30px rgba(60, 50, 35, 0.12);
   --headline-gradient: linear-gradient(135deg, #1C1A17 0%, #9A7330 55%, #4338CA 100%);
+  --headline-resting-layer: linear-gradient(135deg, #1C1A17 0%, #1C1A17 38%, #9A7330 68%, #4338CA 100%);
+  --headline-spotlight-gold: hsl(calc(36deg + var(--hue, 0deg)) 95% 26% / var(--spotlight-opacity, 0));
+  --headline-spotlight-violet: hsl(calc(255deg + var(--hue, 0deg)) 88% 28% / calc(var(--spotlight-opacity, 0) * 0.9));
   --slide-track-bg: #EAE3D6;
 }
 
@@ -1629,7 +1635,51 @@ a.landing-brand:focus-visible {
 .headline-gradient {
   background: var(--headline-gradient);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .landing-headline {
+    --spotlight-opacity: 0;
+    --hue: 0deg;
+    --mx: -9999px;
+    --my: -9999px;
+    background-image:
+      radial-gradient(
+        circle 180px at var(--mx, -9999px) var(--my, -9999px),
+        var(--headline-spotlight-gold) 0%,
+        var(--headline-spotlight-violet) 55%,
+        transparent 100%
+      ),
+      var(--headline-resting-layer);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+  }
+
+  .landing-headline .headline-gradient {
+    background: transparent !important;
+    -webkit-background-clip: initial !important;
+    background-clip: initial !important;
+    -webkit-text-fill-color: inherit !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .landing-headline {
+    background-image: none !important;
+    -webkit-text-fill-color: var(--text-primary) !important;
+    color: var(--text-primary) !important;
+  }
+
+  .landing-headline .headline-gradient {
+    background: var(--headline-gradient) !important;
+    -webkit-background-clip: text !important;
+    background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+  }
 }
 
 .landing-description {
