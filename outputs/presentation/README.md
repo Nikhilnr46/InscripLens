@@ -1,0 +1,11 @@
+# Presentation 3 review draft
+
+Deliverable: `InscripLens_Presentation3_review_final.pptx` (40 slides, including three diagram appendix slides). This is a review draft, not a claim that the original project meets the required 80% implementation threshold. It covers the supplied Presentation-3 flow, ten carried-forward research papers, current implementation, diagrams, real local application screenshots, controlled model comparisons and remaining scope.
+
+Source inputs: `C:/Users/nikhi/MCA/Final project/phase2.pptx`, `Presentation-3 Deliverables .pdf`, repository code and saved experiment reports. Original Phase 2 files are unchanged. Detailed source links and protocol caveats are in slide notes. The previous conceptual translation/user database has been replaced with the actual SQLite analysis/review schema.
+
+Before submission, review the narrative with the student and confirm institutional IEEE/Scopus eligibility for all retained papers. Publisher metadata for the SIFT/HOG paper displays a 2020 issue and a February 2021 first-publication date; the draft uses the issue year. The preprocessing article's deposited PDF/Zenodo record agrees with the supplied Phase 2 citation, but the Crossref API returned inconsistent title metadata for its DOI; the draft links the deposited article. Two Tamil method summaries are explicitly carried forward from the Phase 2 survey, not newly reproduced results. Published-paper accuracy claims have not been equated to InscripLens results.
+
+Friend's Vite work was confirmed by the user to be local and unpushed. Remote fetch showed only main at 6f27f8b before this presentation work. The screenshots and technology descriptions therefore use the current Streamlit app. No frontend merge or app-model change was made.
+
+Private build scripts, rendered slides and validation reports are in `work/phase3_build/`. `InscripLens_Presentation3_draft.pptx` is an earlier local intermediate, not the deliverable. The selected review file passed package/layout/import checks and all slide previews were visually inspected; it has not been opened in native PowerPoint. Images are embedded, tables and diagrams remain editable. Third-party imagery attribution is in relevant notes and THIRD_PARTY.md.
