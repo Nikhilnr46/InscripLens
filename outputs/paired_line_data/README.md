@@ -18,3 +18,11 @@ A deterministic six-source contact sheet of newly eligible crops was visually in
 Next: inspect the stricter subset and repeat the bounded tiny-subset learnability gate with fixed input/model settings. Do not train a large recognizer or claim held-out line accuracy from this audit. Existing earlier CTC result remains 3/4 training examples fitted, with no generalization evidence.
 
 EpiSAM source annotations and images retain their existing CC BY-SA attribution; these crops are derived data, not newly authored ground truth.
+
+## Bounded learnability check
+
+Run `work/binarizer_env/Scripts/python.exe outputs/check_sequence_learning.py --paired-view mask --preserve-height --pack-lengths --max-steps 300` (replace mask with original for the paired comparison). The same four shortest multi-label fit lines, from distinct sources, are selected before training. Full eligible-fit alphabet, same seed/model/optimizer/budget, no development or validation access.
+
+Predicted-mask view: 1/4 exact training sequences after 300 steps. Original grayscale view: 0/4. Both fail the required 4/4 gate. These four examples differ from earlier experiments, so this is not an accuracy comparison with the old 3/4 result. Tiny-subset memorization would still not prove generalization even if successful. No large training run started and no runtime model changed.
+
+Visual comparison against the archive's binary images shows incomplete strokes in some selected examples; even supplied binary images can be sparse. The minimum 20 foreground-pixel filter does not establish glyph completeness. Next investigate source-aligned glyph quality and decoding/optimization controls on a reviewed tiny subset; do not assume adding epochs or more unreviewed images solves the issue.

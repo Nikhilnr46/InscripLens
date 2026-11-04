@@ -1,0 +1,113 @@
+{
+  "purpose": "training-only tiny-subset learnability check, not generalization",
+  "paired_view": "original",
+  "eligible_fit_lines": 124,
+  "minimum_foreground_pixels_per_character": 20,
+  "preserve_vertical_features": true,
+  "packed_sequence_lengths": true,
+  "passed": false,
+  "seconds": 13.103615599997283,
+  "maximum_steps": 300,
+  "history": [
+    {
+      "step": 25,
+      "loss": 2.8100838661193848,
+      "training_exact": 0,
+      "total": 4
+    },
+    {
+      "step": 50,
+      "loss": 2.7206506729125977,
+      "training_exact": 0,
+      "total": 4
+    },
+    {
+      "step": 75,
+      "loss": 2.6019155979156494,
+      "training_exact": 0,
+      "total": 4
+    },
+    {
+      "step": 100,
+      "loss": 2.4110236167907715,
+      "training_exact": 0,
+      "total": 4
+    },
+    {
+      "step": 125,
+      "loss": 2.0977556705474854,
+      "training_exact": 0,
+      "total": 4
+    },
+    {
+      "step": 150,
+      "loss": 1.7873057126998901,
+      "training_exact": 0,
+      "total": 4
+    },
+    {
+      "step": 175,
+      "loss": 1.457944631576538,
+      "training_exact": 0,
+      "total": 4
+    },
+    {
+      "step": 200,
+      "loss": 1.1856728792190552,
+      "training_exact": 0,
+      "total": 4
+    },
+    {
+      "step": 225,
+      "loss": 0.9827553629875183,
+      "training_exact": 0,
+      "total": 4
+    },
+    {
+      "step": 250,
+      "loss": 0.8431899547576904,
+      "training_exact": 0,
+      "total": 4
+    },
+    {
+      "step": 275,
+      "loss": 0.7498210668563843,
+      "training_exact": 0,
+      "total": 4
+    },
+    {
+      "step": 300,
+      "loss": 0.6842917203903198,
+      "training_exact": 0,
+      "total": 4
+    }
+  ],
+  "validation_used": false,
+  "development_used": false,
+  "samples": [
+    {
+      "source_name": "Bidarahalli 1517CE Donation Inscription",
+      "line_number": 8,
+      "target": "0|na",
+      "prediction": "0|a"
+    },
+    {
+      "source_name": "Kalya 1600CE Avi Inscription",
+      "line_number": 1,
+      "target": "a|vi",
+      "prediction": "ai"
+    },
+    {
+      "source_name": "Jinnagara 1700CE Inscription",
+      "line_number": 11,
+      "target": "śrī|śrī",
+      "prediction": "śī"
+    },
+    {
+      "source_name": "Kamenahalli 1800CE Chamundeshwari Donation Inscription",
+      "line_number": 6,
+      "target": "l̤i|grā",
+      "prediction": "l̤iā"
+    }
+  ]
+}
