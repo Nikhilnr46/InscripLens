@@ -2,6 +2,11 @@
 
 An experimental local application for analysing historical Kannada inscription images, with a hero-stone pilot dataset. It connects pretrained enhancement, candidate-region detection, experimental character recognition and review/storage.
 
+## Project Handover and Engineering Log
+
+- **Project Handover & Technical Guide**: See [HANDOVER.md](HANDOVER.md) for full architecture, clean installation, API references, privacy specifications, and pre-push audit results.
+- **Engineering Trajectory & Milestone Log**: See [PROJECT_LOG.md](PROJECT_LOG.md).
+
 ## Current capabilities
 
 - Upload a PNG/JPEG or select a public demonstration image.

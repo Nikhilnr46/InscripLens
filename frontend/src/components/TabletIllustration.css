@@ -1,0 +1,192 @@
+/* TabletIllustration.css - Self-contained styles for Interactive Stone Tablet */
+
+.stone-tablet-hero {
+  position: relative;
+  width: 100%;
+  max-width: 380px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 440px;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  cursor: crosshair;
+}
+
+/* Ambient Radial Aura behind stone */
+.stone-tablet-glow {
+  position: absolute;
+  width: 320px;
+  height: 320px;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--glow-violet) 0%, var(--glow-sandstone) 45%, transparent 70%);
+  filter: blur(40px);
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Fixed Viewfinder Corner Brackets */
+.tablet-bracket {
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  border-color: var(--accent-sandstone);
+  opacity: 0.6;
+  border-style: solid;
+  pointer-events: none;
+  z-index: 12;
+}
+
+.bracket-tl { top: -6px; left: -6px; border-width: 2px 0 0 2px; }
+.bracket-tr { top: -6px; right: -6px; border-width: 2px 2px 0 0; }
+.bracket-bl { bottom: -6px; left: -6px; border-width: 0 0 2px 2px; }
+.bracket-br { bottom: -6px; right: -6px; border-width: 0 2px 2px 0; }
+
+/* Fixed HUD Metadata Chips */
+.hud-chip {
+  position: absolute;
+  padding: 5px 12px;
+  border-radius: 6px;
+  background: var(--hud-bg);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid var(--hud-border);
+  font-size: 0.72rem;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  z-index: 10;
+  pointer-events: none;
+}
+
+.hud-chip-tl { top: 12px; left: -20px; }
+.hud-chip-tr { top: 24px; right: -20px; }
+.hud-chip-bl { bottom: 32px; left: -24px; }
+.hud-chip-br { bottom: 16px; right: -24px; }
+
+.text-sandstone { color: var(--accent-sandstone); }
+.text-violet { color: #818CF8; }
+.text-green { color: var(--success-soft); }
+
+:root[data-theme="light"] .text-violet {
+  color: #6366F1;
+}
+
+/* Parallax-Nudged Tablet SVG Wrapper */
+.tablet-svg-wrapper {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  will-change: transform;
+  transform: translate3d(0, 0, 0);
+  pointer-events: auto;
+}
+
+.stone-tablet-svg {
+  width: 100%;
+  max-width: 320px;
+  height: auto;
+  filter: drop-shadow(0 15px 35px rgba(0, 0, 0, 0.4));
+  display: block;
+}
+
+/* Soft Spotlight Torch Group */
+.tablet-spotlight-group {
+  pointer-events: none;
+  mix-blend-mode: screen;
+  will-change: transform, opacity;
+  transform: translate(var(--mx, -500px), var(--my, -500px));
+  opacity: var(--glow, 0);
+}
+
+/* Hairline Cracks */
+.tablet-cracks-base {
+  pointer-events: none;
+}
+
+.tablet-cracks-lit {
+  pointer-events: none;
+}
+
+.tablet-crack-mask-group {
+  pointer-events: none;
+  will-change: transform, opacity;
+  transform: translate(var(--mx, -500px), var(--my, -500px));
+  opacity: var(--glow, 0);
+}
+
+/* Halegannada Glyph Blocks */
+.tablet-glyph-rect {
+  fill: url(#glyphGlow);
+  filter: url(#softGlow);
+  opacity: 0.92;
+  transition: filter 300ms cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: filter;
+}
+
+.tablet-glyph-rect.is-active {
+  transition: filter 120ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+/* Proximity Selection Frames */
+.tablet-glyph-frame {
+  fill: none;
+  stroke: var(--accent-sandstone);
+  stroke-width: 1px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 300ms cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: opacity, stroke, stroke-dasharray;
+}
+
+.tablet-glyph-frame.is-active {
+  transition: opacity 120ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+.tablet-glyph-frame.is-nearest {
+  stroke: var(--accent-hover);
+  stroke-width: 1.2px;
+  stroke-dasharray: 2 2;
+  filter: drop-shadow(0 0 3px var(--accent-subtle));
+}
+
+/* Scanning Chisel Laser */
+.tablet-scan-line {
+  pointer-events: none;
+}
+
+/* Responsive adjustment for small screens */
+@media (max-width: 480px) {
+  .hud-chip-tl { top: 6px; left: 2px; }
+  .hud-chip-tr { top: 16px; right: 2px; }
+  .hud-chip-bl { bottom: 24px; left: 2px; }
+  .hud-chip-br { bottom: 8px; right: 2px; }
+}
+
+/* Reduced Motion Compliance */
+@media (prefers-reduced-motion: reduce) {
+  .tablet-svg-wrapper {
+    transform: none !important;
+    transition: none !important;
+  }
+
+  .tablet-scan-line {
+    display: none !important;
+  }
+
+  .tablet-spotlight-group,
+  .tablet-crack-mask-group {
+    display: none !important;
+  }
+
+  .tablet-glyph-frame,
+  .tablet-glyph-rect {
+    transition: none !important;
+  }
+}

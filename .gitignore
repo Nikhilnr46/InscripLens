@@ -1,6 +1,7 @@
 .venv/
 venv/
 work/
+work/app_data/
 datasets/
 __pycache__/
 *.py[cod]
@@ -28,3 +29,29 @@ outputs/**/training_records.json
 outputs/**/records.json
 outputs/**/crops/
 outputs/**/*.html
+
+# Frontend dependencies and production build
+node_modules/
+frontend/node_modules/
+dist/
+frontend/dist/
+dist-ssr/
+frontend/dist-ssr/
+
+# Logs
+*.log
+logs/
+
+# Operating system artifacts
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Editor directories and files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Local scratch and test scripts
+scratch/

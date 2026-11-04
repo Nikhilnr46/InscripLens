@@ -1,0 +1,412 @@
+# InscripLens Studio Handover and Technical Guide
+
+## 1. Project Summary
+
+InscripLens Studio is an offline computational research workspace designed for epigraphists, historians, linguists, and academic researchers studying historical Kannada stone inscriptions. The application focuses specifically on hero stones (Veeragallu) and weathered stone tablets found across Karnataka, addressing the challenge of physical granite erosion and raking light degradation.
+
+The system operates entirely on local hardware through a four-stage pipeline:
+1. Photograph Acquisition: The user uploads a field photograph (PNG/JPEG under 20 megapixels) or loads the curated Nagavara 8th-century hero stone benchmark.
+2. Neural Stroke Enhancement: A pretrained Shilalekhya U-Net segmentation network isolates chiseled incisions from background stone grain to produce a binarized foreground stroke mask.
+3. Candidate Localization: Connected-component analysis proposes bounding boxes for candidate glyph regions across the enhanced mask.
+4. Diagnostic Character Recognition: A diagnostic feature classifier generates experimental character label predictions, ranked alternatives, and confidence scores for selected or batch candidate regions.
+5. Epigraphic Review and Provenance: An epigraphist can inspect high-resolution crops against the stone, input suggested readings, record reviewer initials or notes, and save verifiable records locally into SQLite.
+
+Epigraphic Recognition Status: Character recognition is strictly experimental and diagnostic. The application is an investigative aid for human readers, not an automated transcription engine. Reliable full-stone OCR, automated reading order detection, historical-to-modern Kannada linguistic translation, and English transliteration are not implemented.
+
+---
+
+## 2. Credits and Licences
+
+### Project Authorship
+- Developer: Nikhil N R Vasista
+- Institution: PES
+- Year: 2026
+- Verified from: `frontend/src/config/site.ts`
+
+### Reused Research and Third-Party Licences
+- Shilalekhya Pretrained Binarizer:
+  - Authors: IIIT Hyderabad (ihdia)
+  - Licence: MIT Code Licence, Copyright 2025 ihdia
+  - Source Repository: https://github.com/ihdia/shilalekhya-binarization
+  - Role: Pretrained U-Net segmentation architecture and inference engine.
+- EpiSAM Inscriptions Dataset and Checkpoints:
+  - Authors: Arnav Sharma, Pratyush Jena, Amal Joseph, Ravi Kiran Sarvadevabhatla
+  - Licence: Creative Commons Attribution-ShareAlike 4.0 International (CC BY-SA 4.0)
+  - Source Repository: https://huggingface.co/datasets/keyfinder08/EpiSAM_Inscriptions_Dataset
+  - Source Weights: https://huggingface.co/keyfinder08/EpiSAM_Inscriptions_Project
+  - Attribution: Imagery acknowledged to The Mythic Society, Bengaluru.
+  - Redistribution Requirement: Dataset previews, sample crops, and derived masks distributed with this application are derived works. Any redistribution of images, masks, or checkpoint weights must maintain CC BY-SA 4.0 attribution and share-alike licensing.
+- Original Project Code:
+  - A root LICENSE file has not yet been selected. Original glue code, REST server, React client, and evaluation benchmarks remain unassigned until institutional publication decisions are finalized.
+
+---
+
+## 3. Architecture
+
+### Folder Map
+```text
+InscripLens/
+├── api/                           # FastAPI backend server
+│   └── server.py                  # REST API endpoints and static SPA hosting
+├── frontend/                      # React 19 + TypeScript + Vite SPA
+│   ├── public/                    # Static fonts and assets
+│   ├── src/
+│   │   ├── components/            # UI components (SlideToEnter, TabletIllustration, etc.)
+│   │   ├── config/site.ts         # Centralized site metadata and authorship config
+│   │   ├── pages/LandingPage.jsx  # Single-page scrolling landing site
+│   │   ├── utils/                 # Reveal observer, interactions, math helpers
+│   │   ├── App.jsx                # Studio workspace and route coordinator
+│   │   └── index.css              # Theme token design system, interaction styles
+│   ├── index.html                 # HTML shell and metadata
+│   ├── package.json               # Node dependencies
+│   └── vite.config.js             # Vite build configuration
+├── outputs/                       # Core Python pipeline modules and experiments
+│   ├── app_backend.py             # Image analysis, subprocess execution, SQLite history
+│   ├── binarizer_core.py          # Tiled CPU inference engine for Shilalekhya U-Net
+│   ├── segment_candidates.py      # Connected-component bounding box detection
+│   ├── recognize_regions.py       # Batch character prediction runner
+│   ├── recognition_alternatives.py# Ranked label suggestion and example retrieval
+│   ├── run_character_benchmark.py # Feature extraction and diagnostic models
+│   ├── inscriplens_app.py         # Legacy Streamlit prototype application
+│   ├── broad_clean_study/         # Primary SVM model and benchmark reports
+│   ├── matched_mask_study/        # Fallback hero-only model and comparison records
+│   └── full_binarizer/            # Demo stone image and baseline benchmarks
+├── work/                          # Local runtime assets, models, and private data (git-ignored)
+│   ├── app_data/                  # SQLite review database and uploaded run artifacts
+│   ├── binarizer_env/             # Python 3.12 virtual environment for CPU PyTorch
+│   ├── shilalekhya/               # Shilalekhya model definition and weights
+│   └── hero_pilot/                # Benchmark manifest and pilot data
+├── launch_studio.py               # Launcher: opens browser and starts Uvicorn
+├── run_studio.bat                 # Windows shell shortcut for launch_studio.py
+├── requirements.txt               # Main application Python dependencies
+├── requirements-inference.txt     # Inference environment PyTorch dependencies
+└── THIRD_PARTY.md                 # Upstream attribution and citation notices
+```
+
+### Communication Flow and Port Assignments
+1. Port 8000 (`http://127.0.0.1:8000`): Primary InscripLens Studio.
+   - Serves the compiled React SPA from `frontend/dist`.
+   - Handles REST API requests on `/api/*`.
+   - Serves local session artifacts from `/app_data/*`.
+2. Port 8501 (`http://127.0.0.1:8501`): Optional legacy Streamlit application (`outputs/inscriplens_app.py`).
+
+### System Interaction Diagram
+```text
++-------------------------------------------------------------------------------+
+|                             Browser Client                                    |
+|   Landing Page ("/")  <==== SPA Router ====>  Studio Workspace ("/studio")    |
+|   - Hero & Tablet Illustration                - Zoom/Pan Canvas Stage         |
+|   - Theme Toggle (Dark/Light)                 - Interactive Curtain Wipe      |
+|   - Scroll-Spy & Reveal                       - Candidate Strip & Inspector   |
++---------------------------------------+---------------------------------------+
+                                        | HTTP REST / JSON
+                                        v
++-------------------------------------------------------------------------------+
+|                       FastAPI Backend (api/server.py)                         |
+|   - CORS & Global Exception Guard (path sanitization)                         |
+|   - SPA Static File Server (frontend/dist)                                    |
+|   - Static Artifact Mount (/app_data -> work/app_data)                        |
++-------------------+---------------------------------------+-------------------+
+                    |                                       |
+                    v                                       v
++---------------------------------------+   +-----------------------------------+
+|  Subprocess Worker (Python 3.12)      |   |  Diagnostic Classifier (Joblib)   |
+|  Executable: work/binarizer_env       |   |  outputs/broad_clean_study/       |
+|  Model: work/shilalekhya/binarizer.pth|   |  mask_svm_bundle.joblib           |
+|  - Tiled CPU U-Net enhancement        |   |  - HOG feature extraction         |
+|  - Generates stroke mask              |   |  - Top-3 alternative ranking      |
++-------------------+-------------------+   +-----------------------------------+
+                    |
+                    v
++-------------------------------------------------------------------------------+
+|                       Storage Layer (work/app_data)                           |
+|   - Session Folders: input.png, mask.png, crop_*.png, automatic_regions.json  |
+|   - SQLite Database: history.sqlite3 (analysis runs, character reviews)       |
++-------------------------------------------------------------------------------+
+```
+
+---
+
+## 4. Setup and Run Guide (Clean Machine)
+
+### Prerequisites
+- Operating System: Windows 10/11, Linux, or macOS.
+- Python 3.12+: Required for CPU PyTorch inference. Python 3.14 or 3.13 is supported for the main application.
+- Node.js: v20.0.0 or higher with npm.
+- Git: Required for repository cloning.
+
+### Clean Machine Setup Procedure
+
+#### Step 1: Clone Repository
+```bash
+git clone https://github.com/Nikhilnr46/InscripLens.git
+cd InscripLens
+```
+
+#### Step 2: Main Application Environment
+```powershell
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python -m pip install --upgrade pip
+pip install -r requirements.txt
+```
+
+#### Step 3: Binarizer Inference Environment
+To isolate PyTorch CPU binaries from system dependencies, install the dedicated inference worker environment:
+```powershell
+py -3.12 -m venv work/binarizer_env
+.\work\binarizer_env\Scripts\python.exe -m pip install -r requirements-inference.txt
+.\work\binarizer_env\Scripts\python.exe -m pip install "numpy>=2.2" "Pillow>=11"
+```
+
+#### Step 4: Install Runtime Assets and Models
+Obtain `InscripLens_runtime_assets.zip` and extract directly into the repository root:
+- `work/shilalekhya/binarizer.pth`
+- `work/shilalekhya/Unet/model.py`
+- `work/shilalekhya/LICENSE`
+- `outputs/full_binarizer/HS027_original.png`
+- `outputs/matched_mask_study/mask_svm_bundle.joblib`
+
+Optionally, obtain `InscripLens_recognizer_update.zip` and extract into the repository root:
+- `outputs/broad_clean_study/mask_svm_bundle.joblib`
+
+#### Step 5: Build Frontend
+```powershell
+cd frontend
+npm install
+npm run build
+cd ..
+```
+
+### Running the Application
+
+#### Production Mode (Unified Server)
+Run the launcher script or batch file:
+```powershell
+python launch_studio.py
+```
+Or directly via Uvicorn:
+```powershell
+python -m uvicorn server:app --app-dir api --host 127.0.0.1 --port 8000
+```
+Open `http://127.0.0.1:8000` in any modern web browser.
+
+#### Development Mode (Hot Reloading)
+- Terminal 1 (Backend API):
+  ```powershell
+  python -m uvicorn server:app --app-dir api --host 127.0.0.1 --port 8000 --reload
+  ```
+- Terminal 2 (Vite Frontend):
+  ```powershell
+  cd frontend
+  npm run dev
+  ```
+  Open the Vite development port shown in the terminal (default: `http://localhost:5173`).
+
+### Environment Variables
+- `INSCRIPLENS_ADVANCED`: Optional boolean flag (`1`, `true`, `yes`, `on`). When enabled, exposes internal diagnostics, literature comparison tables, and raw experiment exports. When disabled or absent (default), the interface remains in clean researcher mode.
+
+---
+
+## 5. Models and Data
+
+| Asset Name | Relative Location | Approximate Size | Licence | Distribution Mode |
+|---|---|---|---|---|
+| Shilalekhya Pretrained Binarizer | `work/shilalekhya/binarizer.pth` | 120.5 MB | CC BY-SA 4.0 | Downloaded via `InscripLens_runtime_assets.zip` |
+| Shilalekhya Architecture | `work/shilalekhya/Unet/model.py` | 4.2 KB | MIT | Downloaded via `InscripLens_runtime_assets.zip` |
+| Broader Cleaned Mask Recognizer | `outputs/broad_clean_study/mask_svm_bundle.joblib` | 76.8 MB | CC BY-SA 4.0 (derived) | Downloaded via `InscripLens_recognizer_update.zip` |
+| Hero-Only Fallback Recognizer | `outputs/matched_mask_study/mask_svm_bundle.joblib` | 5.6 MB | CC BY-SA 4.0 (derived) | Downloaded via `InscripLens_runtime_assets.zip` |
+| Nagavara Demo Stone Image | `outputs/full_binarizer/HS027_original.png` | 2.1 MB | CC BY-SA 4.0 | Downloaded via `InscripLens_runtime_assets.zip` |
+| Recognition Reference Crops | `outputs/recognition_references.zip` | 14.8 MB | CC BY-SA 4.0 (derived) | Optional pack; generated via script |
+| Pilot Dataset Manifest | `work/hero_pilot/manifest.json` | 878 KB | CC BY-SA 4.0 (derived) | Downloaded via `InscripLens_runtime_assets.zip` |
+
+All binary checkpoints, large model bundles, datasets, and runtime images are excluded from Git by `.gitignore`.
+
+---
+
+## 6. Frontend Guide
+
+### Pages and Single-Page Landing Sections
+The client application is built as a single-page application (SPA) with two primary view states managed in `frontend/src/App.jsx`:
+- Route `/`: Single-page landing site containing four sequential sections:
+  1. `#overview`: Hero banner, epigraphy badge, offline privacy guarantee, interactive stone tablet illustration with proximity glow, and "Slide to enter Studio" control.
+  2. `#workflow`: Three-stage methodology cards ("Capture & Select", "Enhance & Localize", "Inspect & Verify") with 3D tilt and cursor spotlights, plus the demo stone trigger button.
+  3. `#about`: Centered single-column documentation including "What is InscripLens", "Why it exists", the 5-stage pipeline, "Privacy", interactive FAQ accordion, and "Credits and licences".
+  4. `#limitations`: Research scope boundaries, "Limitations of this prototype" card, two-column capability summary ("Can" vs "Cannot yet"), and epigraphist verification notice.
+- Route `/studio`: The interactive Epigraphy Studio workspace containing dual-canvas curtain slider, bounding box overlays, candidate gallery strip with filter tabs, character inspector, alternative ranking cards, and reviewer submission forms.
+
+### Theme System
+- Controlled by `data-theme="dark"` and `data-theme="light"` attributes on `:root`.
+- Dark Mode Tokens: Obsidian base (`#121214`), dark surface (`#1B1B1F`), primary text (`#EDEDEC`), muted text (`#B5AFA6`), gold accent (`#C9A66B`).
+- Light Mode Tokens: Warm parchment base (`#F7F2E8`), parchment surface (`#EDE7DC`), ink text (`#1C1A17`), muted text (`#6B645A`), high-contrast AA gold accent (`#9A7330`).
+- Toggle Implementation: Circular reveal effect powered by the browser View Transitions API, originating from the toggle button click coordinates; falls back to 250ms CSS transition on unsupported browsers. Respects `prefers-reduced-motion`.
+
+### Interaction and Micro-Animation Language
+- Scroll Reveals: Managed by `frontend/src/utils/revealObserver.js`. Uses IntersectionObserver with hysteresis `[0, 0.15]` to trigger replayable reveals without layout shift. Animates individual CSS `translate` and `opacity` properties to prevent collisions with transform-based hover effects.
+- Hover Effects: Throttled using a single requestAnimationFrame loop in `frontend/src/utils/interactions.ts`. Supports:
+  - 3D card tilt (`card-tilt`).
+  - Cursor radial spotlight (`card-spotlight`).
+  - Magnetic button drift (`btn-magnetic`).
+- Tablet Illustration: In `frontend/src/components/TabletIllustration.tsx`. Uses pointer-distance calculation to compute proximity glow on glyph blocks without triggering React component re-renders.
+
+### Configuration and Customization
+- Global Configuration: `frontend/src/config/site.ts`. Modify `SITE.name`, `SITE.developer`, `SITE.college`, `SITE.collegeFull`, and `SITE.year` to update metadata across the application, HTML title, and footer.
+- Style Tokens: `frontend/src/index.css`. All colours, fonts, border radii, and transition timings are defined as CSS variables under `:root`.
+
+---
+
+## 7. Backend and API Guide
+
+All endpoints are hosted locally by FastAPI in `api/server.py`. Every response is strictly sanitized to prevent local machine usernames, drive paths, model file names, or Python tracebacks from leaking.
+
+### Endpoints
+
+| Method | Endpoint | Purpose | Request Payload | Response Shape | Access Level |
+|---|---|---|---|---|---|
+| `GET` | `/api/status` | Reports presence of local binarizer, models, and demo image | None | `{"ready": bool, "demo_available": bool, "recognizer_available": bool, "advanced_mode": bool}` | Public |
+| `GET` | `/api/demo` | Retrieves demo stone metadata | None | `{"id": str, "name": str, "image_url": str, "width": int, "height": int, "description": str}` | Public |
+| `GET` | `/api/demo/image` | Serves the demo stone photograph | None | Binary image stream (`image/png`) | Public |
+| `POST` | `/api/analyse` | Executes neural binarization and candidate extraction | Multipart form (`file`) OR `?use_demo=true` | `{"id": str, "display_name": str, "is_demo": bool, "sha256": str, "image_url": str, "mask_url": str, "width": int, "height": int, "boxes": list, "candidate_count": int, "created": str}` | Public |
+| `POST` | `/api/recognize-all` | Runs batch classification on all candidates | `{"run_id": str}` | `{"run_id": str, "model": str, "candidate_count": int, "regions": list}` | Public |
+| `POST` | `/api/predict-crop` | Classifies single bounding box with alternatives | `{"run_id": str, "bbox": [x1, y1, x2, y2]}` | `{"run_id": str, "bbox": list, "prediction": str, "alternatives": list, "crop_url": str, "model": str, "model_sha256": str, "reference_examples": list}` | Public |
+| `POST` | `/api/review` | Saves reviewer correction to SQLite database | `{"run_id": str, "bbox": list, "prediction": str, "model": str, "model_sha256": str, "suggestion": str, "reviewer": str, "note": str}` | `{"status": "saved", "run_id": str}` | Public |
+| `GET` | `/api/reviews/{run_id}` | Retrieves saved reviewer corrections for a run | None | List of review objects: `[{"bbox": list, "prediction": str, "suggested_label": str, "reviewer": str, "note": str, "created": str}]` | Public |
+| `GET` | `/api/history` | Lists previous analysis sessions from SQLite | None | List of session objects: `[{"id": str, "created": str, "display_name": str, "image_url": str, "mask_url": str, "sha256": str}]` | Public |
+| `GET` | `/api/credits` | Provides structured credits and third-party licence metadata | None | `{"title": str, "project": str, "components": list}` | Public |
+
+### Response Sanitization Audit
+- Error Handler: A global exception handler intercepts unhandled exceptions, logs internally, and returns HTTP 500 with `{"detail": "An internal error occurred while processing the request."}`.
+- Model Anonymization: Model filenames (`*.joblib`, `*.pth`) are replaced with `"Experimental recognizer"`.
+- Path Masking: All internal filesystem paths are converted to relative virtual web paths (`/app_data/...` or `/api/demo/...`).
+
+---
+
+## 8. Privacy and Security Notes
+
+1. 100% Offline Execution: InscripLens Studio connects to no external servers, cloud OCR engines, analytical trackers, or remote telemetry.
+2. Local Data Boundaries:
+   - User uploaded photographs: Saved exclusively to `work/app_data/<run_id>/input.png`.
+   - Generated segmentation masks: Saved exclusively to `work/app_data/<run_id>/mask.png`.
+   - Candidate crop images: Saved exclusively to `work/app_data/<run_id>/crop_*.png`.
+   - Analysis history and reviewer notes: Stored in local SQLite database at `work/app_data/history.sqlite3`.
+3. Confidentiality Notice: The `work/` directory contains private research imagery and epigraphic reviews. It is strictly excluded by `.gitignore` and must never be staged or pushed to public Git repositories.
+4. Model Deserialization Security: Diagnostic models use Python `joblib`. Models must only be loaded from verified local sources; never load arbitrary `.joblib` files supplied by untrusted third parties.
+
+---
+
+## 9. Testing and Regression Checklist
+
+### Manual Quality Assurance Steps
+1. Home Navigation: Open `http://127.0.0.1:8000/`. Verify smooth scrolling on `#overview`, `#workflow`, `#about`, and `#limitations`. Check that nav links jump with 88px sticky header clearance.
+2. Theme Switcher: Click the theme toggle icon. Verify that dark and light themes switch cleanly with AA contrast on text, surfaces, and borders.
+3. Slide to Enter: Focus the slider handle and press `ArrowRight`, `Enter`, or `Space`. Verify transition to `/studio`.
+4. Demo Loading: Click "Try Demo Stone (Nagavara)". Confirm the stone image and 133 candidate regions load.
+5. Curtain Wipe Slider: Drag the curtain handle left and right; verify smooth blending between original stone and neural stroke mask. Test keyboard arrow controls on the slider handle.
+6. Canvas Zoom/Pan: Scroll mouse wheel over the canvas; click and drag to pan; click 100% and Fit buttons.
+7. Candidate Inspector: Click a candidate box on canvas or from the bottom strip. Confirm that character crop, prediction, and 3 alternative suggestions display in the inspector.
+8. Batch Recognition: Click "Classify All Candidates". Confirm progress bar updates and completes.
+9. Review and Save: Enter a suggestion and reviewer initials, click "Save Review". Verify confirmation message appears and review is reflected on the candidate chip.
+10. Run History: Switch to "Run History" in the sidebar. Select a previous run and verify that previous masks and review records restore properly.
+11. Responsive Layout: Reduce browser width below 1100px and 768px. Verify that panels collapse into accessible sheets and drawers without horizontal layout overflow.
+
+### Automated Test Commands
+Run the following verification commands from the repository root:
+```powershell
+# Verify main Streamlit/backend integrity
+python outputs/check_app.py
+
+# Verify backend binarization and candidate extraction logic
+python outputs/check_app_backend.py
+
+# Verify fresh-clone asset guard behavior
+python outputs/check_fresh_clone.py
+
+# Verify SQLite review persistence and Unicode handling
+python outputs/check_review_storage.py
+
+# Verify frontend TypeScript types and Vite production compilation
+cd frontend
+npm run build
+cd ..
+```
+
+---
+
+## 10. Known Issues and Limitations
+
+1. Character Recognition Accuracy: The HOG/SVM classifier achieves 52/300 (17.33%) overall accuracy on automatically located regions against reference labels. It is intended solely as an epigraphist suggestion tool.
+2. Unverified Reading Order: Automated reading order determination is not implemented. Candidates are sorted spatially by coordinates, which may not match historical inscription flow.
+3. Language Translation: Historical Halegannada language conversion and English translation are outside project scope and not available.
+4. CPU Inference Throughput: Neural segmentation on CPU hardware requires approximately 4 to 10 seconds per image depending on resolution.
+5. Single-User Architecture: SQLite database access is designed for a single concurrent local researcher session.
+
+---
+
+## 11. Troubleshooting Guide
+
+| Issue | Cause | Solution |
+|---|---|---|
+| Page scrolling locked on landing page (`/`) | Body overflow lock inherited from modal or studio styles | Ensure `html { overflow-y: scroll; }` and `overflow-x: clip;` are set; verify no active element has `overflow: hidden` on root page. |
+| Port 8000 already in use | Previous Uvicorn instance still running in background | In PowerShell: `Get-NetTCPConnection -LocalPort 8000 \| ForEach-Object { Stop-Process -Id $_.OwningProcess -Force }` |
+| Port 8501 already in use | Previous Streamlit server still running | In PowerShell: `Get-NetTCPConnection -LocalPort 8501 \| ForEach-Object { Stop-Process -Id $_.OwningProcess -Force }` |
+| "Enhancement temporarily unavailable" | Missing PyTorch environment or weights | Confirm `work/shilalekhya/binarizer.pth` exists and `work/binarizer_env/Scripts/python.exe` is functional. |
+| Missing demonstration stone | Demo image not extracted | Verify `outputs/full_binarizer/HS027_original.png` is present. |
+| Recognizer fallback notice shown | Broader recognizer bundle absent | Extract `InscripLens_recognizer_update.zip` into repository root to install `outputs/broad_clean_study/mask_svm_bundle.joblib`. |
+| Python 3.12 subprocess failure | PyTorch binary incompatibilities | Re-create `work/binarizer_env` strictly using standard Python 3.12 64-bit. |
+
+---
+
+## 12. Suggested Next Steps (Priority Order)
+
+1. Priority 1: Line and Sequence Transcription Engine
+   - Train a sequence recognition model (e.g. CRNN or Vision Transformer) to predict character groups along inscribed lines rather than classifying disconnected bounding boxes.
+2. Priority 2: Epigraphic Expert Validation Study
+   - Conduct structured evaluation with qualified epigraphists comparing human transcription time with and without neural stroke enhancement.
+3. Priority 3: Browser-Native Inference (WebGPU / ONNX Runtime)
+   - Export Shilalekhya U-Net to ONNX Runtime Web / WebGPU, allowing zero-install client-side enhancement directly inside the browser.
+4. Priority 4: Standardized Epigraphic Export (TEI-EpiDoc XML)
+   - Implement TEI-EpiDoc compliant XML export for review records and character annotations to enable interoperability with global epigraphy repositories.
+5. Priority 5: Automated Runtime Asset Downloader
+   - Provide an automated Python asset downloader script with cryptographic SHA-256 validation to fetch required weights from Hugging Face on fresh clones.
+
+---
+
+## Pre-push Checklist Results
+
+### Secrets and Privacy Audit
+- Working Tree Scan: Verified. Zero API keys, credentials, tokens, passwords, or `.env` files detected in repository source files.
+- Personal Identifiers: Zero absolute user directory paths (such as user profile directories) present in committed files. One historical prose mention of `C:/nikhil` in `COLLABORATOR_HANDOVER.md` was identified as an illustrative path explanation; all code uses dynamic `Path(__file__).resolve()`.
+- Git History Scan: Verified. Scanned commit history for secret patterns (`api_key`, `token`, `password`, `secret`); no secrets have ever been committed.
+
+### .gitignore Audit
+- Verified and Updated: Root `.gitignore` explicitly excludes:
+  - Frontend: `node_modules/`, `frontend/node_modules/`, `dist/`, `frontend/dist/`, `dist-ssr/`, `frontend/dist-ssr/`
+  - Python: `.venv/`, `venv/`, `__pycache__/`, `*.py[cod]`
+  - Models and Datasets: `*.pth`, `*.joblib`, `*.npy`, `*.npz`, `*.zip`, `datasets/`
+  - Runtime Data and Database: `work/`, `work/app_data/`, `*.sqlite*`
+  - Images and Output Artifacts: `*.png`, `*.jpg`, `*.jpeg`, `outputs/**/crops/`
+  - Environment and Secrets: `.env`, `.env.*`, `!.env.example`, `.streamlit/secrets.toml`
+  - System and Editor Files: `.DS_Store`, `Thumbs.db`, `Desktop.ini`, `.vscode/`, `.idea/`
+  - Local Scratch and Test Scripts: `scratch/`
+
+### Large Files and Binaries Audit
+Six untracked files exceed 25 MB on the development machine. All are properly excluded from Git by `.gitignore`:
+1. `work/binarizer_env/Lib/site-packages/torch/lib/torch_cpu.dll` (295.2 MB) - Excluded by `work/`.
+2. `InscripLens_runtime_assets.zip` (135.7 MB) - Excluded by `*.zip`.
+3. `work/shilalekhya/binarizer.pth` (120.5 MB) - Excluded by `work/` and `*.pth`.
+4. `outputs/broad_clean_study/mask_svm_bundle.joblib` (76.8 MB) - Excluded by `*.joblib`.
+5. `InscripLens_recognizer_update.zip` (76.8 MB) - Excluded by `*.zip`.
+6. `work/binarizer_env/Lib/site-packages/torch/lib/torch_cpu.lib` (27.8 MB) - Excluded by `work/`.
+- Tracked Git Files: Zero tracked files in Git exceed 25 MB.
+- Recommendation: Do not use Git LFS. Continue distributing model weights and demo assets via external release archives (`InscripLens_runtime_assets.zip` and Hugging Face repositories).
+
+### Licence and Attribution Audit
+- Root Licence: A root `LICENSE` file does not exist in the repository. As instructed, none has been invented; original code remains unassigned pending institutional review.
+- Third-Party Attributions: Present and complete in `THIRD_PARTY.md`, `README.md`, `HANDOVER.md`, and the application Credits interfaces.
+- Upstream Licences: Shilalekhya MIT notice retained; EpiSAM CC BY-SA 4.0 share-alike notices retained.
+
+### Codebase Cleanliness and Leftovers Audit
+- Console Calls: Zero `console.log` statements exist in `frontend/src`.
+- Markers: Zero `TODO` or `FIXME` comments exist in `frontend/src`, `api/`, or `outputs/`.
+- Streamlit Legacy Application: `outputs/inscriplens_app.py` remains in the repository for historical verification, literature benchmark comparisons, and side-by-side evaluation against the new React/FastAPI Studio.
+- Build Verification: Clean production build generated by Vite (`dist/index.html`, `dist/assets/*.css`, `dist/assets/*.js`) with zero warnings or errors.

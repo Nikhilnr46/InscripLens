@@ -1,0 +1,233 @@
+/* Sandstone/Charcoal Theme Styles for InscripLens */
+
+/* Global typography and colors */
+html, body, [class*="css"], .stApp {
+    font-family: 'Inter', 'Noto Sans Kannada', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background-color: #16181A;
+    color: #F3F4F6;
+}
+
+/* Kannada text font prioritization */
+.kannada-text, [lang="kn"], div[data-testid="stDataFrame"] td, div[data-testid="stDataFrame"] th {
+    font-family: 'Noto Sans Kannada', 'Inter', sans-serif;
+}
+
+/* Links with warm sand accent (#C9A66B) - WCAG AA compliant */
+a, a:visited {
+    color: #C9A66B !important;
+    text-decoration: none;
+    transition: color 0.15s ease-in-out;
+}
+
+a:hover, a:focus {
+    color: #DFBA7E !important;
+    text-decoration: underline;
+}
+
+/* Card-style bordered containers with 8px rounded corners */
+div[data-testid="stExpander"] {
+    background-color: #202225 !important;
+    border: 1px solid #33363A !important;
+    border-radius: 8px !important;
+    box-shadow: none !important;
+    margin: 0.75rem 0;
+}
+
+/* Form fields, inputs, selects, and textareas with 8px rounded corners */
+input[type="text"], input[type="number"], select, textarea, div[data-baseweb="select"] > div {
+    border-radius: 8px !important;
+    border: 1px solid #3A3D42 !important;
+    background-color: #1A1C1E !important;
+    color: #F3F4F6 !important;
+}
+
+input[type="text"]:focus, input[type="number"]:focus, textarea:focus {
+    border-color: #C9A66B !important;
+    box-shadow: 0 0 0 1px #C9A66B !important;
+}
+
+/* Primary button: clearly styled warm sand accent */
+button[kind="primary"], .stButton > button[kind="primary"] {
+    background-color: #C9A66B !important;
+    color: #16181A !important;
+    font-family: 'Inter', sans-serif !important;
+    font-weight: 600 !important;
+    border: 1px solid #B89357 !important;
+    border-radius: 8px !important;
+    padding: 0.5rem 1.25rem !important;
+    transition: background-color 0.15s ease-in-out, border-color 0.15s ease-in-out;
+}
+
+button[kind="primary"]:hover, .stButton > button[kind="primary"]:hover {
+    background-color: #DFBA7E !important;
+    border-color: #C9A66B !important;
+    color: #111214 !important;
+}
+
+/* Secondary / standard buttons with 8px rounded corners */
+button[kind="secondary"], .stButton > button:not([kind="primary"]), div[data-testid="stDownloadButton"] > button {
+    background-color: #202225 !important;
+    color: #F3F4F6 !important;
+    border: 1px solid #3A3D42 !important;
+    border-radius: 8px !important;
+    font-family: 'Inter', sans-serif !important;
+    font-weight: 500 !important;
+    transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+button[kind="secondary"]:hover, .stButton > button:not([kind="primary"]):hover, div[data-testid="stDownloadButton"] > button:hover {
+    background-color: #2A2D31 !important;
+    border-color: #C9A66B !important;
+    color: #C9A66B !important;
+}
+
+/* Softer red only for errors - muted accessible red */
+div[data-testid="stAlert"]:has([data-testid="stNotificationIconError"]),
+div.stAlert[data-baseweb="notification"]:has(svg path[d*="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10"]) {
+    background-color: #2A1719 !important;
+    border: 1px solid #E06C75 !important;
+    color: #FCA5A5 !important;
+    border-radius: 8px !important;
+}
+
+/* Alerts and notifications border radius */
+div[data-testid="stAlert"] {
+    border-radius: 8px !important;
+}
+
+/* Images with subtle border and 8px corners */
+img, div[data-testid="stImage"] img {
+    border-radius: 8px !important;
+    border: 1px solid #33363A;
+}
+
+/* Typography hierarchy */
+h1, h2, h3, h4 {
+    font-family: 'Inter', sans-serif !important;
+    color: #F9FAFB !important;
+    letter-spacing: -0.01em;
+}
+
+.main-header {
+    font-size: 2.1rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: #F9FAFB;
+    margin-bottom: 0.25rem;
+}
+
+.sub-header {
+    font-size: 1.05rem;
+    font-weight: 400;
+    color: #9CA3AF;
+    margin-bottom: 0.5rem;
+}
+
+.compact-notice {
+    font-size: 0.85rem;
+    color: #9CA3AF;
+    margin-bottom: 0.75rem;
+}
+
+/* Step indicator */
+.step-container {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.75rem;
+    margin: 1rem 0 1.5rem 0;
+    padding: 0.75rem 1rem;
+    background-color: #202225;
+    border: 1px solid #33363A;
+    border-radius: 8px;
+}
+
+.step-item {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.step-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+.step-badge-completed {
+    background-color: #10B981;
+    color: #FFFFFF;
+}
+
+.step-badge-current {
+    background-color: #C9A66B;
+    color: #16181A;
+}
+
+.step-badge-pending {
+    background-color: #3A3D42;
+    color: #9CA3AF;
+}
+
+.step-text-completed {
+    color: #F3F4F6;
+    font-weight: 500;
+}
+
+.step-text-current {
+    color: #C9A66B;
+    font-weight: 600;
+}
+
+.step-text-pending {
+    color: #6B7280;
+    font-weight: 400;
+}
+
+/* Tabs styling */
+div[data-testid="stTabs"] button[role="tab"] {
+    font-family: 'Inter', sans-serif !important;
+    font-weight: 500 !important;
+    border-radius: 8px 8px 0 0 !important;
+    color: #9CA3AF !important;
+    border: none !important;
+    padding: 0.5rem 1.25rem !important;
+}
+
+div[data-testid="stTabs"] button[role="tab"][aria-selected="true"] {
+    color: #C9A66B !important;
+    border-bottom: 2px solid #C9A66B !important;
+    font-weight: 600 !important;
+}
+
+/* Badges */
+.badge-unverified {
+    display: inline-block;
+    padding: 0.25rem 0.6rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    background-color: #292318;
+    color: #FDE68A;
+    border-radius: 8px;
+    border: 1px solid #D97706;
+    margin-bottom: 0.5rem;
+}
+
+.badge-clean-model {
+    display: inline-block;
+    padding: 0.2rem 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+    background-color: #202225;
+    color: #C9A66B;
+    border-radius: 8px;
+    border: 1px solid #C9A66B;
+}
