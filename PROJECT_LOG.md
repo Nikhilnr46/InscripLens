@@ -1,5 +1,36 @@
 # InscripLens Studio Project Log
 
+## 6 November: Region Selection Implementation (Step S2 of 3)
+
+Implemented interactive stone region selection (`RegionSelector`) for uploaded images prior to neural analysis:
+- Flow & 3-Step Progress Navigation:
+  - Added visual 3-step progress indicator to `/import` header: `1. Choose` -> `2. Select area` -> `3. Studio`.
+  - Step 1 (Choose) transitions to Step 2 (Select area) exclusively upon selecting or dropping a valid photograph; the curated Nagavara demonstration stone bypasses cropping and enters Studio directly.
+  - Back navigation from Step 2 cleanly resets the active image, closes ImageBitmap instances, and returns to Step 1.
+- EXIF Orientation & Full-Resolution Bitmap Pipeline:
+  - Decoded incoming photos via `createImageBitmap(file, { imageOrientation: "from-image" })`, permanently eliminating orientation inversion and phone rotation bugs.
+  - Retained full-resolution bitmap in memory for lossless final extraction while rendering a responsive viewport stage.
+  - Graceful fallback: on decoding failure or browser memory restrictions, provides a dedicated notice with a "Continue with the whole image" recovery route.
+- Interactive Crop Canvas & Dimming Overlay:
+  - SVG mask cutout dims unselected stone area (`rgba(0,0,0,0.58)`).
+  - Drag inside selection box to move; drag on empty canvas to draw a new bounding box.
+  - 8 resize handles (corners and edges) with enlarged touch targets and adaptive scale stroke widths.
+  - Full keyboard accessibility: Arrow keys nudge selection by 1% of image size, Shift + Arrow keys resize, and Escape resets to default.
+  - Pointer events with `touch-action: none` and pointer capture ensure fluid pan/zoom/crop on touch screens.
+- Live Dimension Readout & Epigraphic Quality Bounds:
+  - Displays selection width × height in original photo pixels alongside total stone dimensions and percentage coverage.
+  - Enforced 64 × 64 px hard minimum bounding box.
+  - Added warning banner for selections below 300 × 300 px indicating smaller glyph areas may produce weaker enhancement and recognition.
+- Precision Zoom & Pan:
+  - Cursor-centered wheel and pinch zoom (clamped 0.1x to 5.0x).
+  - Middle-mouse drag and Space-key pan navigation.
+  - Fit-to-view, 100% scale, Zoom In, and Zoom Out control bar.
+- Export & Memory Handoff:
+  - Pre-selects a centered 80% default crop for fast adjustment.
+  - "Use whole image" button and ≥ 99% area coverage selections pass the original File directly with zero re-encoding.
+  - Cropped selections are rendered from full-resolution bitmap onto an offscreen canvas with a 3200 px long-side cap (preserving fine stroke detail well above the backend's 1600 px internal downscaling ceiling) and exported as `selected-area.png`.
+  - In-memory store (`fileStore.ts`) holds cropped `File`, `originalFile`, `selection`, and `originalSize` without disk or `localStorage` persistence, invoking the unmodified Studio upload pipeline.
+
 ## 6 November: Import Screen Implementation (Step S1 of 3)
 
 Implemented the dedicated Image Import workspace route (`/import`) providing a streamlined entry point before Studio analysis:

@@ -28,7 +28,7 @@ import {
 } from 'lucide-react';
 import LandingPage from './pages/LandingPage.jsx';
 import ImportPage from './pages/ImportPage.jsx';
-import { setPendingFile, getPendingFile, clearPendingFile } from './utils/fileStore';
+import { setPendingFile, setPendingHandoff, getPendingFile, clearPendingFile } from './utils/fileStore';
 import ThemeToggle from './components/ThemeToggle.tsx';
 import { SITE } from './config/site.ts';
 import { initSiteInteractions } from './utils/interactions.ts';
@@ -805,8 +805,12 @@ export default function App() {
     }
   };
 
-  const handleSelectFileFromImport = (file) => {
-    setPendingFile(file);
+  const handleSelectFileFromImport = (payload) => {
+    if (payload instanceof File) {
+      setPendingFile(payload);
+    } else {
+      setPendingHandoff(payload);
+    }
     navigateToStudio(false);
   };
 
@@ -1154,6 +1158,7 @@ export default function App() {
   if (route === '/import') {
     return (
       <ImportPage
+        onSelectHandoff={handleSelectFileFromImport}
         onSelectFile={handleSelectFileFromImport}
         onSelectDemo={() => navigateToStudio(true)}
         onBackToLanding={navigateToHome}

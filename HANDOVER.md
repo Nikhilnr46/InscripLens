@@ -1,5 +1,14 @@
 # InscripLens Studio Handover and Technical Guide
 
+## 6 November: Region Selection (Step S2 of 3)
+
+Integrated in-browser region selection (`frontend/src/components/RegionSelector.jsx`) within the `/import` workflow before dispatching to Studio:
+- 3-Step Import Progress: Visual indicator (`1. Choose` -> `2. Select area` -> `3. Studio`). Uploaded photographs enter region selection; demo stone bypasses selection directly to Studio.
+- EXIF-Aware Bitmap Decoding: Uses `createImageBitmap(file, { imageOrientation: "from-image" })` to correctly orient smartphone captures, preserving the full-resolution bitmap in memory.
+- Interactive SVG Selection Stage: Dimming scrim outside selection, 8 resize handles, drag to move, drag to draw, keyboard arrow adjustments (1% step, Shift to resize), pointer events for touch devices, live original pixel readout, 64x64 minimum constraint, and <300px resolution warning.
+- Zoom & Pan: Cursor-centered wheel/pinch zoom (0.1x to 5.0x), middle-mouse/Space-key pan, Fit-to-view, and 100% controls.
+- Lossless PNG Crop & Handoff: Selections covering >=99% or "Use whole image" pass original File without re-encoding. Cropped selections cap long side at 3200 px (supersampling the backend 1600 px limit) and export as `selected-area.png`. In-memory store retains original File, crop File, selection bounding box, and dimensions for S3.
+
 ## 6 November: Import Screen (Step S1 of 3)
 
 Added dedicated `/import` workspace route allowing users to choose between uploading a field photograph and loading the curated Nagavara demonstration stone before entering Studio:
