@@ -70,3 +70,4 @@ echo "  Setup Complete!"
 echo "  Launch Studio with:"
 echo "    .venv/bin/python launch_studio.py"
 echo "====================================================================="
+
