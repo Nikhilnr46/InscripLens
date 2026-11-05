@@ -1,5 +1,5 @@
 """Fixed initial 10-epoch sequence experiment; no validation-stone access."""
-import json,random,time,itertools
+import argparse,json,random,time,itertools
 from pathlib import Path
 import numpy as np
 from PIL import Image
@@ -11,6 +11,9 @@ ROOT=Path(__file__).resolve().parent.parent
 
 
 def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--omit-separators', action='store_true')
+    args = parser.parse_args()
     random.seed(42);np.random.seed(42);torch.manual_seed(42);torch.set_num_threads(4)
     folder=ROOT/'outputs/paired_line_data';out=ROOT/'outputs/screened_sequence_study';out.mkdir(exist_ok=True)
     rows=[r for r in json.loads((folder/'records.json').read_text(encoding='utf-8')) if r['eligible']]
@@ -18,6 +21,12 @@ def main():
     assert len(fit)==124 and len(dev)==7
     assert not {r['source_name'] for r in fit}&{r['source_name'] for r in dev}
     alphabet=sorted(set(''.join(r['target'] for r in fit)));enc={c:i+1 for i,c in enumerate(alphabet)}
+    if args.omit_separators:
+        # Preserve the output layer and initialization of the baseline.
+        out = ROOT/'outputs/sequence_separator_comparison'
+        out.mkdir(exist_ok=True)
+        for row in rows:
+            row['target'] = row['target'].replace('|', '')
     assert set(''.join(r['target'] for r in dev))<=set(alphabet)
     for r in rows:
         with Image.open(folder/r['mask_crop']) as im:
@@ -57,6 +66,24 @@ def main():
     summary=dict(reports=reports,history=logs,epochs=10,seed=42,seconds=time.perf_counter()-start,validation_used=False,production_model_changed=False,
         protocol='Fixed initial ten epochs, batch4, Adam .003, packed vertical CNN-BiLSTM-CTC; alphabet from fit only; image-only height48 width256..1024. Final checkpoint evaluated once, no development checkpoint selection.',
         limitations=['Supplied annotation-assisted line crops and unverified source labels.','Only seven development lines.','Roman codepoint error includes label separators; not modern Kannada OCR.','Ten epochs is a diagnostic budget, not convergence or impossibility evidence.'])
+    if args.omit_separators:
+        prior=json.loads((ROOT/'outputs/screened_sequence_study/predictions.json').read_text(encoding='utf-8'))
+        prior_by_id={(r['source_name'],r['line_number']):r for r in prior if r['split']=='development'}
+        letter_results=[]
+        for row,pred in zip(dev,[r for r in predictions if r['split']=='development'],strict=True):
+            baseline=prior_by_id[row['source_name'],row['line_number']]
+            target=row['target'];assert target==baseline['target'].replace('|','')
+            x,lengths=batch([row])
+            with torch.inference_mode():blank_lp=model(torch.zeros_like(x),lengths)[:,0].numpy()
+            blank=''.join(alphabet[c-1] for c in decode(blank_lp,10)).replace('|','')
+            letter_results.append(dict(source=row['source_name'],line=row['line_number'],target=target,
+                baseline=baseline['beam'].replace('|',''),candidate=pred['beam'].replace('|',''),blank=blank))
+        denominator=sum(len(r['target']) for r in letter_results)
+        summary['letter_only']={k:sum(distance(r['target'],r[k]) for r in letter_results)/denominator for k in ['baseline','candidate','blank']}
+        summary['letter_codepoints']=denominator
+        summary['development_examples']=letter_results
+        summary['target_policy']='Omit inserted separators in supervision. Same alphabet, seed, images and training settings as baseline. Score both after stripping separators. Blank control preserves dimensions.'
+        summary['limitations'][2]='Roman codepoint error on annotation-assisted crops.'
     (out/'summary.json').write_text(json.dumps(summary,indent=2)+'\n')
     (out/'predictions.json').write_text(json.dumps(predictions,ensure_ascii=False,indent=2),encoding='utf-8')
     torch.save(dict(state_dict=model.state_dict(),alphabet=alphabet),out/'sequence_model.pth')

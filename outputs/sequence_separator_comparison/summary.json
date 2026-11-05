@@ -1,0 +1,150 @@
+{
+  "reports": {
+    "fit": {
+      "lines": 124,
+      "reference_codepoints": 2674,
+      "greedy_exact": 0,
+      "greedy_edits": 2674,
+      "greedy_cer": 1.0
+    },
+    "development": {
+      "lines": 7,
+      "reference_codepoints": 125,
+      "greedy_exact": 0,
+      "greedy_edits": 125,
+      "greedy_cer": 1.0,
+      "beam_exact": 0,
+      "beam_edits": 116,
+      "beam_cer": 0.928
+    }
+  },
+  "history": [
+    {
+      "epoch": 1,
+      "training_loss": 10.684926963621571,
+      "elapsed_seconds": 4.921356300008483
+    },
+    {
+      "epoch": 2,
+      "training_loss": 3.8008315793929563,
+      "elapsed_seconds": 9.688974600008805
+    },
+    {
+      "epoch": 3,
+      "training_loss": 3.920425638075798,
+      "elapsed_seconds": 13.965434600002482
+    },
+    {
+      "epoch": 4,
+      "training_loss": 3.868835787619314,
+      "elapsed_seconds": 18.162958300003083
+    },
+    {
+      "epoch": 5,
+      "training_loss": 3.7692551535944783,
+      "elapsed_seconds": 22.429150299998582
+    },
+    {
+      "epoch": 6,
+      "training_loss": 3.62888010855644,
+      "elapsed_seconds": 27.1170562000043
+    },
+    {
+      "epoch": 7,
+      "training_loss": 3.642233648607808,
+      "elapsed_seconds": 31.557130400004098
+    },
+    {
+      "epoch": 8,
+      "training_loss": 3.530459011754682,
+      "elapsed_seconds": 36.32569959999819
+    },
+    {
+      "epoch": 9,
+      "training_loss": 3.4979543070639334,
+      "elapsed_seconds": 41.39709060000314
+    },
+    {
+      "epoch": 10,
+      "training_loss": 3.4815415259330504,
+      "elapsed_seconds": 45.53340539999772
+    }
+  ],
+  "epochs": 10,
+  "seed": 42,
+  "seconds": 49.25523100000282,
+  "validation_used": false,
+  "production_model_changed": false,
+  "protocol": "Fixed initial ten epochs, batch4, Adam .003, packed vertical CNN-BiLSTM-CTC; alphabet from fit only; image-only height48 width256..1024. Final checkpoint evaluated once, no development checkpoint selection.",
+  "limitations": [
+    "Supplied annotation-assisted line crops and unverified source labels.",
+    "Only seven development lines.",
+    "Roman codepoint error on annotation-assisted crops.",
+    "Ten epochs is a diagnostic budget, not convergence or impossibility evidence."
+  ],
+  "letter_only": {
+    "baseline": 1.0,
+    "candidate": 0.928,
+    "blank": 1.0
+  },
+  "letter_codepoints": 125,
+  "development_examples": [
+    {
+      "source": "Aradeshanahalli 900CE Mumennayaga's Turugol Herostone With Inscription",
+      "line": 10,
+      "target": "ndiyasth\u0101namum\u0115",
+      "baseline": "",
+      "candidate": "a",
+      "blank": "0"
+    },
+    {
+      "source": "Aradeshanahalli 900CE Mumennayaga's Turugol Herostone With Inscription",
+      "line": 6,
+      "target": "suttir\u0115nandigundadapa",
+      "baseline": "",
+      "candidate": "a",
+      "blank": "0"
+    },
+    {
+      "source": "Aradeshanahalli 900CE Seemarasa Bhattaraka's Hero Stone Inscription",
+      "line": 3,
+      "target": "rsarabha\u1e6d\u0101rarkiy\u0101sd\u0101varak\u0115ysid\u0101",
+      "baseline": "",
+      "candidate": "aaaa",
+      "blank": "0"
+    },
+    {
+      "source": "Sadahalli 800CE Uldanapitta Kammara's Herostone With Insciption",
+      "line": 1,
+      "target": "\u015br\u012b\u0115gitt\u014f\u1e5f\u0115",
+      "baseline": "",
+      "candidate": "a",
+      "blank": "0"
+    },
+    {
+      "source": "Sadahalli 800CE Uldanapitta Kammara's Herostone With Insciption",
+      "line": 2,
+      "target": "yamah\u0101janadapa",
+      "baseline": "",
+      "candidate": "a",
+      "blank": "0"
+    },
+    {
+      "source": "Srinivagilu 800CE Palchatereyamma's Turugol Herostone With Inscription",
+      "line": 1,
+      "target": "svasti\u015br\u012bpal\u0324cat\u0115\u1e5f\u0115",
+      "baseline": "",
+      "candidate": "a",
+      "blank": "0"
+    },
+    {
+      "source": "T Dasarahalli 800CE Turugol Herostone With Inscription",
+      "line": 5,
+      "target": "i\u016bra\u0101l\u0324v\u014fsata\u1e43",
+      "baseline": "",
+      "candidate": "a",
+      "blank": "0"
+    }
+  ],
+  "target_policy": "Omit inserted separators in supervision. Same alphabet, seed, images and training settings as baseline. Score both after stripping separators. Blank control preserves dimensions."
+}
