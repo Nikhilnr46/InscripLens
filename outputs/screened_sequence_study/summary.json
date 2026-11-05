@@ -1,0 +1,85 @@
+{
+  "reports": {
+    "fit": {
+      "lines": 124,
+      "reference_codepoints": 3707,
+      "greedy_exact": 0,
+      "greedy_edits": 3707,
+      "greedy_cer": 1.0
+    },
+    "development": {
+      "lines": 7,
+      "reference_codepoints": 172,
+      "greedy_exact": 0,
+      "greedy_edits": 172,
+      "greedy_cer": 1.0,
+      "beam_exact": 0,
+      "beam_edits": 131,
+      "beam_cer": 0.7616279069767442
+    }
+  },
+  "history": [
+    {
+      "epoch": 1,
+      "training_loss": 9.736614650295627,
+      "elapsed_seconds": 10.951027600007365
+    },
+    {
+      "epoch": 2,
+      "training_loss": 3.67800481857792,
+      "elapsed_seconds": 21.303071800008183
+    },
+    {
+      "epoch": 3,
+      "training_loss": 3.7677427722561743,
+      "elapsed_seconds": 31.348437000007834
+    },
+    {
+      "epoch": 4,
+      "training_loss": 3.777494684342415,
+      "elapsed_seconds": 43.90762929999619
+    },
+    {
+      "epoch": 5,
+      "training_loss": 3.7080729161539385,
+      "elapsed_seconds": 54.11402100000123
+    },
+    {
+      "epoch": 6,
+      "training_loss": 3.5380598883475027,
+      "elapsed_seconds": 66.76420000000508
+    },
+    {
+      "epoch": 7,
+      "training_loss": 3.5603491029431744,
+      "elapsed_seconds": 77.22570090000227
+    },
+    {
+      "epoch": 8,
+      "training_loss": 3.3254854602198445,
+      "elapsed_seconds": 87.21117860000231
+    },
+    {
+      "epoch": 9,
+      "training_loss": 3.275029159361316,
+      "elapsed_seconds": 97.28183920000447
+    },
+    {
+      "epoch": 10,
+      "training_loss": 3.284273616729244,
+      "elapsed_seconds": 107.72712969999702
+    }
+  ],
+  "epochs": 10,
+  "seed": 42,
+  "seconds": 117.35496599999897,
+  "validation_used": false,
+  "production_model_changed": false,
+  "protocol": "Fixed initial ten epochs, batch4, Adam .003, packed vertical CNN-BiLSTM-CTC; alphabet from fit only; image-only height48 width256..1024. Final checkpoint evaluated once, no development checkpoint selection.",
+  "limitations": [
+    "Supplied annotation-assisted line crops and unverified source labels.",
+    "Only seven development lines.",
+    "Roman codepoint error includes label separators; not modern Kannada OCR.",
+    "Ten epochs is a diagnostic budget, not convergence or impossibility evidence."
+  ]
+}
