@@ -1,3 +1,4 @@
+import RedrawComparison from './RedrawComparison';
 import React, { useState, useEffect, useRef } from 'react';
 import {
   Layers,
@@ -2032,6 +2033,7 @@ export default function App() {
                           })()}
                         </div>
 
+                        <RedrawComparison key={analysis.id + ":" + selectedBoxIndex} analysis={analysis} box={analysis.boxes[selectedBoxIndex]} scriptMode={scriptMode} modernLetters={modernLetters} />
                         {/* Selectable Alternative Chips with Confidence Bars if Available */}
                         <div className="inspector-section">
                           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
