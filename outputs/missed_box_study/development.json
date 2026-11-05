@@ -1,0 +1,1481 @@
+{
+  "matched": 254,
+  "counts": {
+    "component_shared_across_reference_boxes": 60,
+    "other_box_mismatch": 29,
+    "multiple_substantial_pieces": 15,
+    "empty_mask": 1
+  },
+  "misses": [
+    {
+      "source": "Aradeshanahalli 900CE Mumennayaga's Turugol Herostone With Inscription",
+      "key": "900_Dv42_Aradeshanahalli_1_1_siddha\u1e43.JPG",
+      "box": [
+        115,
+        433,
+        165,
+        498
+      ],
+      "kind": "component_shared_across_reference_boxes",
+      "foreground": 649,
+      "components": 1,
+      "substantial": 1
+    },
+    {
+      "source": "Aradeshanahalli 900CE Mumennayaga's Turugol Herostone With Inscription",
+      "key": "900_Dv42_Aradeshanahalli_1_2_sva.JPG",
+      "box": [
+        164,
+        442,
+        213,
+        498
+      ],
+      "kind": "component_shared_across_reference_boxes",
+      "foreground": 866,
+      "components": 2,
+      "substantial": 1
+    },
+    {
+      "source": "Aradeshanahalli 900CE Mumennayaga's Turugol Herostone With Inscription",
+      "key": "900_Dv42_Aradeshanahalli_1_4_k\u0101.JPG",
+      "box": [
+        263,
+        426,
+        303,
+        480
+      ],
+      "kind": "component_shared_across_reference_boxes",
+      "foreground": 638,
+      "components": 3,
+      "substantial": 2
+    },
+    {
+      "source": "Aradeshanahalli 900CE Mumennayaga's Turugol Herostone With Inscription",
+      "key": "900_Dv42_Aradeshanahalli_1_5_la.JPG",
+      "box": [
+        297,
+        425,
+        339,
+        468
+      ],
+      "kind": "component_shared_across_reference_boxes",
+      "foreground": 563,
+      "components": 1,
+      "substantial": 1
+    },
+    {
+      "source": "Aradeshanahalli 900CE Mumennayaga's Turugol Herostone With Inscription",
+      "key": "900_Dv42_Aradeshanahalli_1_6_va.JPG",
+      "box": [
+        337,
+        418,
+        380,
+        465
+      ],
+      "kind": "other_box_mismatch",
+      "foreground": 478,
+      "components": 2,
+      "substantial": 1
+    },
+    {
+      "source": "Aradeshanahalli 900CE Mumennayaga's Turugol Herostone With Inscription",
+      "key": "900_Dv42_Aradeshanahalli_1_9_p\u1e5b.JPG",
+      "box": [
+        450,
+        403,
+        490,
+        473
+      ],
+      "kind": "component_shared_across_reference_boxes",
+      "foreground": 841,
+      "components": 1,
+      "substantial": 1
+    },
+    {
+      "source": "Aradeshanahalli 900CE Mumennayaga's Turugol Herostone With Inscription",
+      "key": "900_Dv42_Aradeshanahalli_1_10_thi.JPG",
+      "box": [
+        486,
+        389,
+        529,
+        449
+      ],
+      "kind": "component_shared_across_reference_boxes",
+      "foreground": 849,
+      "components": 1,
+      "substantial": 1
+    },
+    {
+      "source": "Aradeshanahalli 900CE Mumennayaga's Turugol Herostone With Inscription",
+      "key": "900_Dv42_Aradeshanahalli_1_13_lla.JPG",
+      "box": [
+        594,
+        393,
+        649,
+        454
+      ],
+      "kind": "component_shared_across_reference_boxes",
+      "foreground": 991,
+      "components": 4,
+      "substantial": 2
+    },
+    {
+      "source": "Aradeshanahalli 900CE Mumennayaga's Turugol Herostone With Inscription",
+      "key": "900_Dv42_Aradeshanahalli_1_17_r\u0101.JPG",
+      "box": [
+        752,
+        377,
+        795,
+        424
+      ],
+      "kind": "component_shared_across_reference_boxes",
+      "foreground": 708,
+      "components": 2,
+      "substantial": 2
+    },
+    {
+      "source": "Aradeshanahalli 900CE Mumennayaga's Turugol Herostone With Inscription",
+      "key": "900_Dv42_Aradeshanahalli_2_1_r\u0101.JPG",
+      "box": [
+        956,
+        400,
+        987,
+        437
+      ],
+      "kind": "component_shared_across_reference_boxes",
+      "foreground": 381,
+      "components": 1,
+      "substantial": 1
+    },
+    {
+      "source": "Aradeshanahalli 900CE Mumennayaga's Turugol Herostone With Inscription",
+      "key": "900_Dv42_Aradeshanahalli_2_6_tpra.JPG",
+      "box": [
+        1153,
+        380,
+        1198,
+        445
+      ],
+      "kind": "component_shared_across_reference_boxes",
+      "foreground": 1296,
+      "components": 3,
+      "substantial": 2
+    },
+    {
+      "source": "Aradeshanahalli 900CE Mumennayaga's Turugol Herostone With Inscription",
+      "key": "900_Dv42_Aradeshanahalli_2_9_d\u0115.JPG",
+      "box": [
+        1276,
+        353,
+        1317,
+        393
+      ],
+      "kind": "component_shared_across_reference_boxes",
+      "foreground": 481,
+      "components": 1,
+      "substantial": 1
+    },
+    {
+      "source": "Aradeshanahalli 900CE Mumennayaga's Turugol Herostone With Inscription",
+      "key": "900_Dv42_Aradeshanahalli_3_4_sa.JPG",
+      "box": [
+        1065,
+        426,
+        1109,
+        472
+      ],
+      "kind": "component_shared_across_reference_boxes",
+      "foreground": 518,
+      "components": 2,
+      "substantial": 2
+    },
+    {
+      "source": "Aradeshanahalli 900CE Mumennayaga's Turugol Herostone With Inscription",
+      "key": "900_Dv42_Aradeshanahalli_3_6_ma.JPG",
+      "box": [
+        1125,
+        427,
+        1168,
+        467
+      ],
+      "kind": "component_shared_across_reference_boxes",
+      "foreground": 769,
+      "components": 3,
+      "substantial": 2
+    },
+    {
+      "source": "Aradeshanahalli 900CE Mumennayaga's Turugol Herostone With Inscription",
+      "key": "900_Dv42_Aradeshanahalli_3_9_vi.JPG",
+      "box": [
+        1266,
+        387,
+        1299,
+        434
+      ],
+      "kind": "component_shared_across_reference_boxes",
+      "foreground": 651,
+      "components": 3,
+      "substantial": 1
+    },
+    {
+      "source": "Aradeshanahalli 900CE Mumennayaga's Turugol Herostone With Inscription",
+      "key": "900_Dv42_Aradeshanahalli_4_9_gi.JPG",
+      "box": [
+        1287,
+        444,
+        1327,
+        492
+      ],
+      "kind": "other_box_mismatch",
+      "foreground": 569,
+      "components": 3,
+      "substantial": 1
+    },
+    {
+      "source": "Aradeshanahalli 900CE Mumennayaga's Turugol Herostone With Inscription",
+      "key": "900_Dv42_Aradeshanahalli_5_5_pra.JPG",
+      "box": [
+        1164,
+        511,
+        1207,
+        566
+      ],
+      "kind": "component_shared_across_reference_boxes",
+      "foreground": 769,
+      "components": 2,
+      "substantial": 1
+    },
+    {
+      "source": "Aradeshanahalli 900CE Mumennayaga's Turugol Herostone With Inscription",
+      "key": "900_Dv42_Aradeshanahalli_5_6_ti.JPG",
+      "box": [
+        1204,
+        495,
+        1244,
+        555
+      ],
+      "kind": "other_box_mismatch",
+      "foreground": 681,
+      "components": 5,
+      "substantial": 1
+    },
+    {
+      "source": "Aradeshanahalli 900CE Mumennayaga's Turugol Herostone With Inscription",
+      "key": "900_Dv42_Aradeshanahalli_6_5_ndi.JPG",
+      "box": [
+        1163,
+        562,
+        1195,
+        627
+      ],
+      "kind": "component_shared_across_reference_boxes",
+      "foreground": 759,
+      "components": 3,
+      "substantial": 1
+    },
+    {
+      "source": "Aradeshanahalli 900CE Mumennayaga's Turugol Herostone With Inscription",
+      "key": "900_Dv42_Aradeshanahalli_7_6_yi\u1e43.JPG",
+      "box": [
+        1265,
+        600,
+        1317,
+        643
+      ],
+      "kind": "other_box_mismatch",
+      "foreground": 484,
+      "components": 1,
+      "substantial": 1
+    },
+    {
+      "source": "Aradeshanahalli 900CE Mumennayaga's Turugol Herostone With Inscription",
+      "key": "900_Dv42_Aradeshanahalli_9_6_na.JPG",
+      "box": [
+        1243,
+        705,
+        1283,
+        752
+      ],
+      "kind": "other_box_mismatch",
+      "foreground": 334,
+      "components": 1,
+      "substantial": 1
+    },
+    {
+      "source": "Aradeshanahalli 900CE Mumennayaga's Turugol Herostone With Inscription",
+      "key": "900_Dv42_Aradeshanahalli_10_2_ya.JPG",
+      "box": [
+        1057,
+        809,
+        1111,
+        859
+      ],
+      "kind": "other_box_mismatch",
+      "foreground": 410,
+      "components": 3,
+      "substantial": 1
+    },
+    {
+      "source": "Aradeshanahalli 900CE Mumennayaga's Turugol Herostone With Inscription",
+      "key": "900_Dv42_Aradeshanahalli_10_6_m\u0115.JPG",
+      "box": [
+        1221,
+        762,
+        1270,
+        802
+      ],
+      "kind": "component_shared_across_reference_boxes",
+      "foreground": 633,
+      "components": 1,
+      "substantial": 1
+    },
+    {
+      "source": "Aradeshanahalli 900CE Mumennayaga's Turugol Herostone With Inscription",
+      "key": "900_Dv42_Aradeshanahalli_11_1_nna.JPG",
+      "box": [
+        1020,
+        879,
+        1048,
+        934
+      ],
+      "kind": "other_box_mismatch",
+      "foreground": 316,
+      "components": 3,
+      "substantial": 1
+    },
+    {
+      "source": "Aradeshanahalli 900CE Mumennayaga's Turugol Herostone With Inscription",
+      "key": "900_Dv42_Aradeshanahalli_12_3_n\u0115.JPG",
+      "box": [
+        1105,
+        909,
+        1145,
+        955
+      ],
+      "kind": "component_shared_across_reference_boxes",
+      "foreground": 31,
+      "components": 1,
+      "substantial": 1
+    },
+    {
+      "source": "Aradeshanahalli 900CE Mumennayaga's Turugol Herostone With Inscription",
+      "key": "900_Dv42_Aradeshanahalli_12_6_g\u0115.JPG",
+      "box": [
+        1212,
+        888,
+        1255,
+        930
+      ],
+      "kind": "other_box_mismatch",
+      "foreground": 413,
+      "components": 1,
+      "substantial": 1
+    },
+    {
+      "source": "Aradeshanahalli 900CE Mumennayaga's Turugol Herostone With Inscription",
+      "key": "900_Dv42_Aradeshanahalli_14_2_kki.JPG",
+      "box": [
+        1029,
+        1013,
+        1073,
+        1063
+      ],
+      "kind": "component_shared_across_reference_boxes",
+      "foreground": 608,
+      "components": 3,
+      "substantial": 2
+    },
+    {
+      "source": "Aradeshanahalli 900CE Seemarasa Bhattaraka's Hero Stone Inscription",
+      "key": "900_Dv41_Aradeshanahalli_2_9_ndi.JPG",
+      "box": [
+        904,
+        56,
+        1029,
+        260
+      ],
+      "kind": "multiple_substantial_pieces",
+      "foreground": 3504,
+      "components": 5,
+      "substantial": 2
+    },
+    {
+      "source": "Aradeshanahalli 900CE Seemarasa Bhattaraka's Hero Stone Inscription",
+      "key": "900_Dv41_Aradeshanahalli_2_11_s\u012b.JPG",
+      "box": [
+        1105,
+        83,
+        1218,
+        236
+      ],
+      "kind": "other_box_mismatch",
+      "foreground": 4291,
+      "components": 4,
+      "substantial": 1
+    },
+    {
+      "source": "Aradeshanahalli 900CE Seemarasa Bhattaraka's Hero Stone Inscription",
+      "key": "900_Dv41_Aradeshanahalli_3_1_rsa.JPG",
+      "box": [
+        113,
+        293,
+        227,
+        392
+      ],
+      "kind": "component_shared_across_reference_boxes",
+      "foreground": 1434,
+      "components": 1,
+      "substantial": 1
+    },
+    {
+      "source": "Aradeshanahalli 900CE Seemarasa Bhattaraka's Hero Stone Inscription",
+      "key": "900_Dv41_Aradeshanahalli_3_2_ra.JPG",
+      "box": [
+        230,
+        305,
+        305,
+        404
+      ],
+      "kind": "component_shared_across_reference_boxes",
+      "foreground": 1408,
+      "components": 1,
+      "substantial": 1
+    },
+    {
+      "source": "Aradeshanahalli 900CE Seemarasa Bhattaraka's Hero Stone Inscription",
+      "key": "900_Dv41_Aradeshanahalli_3_4_\u1e6d\u0101.JPG",
+      "box": [
+        412,
+        274,
+        515,
+        385
+      ],
+      "kind": "multiple_substantial_pieces",
+      "foreground": 2249,
+      "components": 2,
+      "substantial": 2
+    },
+    {
+      "source": "Aradeshanahalli 900CE Tax Collectors Inscription",
+      "key": "900_Dv43_Aradeshanahalli_2_6_mu.JPG",
+      "box": [
+        679,
+        349,
+        761,
+        499
+      ],
+      "kind": "multiple_substantial_pieces",
+      "foreground": 2538,
+      "components": 3,
+      "substantial": 2
+    },
+    {
+      "source": "Aradeshanahalli 900CE Tax Collectors Inscription",
+      "key": "900_Dv43_Aradeshanahalli_3_5_\u1e5fi.JPG",
+      "box": [
+        542,
+        464,
+        627,
+        568
+      ],
+      "kind": "multiple_substantial_pieces",
+      "foreground": 1891,
+      "components": 4,
+      "substantial": 2
+    },
+    {
+      "source": "Aradeshanahalli 900CE Tax Collectors Inscription",
+      "key": "900_Dv43_Aradeshanahalli_3_6_d\u0101.JPG",
+      "box": [
+        622,
+        480,
+        697,
+        565
+      ],
+      "kind": "component_shared_across_reference_boxes",
+      "foreground": 1311,
+      "components": 2,
+      "substantial": 1
+    },
+    {
+      "source": "Aradeshanahalli 900CE Tax Collectors Inscription",
+      "key": "900_Dv43_Aradeshanahalli_3_7_ra.JPG",
+      "box": [
+        687,
+        492,
+        720,
+        610
+      ],
+      "kind": "component_shared_across_reference_boxes",
+      "foreground": 1343,
+      "components": 1,
+      "substantial": 1
+    },
+    {
+      "source": "Aradeshanahalli 900CE Tax Collectors Inscription",
+      "key": "900_Dv43_Aradeshanahalli_3_11_n\u0101.JPG",
+      "box": [
+        950,
+        495,
+        1025,
+        579
+      ],
+      "kind": "other_box_mismatch",
+      "foreground": 778,
+      "components": 1,
+      "substantial": 1
+    },
+    {
+      "source": "Aradeshanahalli 900CE Tax Collectors Inscription",
+      "key": "900_Dv43_Aradeshanahalli_3_14_ra.JPG",
+      "box": [
+        1159,
+        519,
+        1215,
+        607
+      ],
+      "kind": "other_box_mismatch",
+      "foreground": 694,
+      "components": 1,
+      "substantial": 1
+    },
+    {
+      "source": "Sadahalli 1328CE Veeraballala Inscription (Not Documented Before)",
+      "key": "1329_unpub_Sadahalli_1_3_tpra.JPG",
+      "box": [
+        255,
+        67,
+        369,
+        203
+      ],
+      "kind": "component_shared_across_reference_boxes",
+      "foreground": 2500,
+      "components": 7,
+      "substantial": 2
+    },
+    {
+      "source": "Sadahalli 1328CE Veeraballala Inscription (Not Documented Before)",
+      "key": "1329_unpub_Sadahalli_1_5_pa.JPG",
+      "box": [
+        449,
+        113,
+        508,
+        175
+      ],
+      "kind": "other_box_mismatch",
+      "foreground": 734,
+      "components": 3,
+      "substantial": 1
+    },
+    {
+      "source": "Sadahalli 1328CE Veeraballala Inscription (Not Documented Before)",
+      "key": "1329_unpub_Sadahalli_1_6_ca.JPG",
+      "box": [
+        513,
+        105,
+        595,
+        180
+      ],
+      "kind": "other_box_mismatch",
+      "foreground": 258,
+      "components": 1,
+      "substantial": 1
+    },
+    {
+      "source": "Sadahalli 1328CE Veeraballala Inscription (Not Documented Before)",
+      "key": "1329_unpub_Sadahalli_2_3_h\u014f.JPG",
+      "box": [
+        203,
+        163,
+        295,
+        252
+      ],
+      "kind": "component_shared_across_reference_boxes",
+      "foreground": 2028,
+      "components": 5,
+      "substantial": 3
+    },
+    {
+      "source": "Sadahalli 1328CE Veeraballala Inscription (Not Documented Before)",
+      "key": "1329_unpub_Sadahalli_2_4_ysa.JPG",
+      "box": [
+        298,
+        179,
+        413,
+        256
+      ],
+      "kind": "multiple_substantial_pieces",
+      "foreground": 1967,
+      "components": 3,
+      "substantial": 2
+    },
+    {
+      "source": "Sadahalli 1328CE Veeraballala Inscription (Not Documented Before)",
+      "key": "1329_unpub_Sadahalli_2_5_l\u0324a.JPG",
+      "box": [
+        416,
+        167,
+        477,
+        252
+      ],
+      "kind": "component_shared_across_reference_boxes",
+      "foreground": 885,
+      "components": 4,
+      "substantial": 1
+    },
+    {
+      "source": "Sadahalli 1328CE Veeraballala Inscription (Not Documented Before)",
+      "key": "1329_unpub_Sadahalli_2_6_\u015br\u012b.JPG",
+      "box": [
+        465,
+        176,
+        581,
+        252
+      ],
+      "kind": "component_shared_across_reference_boxes",
+      "foreground": 1121,
+      "components": 3,
+      "substantial": 2
+    },
+    {
+      "source": "Sadahalli 1328CE Veeraballala Inscription (Not Documented Before)",
+      "key": "1329_unpub_Sadahalli_3_1_ba.JPG",
+      "box": [
+        91,
+        249,
+        155,
+        317
+      ],
+      "kind": "component_shared_across_reference_boxes",
+      "foreground": 26,
+      "components": 1,
+      "substantial": 1
+    },
+    {
+      "source": "Sadahalli 1328CE Veeraballala Inscription (Not Documented Before)",
+      "key": "1329_unpub_Sadahalli_3_2_l\u0101.JPG",
+      "box": [
+        152,
+        256,
+        227,
+        317
+      ],
+      "kind": "other_box_mismatch",
+      "foreground": 738,
+      "components": 4,
+      "substantial": 1
+    },
+    {
+      "source": "Sadahalli 1328CE Veeraballala Inscription (Not Documented Before)",
+      "key": "1329_unpub_Sadahalli_3_3_l\u0324a.JPG",
+      "box": [
+        229,
+        241,
+        289,
+        331
+      ],
+      "kind": "component_shared_across_reference_boxes",
+      "foreground": 854,
+      "components": 5,
+      "substantial": 1
+    },
+    {
+      "source": "Sadahalli 1328CE Veeraballala Inscription (Not Documented Before)",
+      "key": "1329_unpub_Sadahalli_3_4_de.JPG",
+      "box": [
+        275,
+        247,
+        357,
+        318
+      ],
+      "kind": "other_box_mismatch",
+      "foreground": 557,
+      "components": 3,
+      "substantial": 1
+    },
+    {
+      "source": "Sadahalli 1328CE Veeraballala Inscription (Not Documented Before)",
+      "key": "1329_unpub_Sadahalli_3_5_va.JPG",
+      "box": [
+        357,
+        245,
+        402,
+        314
+      ],
+      "kind": "other_box_mismatch",
+      "foreground": 671,
+      "components": 2,
+      "substantial": 1
+    },
+    {
+      "source": "Sadahalli 1328CE Veeraballala Inscription (Not Documented Before)",
+      "key": "1329_unpub_Sadahalli_3_6_rsa.JPG",
+      "box": [
+        400,
+        243,
+        473,
+        336
+      ],
+      "kind": "component_shared_across_reference_boxes",
+      "foreground": 1339,
+      "components": 3,
+      "substantial": 3
+    },
+    {
+      "source": "Sadahalli 1328CE Veeraballala Inscription (Not Documented Before)",
+      "key": "1329_unpub_Sadahalli_3_7_ru.JPG",
+      "box": [
+        471,
+        233,
+        565,
+        324
+      ],
+      "kind": "component_shared_across_reference_boxes",
+      "foreground": 982,
+      "components": 4,
+      "substantial": 3
+    },
+    {
+      "source": "Sadahalli 1328CE Veeraballala Inscription (Not Documented Before)",
+      "key": "1329_unpub_Sadahalli_4_1_thvi.JPG",
+      "box": [
+        68,
+        325,
+        130,
+        411
+      ],
+      "kind": "other_box_mismatch",
+      "foreground": 1231,
+      "components": 4,
+      "substantial": 1
+    },
+    {
+      "source": "Sadahalli 1328CE Veeraballala Inscription (Not Documented Before)",
+      "key": "1329_unpub_Sadahalli_4_2_r\u0101.JPG",
+      "box": [
+        126,
+        309,
+        197,
+        384
+      ],
+      "kind": "other_box_mismatch",
+      "foreground": 831,
+      "components": 3,
+      "substantial": 1
+    },
+    {
+      "source": "Sadahalli 1328CE Veeraballala Inscription (Not Documented Before)",
+      "key": "1329_unpub_Sadahalli_4_4_g\u0115.JPG",
+      "box": [
+        314,
+        305,
+        367,
+        371
+      ],
+      "kind": "other_box_mismatch",
+      "foreground": 492,
+      "components": 2,
+      "substantial": 1
+    },
+    {
+      "source": "Sadahalli 1328CE Veeraballala Inscription (Not Documented Before)",
+      "key": "1329_unpub_Sadahalli_4_5_yvu.JPG",
+      "box": [
+        433,
+        319,
+        567,
+        407
+      ],
+      "kind": "multiple_substantial_pieces",
+      "foreground": 1460,
+      "components": 4,
+      "substantial": 3
+    },
+    {
+      "source": "Sadahalli 1328CE Veeraballala Inscription (Not Documented Before)",
+      "key": "1329_unpub_Sadahalli_5_6_ha.JPG",
+      "box": [
+        299,
+        371,
+        378,
+        440
+      ],
+      "kind": "multiple_substantial_pieces",
+      "foreground": 556,
+      "components": 3,
+      "substantial": 2
+    },
+    {
+      "source": "Sadahalli 1328CE Veeraballala Inscription (Not Documented Before)",
+      "key": "1329_unpub_Sadahalli_8_4_vi.JPG",
+      "box": [
+        221,
+        571,
+        286,
+        649
+      ],
+      "kind": "other_box_mismatch",
+      "foreground": 764,
+      "components": 2,
+      "substantial": 1
+    },
+    {
+      "source": "Sadahalli 1328CE Veeraballala Inscription (Not Documented Before)",
+      "key": "1329_unpub_Sadahalli_8_5_bha.JPG",
+      "box": [
+        284,
+        568,
+        356,
+        639
+      ],
+      "kind": "empty_mask",
+      "foreground": 0,
+      "components": 0,
+      "substantial": 0
+    },
+    {
+      "source": "Sadahalli 1328CE Veeraballala Inscription (Not Documented Before)",
+      "key": "1329_unpub_Sadahalli_9_4_da.JPG",
+      "box": [
+        256,
+        638,
+        326,
+        715
+      ],
+      "kind": "component_shared_across_reference_boxes",
+      "foreground": 109,
+      "components": 2,
+      "substantial": 2
+    },
+    {
+      "source": "Sadahalli 1328CE Veeraballala Inscription (Not Documented Before)",
+      "key": "1329_unpub_Sadahalli_10_2_1.JPG",
+      "box": [
+        145,
+        733,
+        206,
+        795
+      ],
+      "kind": "component_shared_across_reference_boxes",
+      "foreground": 557,
+      "components": 1,
+      "substantial": 1
+    },
+    {
+      "source": "Sadahalli 1328CE Veeraballala Inscription (Not Documented Before)",
+      "key": "1329_unpub_Sadahalli_10_3_2.JPG",
+      "box": [
+        168,
+        727,
+        267,
+        815
+      ],
+      "kind": "component_shared_across_reference_boxes",
+      "foreground": 877,
+      "components": 3,
+      "substantial": 3
+    },
+    {
+      "source": "Sadahalli 800CE Uldanapitta Kammara's Herostone With Insciption",
+      "key": "800_UnPub_Sadahalli_1_4_tt\u014f.JPG",
+      "box": [
+        426,
+        93,
+        508,
+        197
+      ],
+      "kind": "component_shared_across_reference_boxes",
+      "foreground": 2580,
+      "components": 2,
+      "substantial": 1
+    },
+    {
+      "source": "Sadahalli 800CE Uldanapitta Kammara's Herostone With Insciption",
+      "key": "800_UnPub_Sadahalli_1_5_\u1e5f\u0115.JPG",
+      "box": [
+        505,
+        103,
+        609,
+        176
+      ],
+      "kind": "component_shared_across_reference_boxes",
+      "foreground": 1801,
+      "components": 1,
+      "substantial": 1
+    },
+    {
+      "source": "Sadahalli 800CE Uldanapitta Kammara's Herostone With Insciption",
+      "key": "800_UnPub_Sadahalli_2_2_ma.JPG",
+      "box": [
+        128,
+        222,
+        221,
+        317
+      ],
+      "kind": "other_box_mismatch",
+      "foreground": 2216,
+      "components": 4,
+      "substantial": 1
+    },
+    {
+      "source": "Sadahalli 800CE Uldanapitta Kammara's Herostone With Insciption",
+      "key": "800_UnPub_Sadahalli_2_4_ja.JPG",
+      "box": [
+        330,
+        219,
+        407,
+        308
+      ],
+      "kind": "multiple_substantial_pieces",
+      "foreground": 2176,
+      "components": 2,
+      "substantial": 2
+    },
+    {
+      "source": "Sadahalli 800CE Uldanapitta Kammara's Herostone With Insciption",
+      "key": "800_UnPub_Sadahalli_3_4_u.JPG",
+      "box": [
+        309,
+        308,
+        385,
+        391
+      ],
+      "kind": "component_shared_across_reference_boxes",
+      "foreground": 1384,
+      "components": 1,
+      "substantial": 1
+    },
+    {
+      "source": "Sadahalli 800CE Uldanapitta Kammara's Herostone With Insciption",
+      "key": "800_UnPub_Sadahalli_3_6_na.JPG",
+      "box": [
+        473,
+        307,
+        535,
+        391
+      ],
+      "kind": "component_shared_across_reference_boxes",
+      "foreground": 1147,
+      "components": 2,
+      "substantial": 2
+    },
+    {
+      "source": "Sadahalli 800CE Uldanapitta Kammara's Herostone With Insciption",
+      "key": "800_UnPub_Sadahalli_4_1_ka.JPG",
+      "box": [
+        22,
+        387,
+        84,
+        492
+      ],
+      "kind": "component_shared_across_reference_boxes",
+      "foreground": 1763,
+      "components": 1,
+      "substantial": 1
+    },
+    {
+      "source": "Sadahalli 800CE Uldanapitta Kammara's Herostone With Insciption",
+      "key": "800_UnPub_Sadahalli_4_4_t\u014f.JPG",
+      "box": [
+        266,
+        390,
+        354,
+        460
+      ],
+      "kind": "component_shared_across_reference_boxes",
+      "foreground": 2288,
+      "components": 2,
+      "substantial": 1
+    },
+    {
+      "source": "Sadahalli 800CE Uldanapitta Kammara's Herostone With Insciption",
+      "key": "800_UnPub_Sadahalli_4_7_l\u0324u.JPG",
+      "box": [
+        607,
+        427,
+        673,
+        544
+      ],
+      "kind": "component_shared_across_reference_boxes",
+      "foreground": 2407,
+      "components": 1,
+      "substantial": 1
+    },
+    {
+      "source": "Sadahalli 800CE Uldanapitta Kammara's Herostone With Insciption",
+      "key": "800_UnPub_Sadahalli_5_1_l\u0324.JPG",
+      "box": [
+        36,
+        494,
+        104,
+        564
+      ],
+      "kind": "component_shared_across_reference_boxes",
+      "foreground": 1880,
+      "components": 1,
+      "substantial": 1
+    },
+    {
+      "source": "Sadahalli 800CE Uldanapitta Kammara's Herostone With Insciption",
+      "key": "800_UnPub_Sadahalli_5_2_sa.JPG",
+      "box": [
+        89,
+        483,
+        149,
+        545
+      ],
+      "kind": "component_shared_across_reference_boxes",
+      "foreground": 1722,
+      "components": 2,
+      "substantial": 1
+    },
+    {
+      "source": "Sadahalli 800CE Uldanapitta Kammara's Herostone With Insciption",
+      "key": "800_UnPub_Sadahalli_5_5_i.JPG",
+      "box": [
+        262,
+        459,
+        340,
+        538
+      ],
+      "kind": "other_box_mismatch",
+      "foreground": 1216,
+      "components": 3,
+      "substantial": 1
+    },
+    {
+      "source": "Sadahalli 800CE Uldanapitta Kammara's Herostone With Insciption",
+      "key": "800_UnPub_Sadahalli_5_7_ra.JPG",
+      "box": [
+        395,
+        459,
+        439,
+        547
+      ],
+      "kind": "component_shared_across_reference_boxes",
+      "foreground": 1394,
+      "components": 2,
+      "substantial": 1
+    },
+    {
+      "source": "Sadahalli 800CE Uldanapitta Kammara's Herostone With Insciption",
+      "key": "800_UnPub_Sadahalli_6_4_ra.JPG",
+      "box": [
+        210,
+        541,
+        271,
+        619
+      ],
+      "kind": "other_box_mismatch",
+      "foreground": 1241,
+      "components": 4,
+      "substantial": 1
+    },
+    {
+      "source": "Sadahalli 800CE Uldanapitta Kammara's Herostone With Insciption",
+      "key": "800_UnPub_Sadahalli_6_5_mpu.JPG",
+      "box": [
+        263,
+        524,
+        333,
+        707
+      ],
+      "kind": "component_shared_across_reference_boxes",
+      "foreground": 4192,
+      "components": 4,
+      "substantial": 2
+    },
+    {
+      "source": "Sadahalli 800CE Uldanapitta Kammara's Herostone With Insciption",
+      "key": "800_UnPub_Sadahalli_6_6_ma.JPG",
+      "box": [
+        346,
+        536,
+        406,
+        614
+      ],
+      "kind": "component_shared_across_reference_boxes",
+      "foreground": 1528,
+      "components": 1,
+      "substantial": 1
+    },
+    {
+      "source": "Sadahalli 800CE Uldanapitta Kammara's Herostone With Insciption",
+      "key": "800_UnPub_Sadahalli_6_8_na.JPG",
+      "box": [
+        505,
+        537,
+        567,
+        597
+      ],
+      "kind": "component_shared_across_reference_boxes",
+      "foreground": 959,
+      "components": 3,
+      "substantial": 2
+    },
+    {
+      "source": "Sadahalli 800CE Uldanapitta Kammara's Herostone With Insciption",
+      "key": "800_UnPub_Sadahalli_6_9_ri.JPG",
+      "box": [
+        581,
+        535,
+        646,
+        650
+      ],
+      "kind": "component_shared_across_reference_boxes",
+      "foreground": 2519,
+      "components": 2,
+      "substantial": 1
+    },
+    {
+      "source": "Sadahalli 800CE Uldanapitta Kammara's Herostone With Insciption",
+      "key": "800_UnPub_Sadahalli_7_3_ki.JPG",
+      "box": [
+        320,
+        612,
+        365,
+        715
+      ],
+      "kind": "multiple_substantial_pieces",
+      "foreground": 1989,
+      "components": 3,
+      "substantial": 2
+    },
+    {
+      "source": "Sadahalli 800CE Uldanapitta Kammara's Herostone With Insciption",
+      "key": "800_UnPub_Sadahalli_7_6_\u1e0da.JPG",
+      "box": [
+        531,
+        639,
+        604,
+        717
+      ],
+      "kind": "other_box_mismatch",
+      "foreground": 1659,
+      "components": 6,
+      "substantial": 1
+    },
+    {
+      "source": "Sadahalli 800CE Uldanapitta Kammara's Herostone With Insciption",
+      "key": "800_UnPub_Sadahalli_7_7_du.JPG",
+      "box": [
+        586,
+        640,
+        633,
+        770
+      ],
+      "kind": "component_shared_across_reference_boxes",
+      "foreground": 1998,
+      "components": 3,
+      "substantial": 1
+    },
+    {
+      "source": "Sadahalli 800CE Uldanapitta Kammara's Herostone With Insciption",
+      "key": "800_UnPub_Sadahalli_8_3_sa.JPG",
+      "box": [
+        257,
+        703,
+        335,
+        775
+      ],
+      "kind": "other_box_mismatch",
+      "foreground": 1128,
+      "components": 2,
+      "substantial": 1
+    },
+    {
+      "source": "Sadahalli 800CE Uldanapitta Kammara's Herostone With Insciption",
+      "key": "800_UnPub_Sadahalli_8_5_kk\u0115.JPG",
+      "box": [
+        414,
+        689,
+        477,
+        787
+      ],
+      "kind": "component_shared_across_reference_boxes",
+      "foreground": 2469,
+      "components": 2,
+      "substantial": 2
+    },
+    {
+      "source": "Sadahalli 800CE Uldanapitta Kammara's Herostone With Insciption",
+      "key": "800_UnPub_Sadahalli_8_7_dha.JPG",
+      "box": [
+        626,
+        699,
+        686,
+        769
+      ],
+      "kind": "component_shared_across_reference_boxes",
+      "foreground": 1138,
+      "components": 1,
+      "substantial": 1
+    },
+    {
+      "source": "Srinivagilu 800CE Palchatereyamma's Turugol Herostone With Inscription",
+      "key": "800_IthDar_Srinivagilu_1_2_sti.JPG",
+      "box": [
+        135,
+        570,
+        202,
+        669
+      ],
+      "kind": "multiple_substantial_pieces",
+      "foreground": 1764,
+      "components": 2,
+      "substantial": 2
+    },
+    {
+      "source": "Srinivagilu 800CE Palchatereyamma's Turugol Herostone With Inscription",
+      "key": "800_IthDar_Srinivagilu_2_2_mma.JPG",
+      "box": [
+        138,
+        667,
+        226,
+        775
+      ],
+      "kind": "multiple_substantial_pieces",
+      "foreground": 2592,
+      "components": 3,
+      "substantial": 2
+    },
+    {
+      "source": "Srinivagilu 800CE Palchatereyamma's Turugol Herostone With Inscription",
+      "key": "800_IthDar_Srinivagilu_2_6_lv\u0101.JPG",
+      "box": [
+        461,
+        656,
+        551,
+        753
+      ],
+      "kind": "multiple_substantial_pieces",
+      "foreground": 2969,
+      "components": 5,
+      "substantial": 2
+    },
+    {
+      "source": "Srinivagilu 800CE Palchatereyamma's Turugol Herostone With Inscription",
+      "key": "800_IthDar_Srinivagilu_3_2_la.JPG",
+      "box": [
+        127,
+        769,
+        210,
+        829
+      ],
+      "kind": "other_box_mismatch",
+      "foreground": 1603,
+      "components": 4,
+      "substantial": 1
+    },
+    {
+      "source": "Srinivagilu 800CE Palchatereyamma's Turugol Herostone With Inscription",
+      "key": "800_IthDar_Srinivagilu_3_4_\u1e5fu.JPG",
+      "box": [
+        284,
+        756,
+        355,
+        846
+      ],
+      "kind": "component_shared_across_reference_boxes",
+      "foreground": 2086,
+      "components": 2,
+      "substantial": 1
+    },
+    {
+      "source": "Srinivagilu 800CE Palchatereyamma's Turugol Herostone With Inscription",
+      "key": "800_IthDar_Srinivagilu_4_4_ggi.JPG",
+      "box": [
+        260,
+        834,
+        322,
+        924
+      ],
+      "kind": "component_shared_across_reference_boxes",
+      "foreground": 1943,
+      "components": 2,
+      "substantial": 1
+    },
+    {
+      "source": "T Dasarahalli 800CE Kosigaramalta Guramareya's Turugol Herostone Inscription",
+      "key": "800_BN39_Tdasarahalli_1_4_\u015br\u012b.JPG",
+      "box": [
+        365,
+        141,
+        421,
+        238
+      ],
+      "kind": "component_shared_across_reference_boxes",
+      "foreground": 1870,
+      "components": 1,
+      "substantial": 1
+    },
+    {
+      "source": "T Dasarahalli 800CE Kosigaramalta Guramareya's Turugol Herostone Inscription",
+      "key": "800_BN39_Tdasarahalli_1_6_si.JPG",
+      "box": [
+        479,
+        122,
+        553,
+        192
+      ],
+      "kind": "multiple_substantial_pieces",
+      "foreground": 1187,
+      "components": 2,
+      "substantial": 2
+    },
+    {
+      "source": "T Dasarahalli 800CE Kosigaramalta Guramareya's Turugol Herostone Inscription",
+      "key": "800_BN39_Tdasarahalli_1_7_ga.JPG",
+      "box": [
+        549,
+        120,
+        591,
+        175
+      ],
+      "kind": "other_box_mismatch",
+      "foreground": 483,
+      "components": 1,
+      "substantial": 1
+    },
+    {
+      "source": "T Dasarahalli 800CE Kosigaramalta Guramareya's Turugol Herostone Inscription",
+      "key": "800_BN39_Tdasarahalli_1_12_r\u0101.JPG",
+      "box": [
+        788,
+        103,
+        834,
+        173
+      ],
+      "kind": "component_shared_across_reference_boxes",
+      "foreground": 1311,
+      "components": 3,
+      "substantial": 1
+    },
+    {
+      "source": "T Dasarahalli 800CE Kosigaramalta Guramareya's Turugol Herostone Inscription",
+      "key": "800_BN39_Tdasarahalli_1_17_\u00f1ja.JPG",
+      "box": [
+        1079,
+        79,
+        1150,
+        183
+      ],
+      "kind": "multiple_substantial_pieces",
+      "foreground": 1856,
+      "components": 2,
+      "substantial": 2
+    },
+    {
+      "source": "T Dasarahalli 800CE Kosigaramalta Guramareya's Turugol Herostone Inscription",
+      "key": "800_BN39_Tdasarahalli_2_3_tu.JPG",
+      "box": [
+        341,
+        220,
+        419,
+        315
+      ],
+      "kind": "component_shared_across_reference_boxes",
+      "foreground": 1998,
+      "components": 2,
+      "substantial": 1
+    },
+    {
+      "source": "T Dasarahalli 800CE Kosigaramalta Guramareya's Turugol Herostone Inscription",
+      "key": "800_BN39_Tdasarahalli_2_7_l\u0324ka.JPG",
+      "box": [
+        618,
+        183,
+        673,
+        262
+      ],
+      "kind": "component_shared_across_reference_boxes",
+      "foreground": 1573,
+      "components": 2,
+      "substantial": 1
+    },
+    {
+      "source": "T Dasarahalli 800CE Kosigaramalta Guramareya's Turugol Herostone Inscription",
+      "key": "800_BN39_Tdasarahalli_2_8_di.JPG",
+      "box": [
+        672,
+        171,
+        726,
+        250
+      ],
+      "kind": "component_shared_across_reference_boxes",
+      "foreground": 1315,
+      "components": 3,
+      "substantial": 1
+    },
+    {
+      "source": "T Dasarahalli 800CE Kosigaramalta Guramareya's Turugol Herostone Inscription",
+      "key": "800_BN39_Tdasarahalli_2_10_tta.JPG",
+      "box": [
+        785,
+        171,
+        832,
+        224
+      ],
+      "kind": "component_shared_across_reference_boxes",
+      "foreground": 1051,
+      "components": 3,
+      "substantial": 1
+    },
+    {
+      "source": "T Dasarahalli 800CE Turugol Herostone With Inscription",
+      "key": "800_BN38_Tdasarahalli_1_1_\u0c84.JPG",
+      "box": [
+        103,
+        138,
+        206,
+        234
+      ],
+      "kind": "other_box_mismatch",
+      "foreground": 2125,
+      "components": 1,
+      "substantial": 1
+    },
+    {
+      "source": "T Dasarahalli 800CE Turugol Herostone With Inscription",
+      "key": "800_BN38_Tdasarahalli_3_10_\u1e45ga.JPG",
+      "box": [
+        967,
+        392,
+        1054,
+        522
+      ],
+      "kind": "multiple_substantial_pieces",
+      "foreground": 2769,
+      "components": 3,
+      "substantial": 2
+    },
+    {
+      "source": "T Dasarahalli 800CE Turugol Herostone With Inscription",
+      "key": "800_BN38_Tdasarahalli_5_1_i.JPG",
+      "box": [
+        746,
+        627,
+        834,
+        698
+      ],
+      "kind": "other_box_mismatch",
+      "foreground": 1230,
+      "components": 1,
+      "substantial": 1
+    },
+    {
+      "source": "T Dasarahalli 800CE Turugol Herostone With Inscription",
+      "key": "800_BN38_Tdasarahalli_5_3_ra.JPG",
+      "box": [
+        921,
+        604,
+        965,
+        708
+      ],
+      "kind": "component_shared_across_reference_boxes",
+      "foreground": 1325,
+      "components": 2,
+      "substantial": 1
+    }
+  ]
+}

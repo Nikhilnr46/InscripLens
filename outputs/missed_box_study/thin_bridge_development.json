@@ -1,0 +1,113 @@
+{
+  "references": 359,
+  "scores": {
+    "baseline": {
+      "boxes": 435,
+      "matched": 254,
+      "f1": 0.6397984886649875
+    },
+    "split": {
+      "boxes": 444,
+      "matched": 256,
+      "f1": 0.6376089663760897
+    }
+  },
+  "rows": [
+    {
+      "source": "Aradeshanahalli 900CE Mumennayaga's Turugol Herostone With Inscription",
+      "references": 124,
+      "baseline": {
+        "boxes": 127,
+        "matched": 97
+      },
+      "split": {
+        "boxes": 129,
+        "matched": 100
+      }
+    },
+    {
+      "source": "Aradeshanahalli 900CE Seemarasa Bhattaraka's Hero Stone Inscription",
+      "references": 23,
+      "baseline": {
+        "boxes": 33,
+        "matched": 18
+      },
+      "split": {
+        "boxes": 34,
+        "matched": 17
+      }
+    },
+    {
+      "source": "Aradeshanahalli 900CE Tax Collectors Inscription",
+      "references": 21,
+      "baseline": {
+        "boxes": 31,
+        "matched": 15
+      },
+      "split": {
+        "boxes": 31,
+        "matched": 15
+      }
+    },
+    {
+      "source": "Sadahalli 1328CE Veeraballala Inscription (Not Documented Before)",
+      "references": 30,
+      "baseline": {
+        "boxes": 80,
+        "matched": 6
+      },
+      "split": {
+        "boxes": 81,
+        "matched": 5
+      }
+    },
+    {
+      "source": "Sadahalli 800CE Uldanapitta Kammara's Herostone With Insciption",
+      "references": 58,
+      "baseline": {
+        "boxes": 53,
+        "matched": 34
+      },
+      "split": {
+        "boxes": 57,
+        "matched": 35
+      }
+    },
+    {
+      "source": "Srinivagilu 800CE Palchatereyamma's Turugol Herostone With Inscription",
+      "references": 27,
+      "baseline": {
+        "boxes": 29,
+        "matched": 21
+      },
+      "split": {
+        "boxes": 29,
+        "matched": 21
+      }
+    },
+    {
+      "source": "T Dasarahalli 800CE Kosigaramalta Guramareya's Turugol Herostone Inscription",
+      "references": 28,
+      "baseline": {
+        "boxes": 28,
+        "matched": 19
+      },
+      "split": {
+        "boxes": 28,
+        "matched": 19
+      }
+    },
+    {
+      "source": "T Dasarahalli 800CE Turugol Herostone With Inscription",
+      "references": 48,
+      "baseline": {
+        "boxes": 54,
+        "matched": 44
+      },
+      "split": {
+        "boxes": 55,
+        "matched": 44
+      }
+    }
+  ]
+}
