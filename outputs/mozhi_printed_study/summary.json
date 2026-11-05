@@ -1,0 +1,22 @@
+{
+  "dataset": "Mozhi-Kannada published test split",
+  "available_test_pairs": 9838,
+  "evaluated_words": 100,
+  "exact_words": 29,
+  "total_edits": 200,
+  "reference_nfc_codepoints": 697,
+  "codepoint_error_rate": 0.28694404591104733,
+  "engine": "tesseract v5.5.3.20260724",
+  "protocol": "First 100 by SHA256(filename); fixed pretrained Tesseract kan, OEM1 PSM8, no tuning/training. NFC and outer whitespace normalization only. Codepoint CER, not grapheme CER.",
+  "source_url": "https://ilocr.iiit.ac.in/dataset/8/",
+  "archive_url": "https://ilocr.iiit.ac.in/public/printed/phase-0/v0.5/kannada/akshara/test.zip",
+  "archive_sha256": "3867c2f1205c8165b2a7c8197cc38d668447decccfc1444ab643c9ef6caed0bf",
+  "license": "CC BY 4.0 per dataset page",
+  "limitations": [
+    "Modern printed word crops, not historical stone or full-page/line OCR.",
+    "Small deterministic sample, not the full benchmark.",
+    "Pretrained OCR training overlap unknown.",
+    "Published labels used without independent expert review."
+  ],
+  "stone_model_changed": false
+}

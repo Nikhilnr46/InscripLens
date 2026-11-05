@@ -23,4 +23,4 @@ No ready-to-use historical Kannada sequence checkpoint was verified in this boun
 3. Fix architecture and a bounded CPU training budget; select only on development. Compare sequence edit error against the current classifier applied in source annotation order. Report that this baseline has supplied boxes/order and is not automatic full-page OCR. Report exact line accuracy separately; keep codepoint error separate from whole-label accuracy.
 4. Stop if data inspection or a tiny-subset overfit check fails. Do not use HS024's published reading, validation labels or plausible historical stories to repair training supervision. Do not change the app recognizer until a measurable development benefit is demonstrated.
 
-Current result: data feasibility audit completed, model training not begun, existing recognition scores unchanged.
+Current result: bounded four-line training checks reached 3/4 exact fits, not a generalization result (see EXPERIMENT.md). Follow-up paired crop geometry/contamination audit is in ../paired_line_data/README.md. Existing application recognition scores remain unchanged.

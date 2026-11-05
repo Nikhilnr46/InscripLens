@@ -1,0 +1,32 @@
+{
+  "fit": {
+    "total": 672,
+    "previous_eligible": 207,
+    "eligible": 124,
+    "newly_eligible": 62,
+    "previously_eligible_now_flagged": 145,
+    "flags": {
+      "sparse_predicted_mask": 164,
+      "neighbour_annotation_overlap": 513
+    }
+  },
+  "development": {
+    "total": 34,
+    "previous_eligible": 21,
+    "eligible": 7,
+    "newly_eligible": 1,
+    "previously_eligible_now_flagged": 15,
+    "flags": {
+      "neighbour_annotation_overlap": 27,
+      "sparse_predicted_mask": 3
+    }
+  },
+  "protocol": "Union of supplied line polygon and its supplied character polygons; preserve original RGB and predicted mask. Reject any annotated neighbour overlap >5%, out-of-image polygon, or any character with <20 foreground pixels. Fixed geometry/quality thresholds, no model-result selection.",
+  "limitations": [
+    "Annotation-assisted localization, not inference-time segmentation.",
+    "Labels remain unverified Roman dataset strings with | separators.",
+    "Unannotated neighbours and missing characters cannot be detected by this audit.",
+    "Geometry repair cannot recover strokes absent from the predicted mask."
+  ],
+  "validation_used": false
+}

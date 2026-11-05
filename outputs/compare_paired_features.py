@@ -10,8 +10,7 @@ from run_character_benchmark import features
 ROOT=Path(__file__).resolve().parent.parent
 
 
-def main():
-    start=time.perf_counter()
+def load_training_features():
     read=lambda p:json.loads((ROOT/p).read_text(encoding='utf-8'))
     protocol=read('outputs/matched_mask_study/summary.json')
     rows=sorted([r for r in read('outputs/training_scope_study/training_records.json')
@@ -39,6 +38,12 @@ def main():
     hero=np.array([r['hero_filename'] for r in rows])[dev]
     assert dev.sum()==359 and hero.sum()==308
     assert np.isfinite(x).all() and np.isfinite(o).all()
+    return x,o,y,rows,dev,hero
+
+
+def main():
+    start=time.perf_counter()
+    x,o,y,rows,dev,hero=load_training_features()
     results={};predictions={}
     for name,data in [('mask_only',x),('equal_original_plus_mask',np.concatenate((x,o),axis=1))]:
         print('Fitting '+name,flush=True);t=time.perf_counter()

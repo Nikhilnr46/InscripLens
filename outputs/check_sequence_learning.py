@@ -41,11 +41,16 @@ def main():
     parser.add_argument('--preserve-height',action='store_true')
     parser.add_argument('--pack-lengths',action='store_true')
     parser.add_argument('--max-steps',type=int,default=300)
+    parser.add_argument('--paired-view',choices=['mask','original'])
     args=parser.parse_args()
     random.seed(42);np.random.seed(42);torch.manual_seed(42);torch.set_num_threads(4)
-    rows=json.loads((OUT/'prepared_records.json').read_text(encoding='utf-8'))
-    eligible=[r for r in rows if r['split']=='fit' and r['minimum_character_polygon_coverage']>=.95]
-    if args.require_foreground:
+    data_dir=ROOT/'outputs/paired_line_data' if args.paired_view else OUT
+    rows=json.loads((data_dir/('records.json' if args.paired_view else 'prepared_records.json')).read_text(encoding='utf-8'))
+    if args.paired_view:
+        eligible=[dict(r,labels=r['target'].split('|'),crop_path=r[args.paired_view+'_crop']) for r in rows if r['split']=='fit' and r['eligible']]
+    else:
+        eligible=[r for r in rows if r['split']=='fit' and r['minimum_character_polygon_coverage']>=.95]
+    if args.require_foreground and not args.paired_view:
         eligible=[r for r in eligible if r['minimum_character_foreground_pixels']>=20]
     # Fixed four shortest sequences, distinct sources, before seeing model output.
     chosen=[];seen=set()
@@ -57,7 +62,8 @@ def main():
     encode={s:i+1 for i,s in enumerate(alphabet)}
     inputs=[];lengths=[]
     for r in chosen:
-        with Image.open(OUT/r['crop_path']) as im:
+        with Image.open(data_dir/r['crop_path']) as source:
+            im=source.convert('L')
             width=max(64,round(im.width*48/im.height))
             required=len(r['target'])+sum(a==b for a,b in zip(r['target'],r['target'][1:]))
             width=max(width,2*(required+4));width=min(width,512)
@@ -86,7 +92,8 @@ def main():
             history.append(log);print(json.dumps(log),flush=True)
             if exact==len(chosen):break
     result={'purpose':'training-only tiny-subset learnability check, not generalization',
-            'minimum_foreground_pixels_per_character':20 if args.require_foreground else None,
+            'paired_view':args.paired_view,'eligible_fit_lines':len(eligible),
+            'minimum_foreground_pixels_per_character':20 if args.require_foreground or args.paired_view else None,
             'preserve_vertical_features':args.preserve_height,
             'packed_sequence_lengths':args.pack_lengths,
             'passed':exact==len(chosen),'seconds':time.perf_counter()-started,
@@ -97,7 +104,8 @@ def main():
     if args.preserve_height:filename=filename.replace('.json','_vertical.json')
     if args.pack_lengths:filename=filename.replace('.json','_packed.json')
     if args.max_steps!=300:filename=filename.replace('.json',f'_{args.max_steps}steps.json')
-    (OUT/filename).write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+    if args.paired_view:filename='learnability_'+args.paired_view+('' if args.max_steps==300 else f'_{args.max_steps}steps')+'.json'
+    (data_dir/filename).write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
     print('Training-only check passed:',result['passed'],flush=True)
 
 
