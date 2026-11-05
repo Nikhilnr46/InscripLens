@@ -227,7 +227,7 @@ When making significant updates to InscripLens Studio, append a new dated entry 
   - Developed reversible display-layer Roman-to-Kannada converter in Python (`outputs/kannada_converter.py`) and JavaScript (`frontend/src/utils/kannadaConverter.js`).
   - Audited all 764 recognizer classes: 751 mapped with 100% certainty in Unicode NFC; 13 unmapped/ambiguous labels withheld from guessing and documented in `outputs/eval/unmapped_labels_report.md`.
   - Added "Script: Kannada / Roman" toggle in Studio toolbar (default Kannada, persisted in localStorage with try/catch).
-  - Added "Modern letters" switch replacing archaic ಱ (`U+0C91`) and ೞ (`U+0CDE`) with modern ರ (`U+0CB0`) and ಳ (`U+0CB3`) flagged with small "lossy" tags.
+  - Added "Modern letters" switch replacing archaic ಱ (`U+0CB1`) and ೞ (`U+0CDE`) with modern ರ (`U+0CB0`) and ಳ (`U+0CB3`) flagged with small "lossy" tags.
   - Candidate chips display large Kannada glyph with small Roman underneath (hidden when Roman-only active); confidence bars and uncertain dimming preserved.
   - Glyph Inspector displays large Kannada with Roman label in parentheses; alternatives shown as Kannada chips with Roman tooltip; review form maintains Roman input with live Kannada preview beside it.
   - Tiny regions (< 10x10 px) demarcated with "Too small to read" and no confidence bar; crop preview skeleton loading bug on candidate #1 resolved.

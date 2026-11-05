@@ -1,0 +1,83 @@
+{
+  "totals": {
+    "n": 300,
+    "matches": 196,
+    "baseline_reference": 77,
+    "baseline_joint": 52,
+    "candidate_reference": 79,
+    "candidate_joint": 53,
+    "joint_fixed": 11,
+    "joint_lost": 10
+  },
+  "rows": [
+    {
+      "source": "Begur 900CE Tondabbe's Husband's Herostone With Inscription",
+      "n": 11,
+      "matches": 3,
+      "baseline_reference": 2,
+      "baseline_joint": 1,
+      "candidate_reference": 2,
+      "candidate_joint": 1,
+      "joint_fixed": 0,
+      "joint_lost": 0
+    },
+    {
+      "source": "Bisanahalli 900CE Saanta's Turugol Herostone With Inscription",
+      "n": 21,
+      "matches": 13,
+      "baseline_reference": 4,
+      "baseline_joint": 4,
+      "candidate_reference": 6,
+      "candidate_joint": 4,
+      "joint_fixed": 1,
+      "joint_lost": 1
+    },
+    {
+      "source": "Kumbalahalli 900CE Nelmalli Herostone With Inscription",
+      "n": 98,
+      "matches": 73,
+      "baseline_reference": 26,
+      "baseline_joint": 15,
+      "candidate_reference": 23,
+      "candidate_joint": 18,
+      "joint_fixed": 3,
+      "joint_lost": 0
+    },
+    {
+      "source": "Kurudusonnenahalli 900CE Sambayya Hero Stone with Inscription",
+      "n": 34,
+      "matches": 29,
+      "baseline_reference": 12,
+      "baseline_joint": 15,
+      "candidate_reference": 14,
+      "candidate_joint": 14,
+      "joint_fixed": 2,
+      "joint_lost": 3
+    },
+    {
+      "source": "Malurpatna 1000CE Kashayya's Herostone With Inscription",
+      "n": 14,
+      "matches": 7,
+      "baseline_reference": 2,
+      "baseline_joint": 3,
+      "candidate_reference": 1,
+      "candidate_joint": 4,
+      "joint_fixed": 1,
+      "joint_lost": 0
+    },
+    {
+      "source": "Nagavara 971CE Herostone With Inscription",
+      "n": 122,
+      "matches": 71,
+      "baseline_reference": 31,
+      "baseline_joint": 14,
+      "candidate_reference": 33,
+      "candidate_joint": 12,
+      "joint_fixed": 4,
+      "joint_lost": 6
+    }
+  ],
+  "training": 9925,
+  "usable": 9513,
+  "protocol": "First of three whole-glyph SVM labels matching both visual predictions (consonant prefix and vowel-led remainder); otherwise retain baseline."
+}

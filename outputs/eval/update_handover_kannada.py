@@ -21,7 +21,7 @@ A reversible, display-layer Roman-to-Kannada converter was integrated across the
 1. Display-Only Conversion: Stored transliteration strings in models (`*.joblib`), database records (`history.sqlite3`), and client review payloads remain strictly unaltered Roman strings.
 2. Unicode Normalization: All conversions produce canonical Unicode NFC output.
 3. No Guesses: Unmapped, truncated, or ambiguous strings (e.g. `ISymbol`, `stam`, isolated consonants without vowels) are preserved in Roman and marked with a small `[Roman]` badge in the interface.
-4. Archaic Substitution Tier: An opt-in "Modern letters" switch replaces historical ಱ (`U+0C91`) and ೞ (`U+0CDE`) with modern ರ (`U+0CB0`) and ಳ (`U+0CB3`), flagging every modified label with a `lossy` badge.
+4. Archaic Substitution Tier: An opt-in "Modern letters" switch replaces historical ಱ (`U+0CB1`) and ೞ (`U+0CDE`) with modern ರ (`U+0CB0`) and ಳ (`U+0CB3`), flagging every modified label with a `lossy` badge.
 5. Local Font Bundling: High-legibility epigraphic rendering is powered by locally bundled Noto Sans Kannada (`frontend/public/fonts/NotoSansKannada.ttf`), requiring zero remote CDN or network requests.
 6. Tiny Region Demarcation: Candidates smaller than 10x10 px are explicitly marked "Too small to read" without confidence bars, and candidate #1 loading stalls are permanently eliminated.
 

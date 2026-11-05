@@ -1,0 +1,105 @@
+{
+  "totals": {
+    "n": 359,
+    "matches": 254,
+    "baseline_reference": 78,
+    "baseline_joint": 49,
+    "candidate_reference": 83,
+    "candidate_joint": 56,
+    "joint_fixed": 11,
+    "joint_lost": 4
+  },
+  "rows": [
+    {
+      "source": "Aradeshanahalli 900CE Mumennayaga's Turugol Herostone With Inscription",
+      "n": 124,
+      "matches": 97,
+      "baseline_reference": 25,
+      "baseline_joint": 24,
+      "candidate_reference": 28,
+      "candidate_joint": 26,
+      "joint_fixed": 4,
+      "joint_lost": 2
+    },
+    {
+      "source": "Aradeshanahalli 900CE Seemarasa Bhattaraka's Hero Stone Inscription",
+      "n": 23,
+      "matches": 18,
+      "baseline_reference": 5,
+      "baseline_joint": 3,
+      "candidate_reference": 7,
+      "candidate_joint": 4,
+      "joint_fixed": 1,
+      "joint_lost": 0
+    },
+    {
+      "source": "Aradeshanahalli 900CE Tax Collectors Inscription",
+      "n": 21,
+      "matches": 15,
+      "baseline_reference": 7,
+      "baseline_joint": 2,
+      "candidate_reference": 7,
+      "candidate_joint": 3,
+      "joint_fixed": 1,
+      "joint_lost": 0
+    },
+    {
+      "source": "Sadahalli 1328CE Veeraballala Inscription (Not Documented Before)",
+      "n": 30,
+      "matches": 6,
+      "baseline_reference": 8,
+      "baseline_joint": 2,
+      "candidate_reference": 5,
+      "candidate_joint": 1,
+      "joint_fixed": 0,
+      "joint_lost": 1
+    },
+    {
+      "source": "Sadahalli 800CE Uldanapitta Kammara's Herostone With Insciption",
+      "n": 58,
+      "matches": 34,
+      "baseline_reference": 10,
+      "baseline_joint": 5,
+      "candidate_reference": 10,
+      "candidate_joint": 6,
+      "joint_fixed": 2,
+      "joint_lost": 1
+    },
+    {
+      "source": "Srinivagilu 800CE Palchatereyamma's Turugol Herostone With Inscription",
+      "n": 27,
+      "matches": 21,
+      "baseline_reference": 6,
+      "baseline_joint": 2,
+      "candidate_reference": 7,
+      "candidate_joint": 3,
+      "joint_fixed": 1,
+      "joint_lost": 0
+    },
+    {
+      "source": "T Dasarahalli 800CE Kosigaramalta Guramareya's Turugol Herostone Inscription",
+      "n": 28,
+      "matches": 19,
+      "baseline_reference": 3,
+      "baseline_joint": 3,
+      "candidate_reference": 5,
+      "candidate_joint": 3,
+      "joint_fixed": 0,
+      "joint_lost": 0
+    },
+    {
+      "source": "T Dasarahalli 800CE Turugol Herostone With Inscription",
+      "n": 48,
+      "matches": 44,
+      "baseline_reference": 14,
+      "baseline_joint": 8,
+      "candidate_reference": 14,
+      "candidate_joint": 10,
+      "joint_fixed": 2,
+      "joint_lost": 0
+    }
+  ],
+  "training": 9566,
+  "usable": 9161,
+  "protocol": "First of three whole-glyph SVM labels matching both visual predictions (consonant prefix and vowel-led remainder); otherwise retain baseline."
+}

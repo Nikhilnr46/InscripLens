@@ -39,7 +39,7 @@ CONSONANTS = [
     ('m', '\u0cae'),       # ಮ
     ('y', '\u0caf'),       # ಯ
     ('r', '\u0cb0'),       # ರ
-    ('\u1e5f', '\u0c91'),  # ಱ (ṟ - archaic r)
+    ('\u1e5f', '\u0cb1'),  # ಱ (ṟ - archaic r)
     ('l', '\u0cb2'),       # ಲ
     ('\u1e37', '\u0cb3'),  # ಳ (ḷ)
     ('\u1e3b', '\u0cde'),  # ೞ (ḻ - archaic l)
@@ -99,7 +99,7 @@ VIRAMA = '\u0ccd'          # ್ (halant / virama)
 
 # Archaic to modern letter mappings
 ARCHAIC_TO_MODERN = {
-    '\u0c91': '\u0cb0',    # ಱ -> ರ
+    '\u0cb1': '\u0cb0',    # ಱ -> ರ
     '\u0cde': '\u0cb3',    # ೞ -> ಳ
 }
 

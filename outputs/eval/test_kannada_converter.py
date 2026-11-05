@@ -32,7 +32,7 @@ class TestKannadaConverter(unittest.TestCase):
             ("sva", "\u0cb8\u0ccd\u0cb5"),           # sva = ಸ್ವ
             ("\u015br\u012b", "\u0cb6\u0ccd\u0cb0\u0cc0"), # śrī = ಶ್ರೀ
             ("p\u1e5b", "\u0caa\u0cc3"),             # pṛ = ಪೃ
-            ("\u1e5f\u0115", "\u0c91\u0cc6"),         # ṟĕ = ಱೆ
+            ("\u1e5f\u0115", "\u0cb1\u0cc6"),         # ṟĕ = ಱೆ
         ]
         for rom, expected in cases:
             converted = to_kannada(rom)
@@ -60,7 +60,7 @@ class TestKannadaConverter(unittest.TestCase):
         """Verify archaic letters ಱ and ೞ, and their lossy modern replacements (ರ and ಳ)."""
         # Archaic ṟĕ = ಱೆ
         kan_re = to_kannada("\u1e5f\u0115")
-        self.assertEqual(kan_re, "\u0c91\u0cc6")
+        self.assertEqual(kan_re, "\u0cb1\u0cc6")
         mod_re, is_lossy_re = to_modern_kannada(kan_re)
         self.assertEqual(mod_re, "\u0cb0\u0cc6")  # ರೆ
         self.assertTrue(is_lossy_re)
@@ -170,7 +170,7 @@ def generate_audit_report():
         "| Short vowel signs | `k\u0115`, `k\u014f` | `ಕೆ`, `ಕೊ` | U+0C95+U+0CC6, U+0C95+U+0CCA |",
         "| Long vowel signs | `ke`, `ko`, `\u015br\u012b` | `ಕೇ`, `ಕೋ`, `ಶ್ರೀ` | U+0C95+U+0CC7, U+0C95+U+0CCB, U+0CB6+U+0CCD+U+0CB0+U+0CC0 |",
         "| Vocalic ṛ | `p\u1e5b` | `ಪೃ` | U+0CAA+U+0CC3 |",
-        "| Archaic ṟ | `\u1e5f\u0115` | `ಱೆ` | U+0C91+U+0CC6 |",
+        "| Archaic ṟ | `\u1e5f\u0115` | `ಱೆ` | U+0CB1+U+0CC6 |",
         "| Archaic ḻ | `\u1e3ba`, `l\u0324a` | `ೞ` | U+0CDE |",
         "| Anusvara | `ka\u1e43`, `a\u1e43`, `\u1e43da` | `ಕಂ`, `ಅಂ`, `ಂದ` | U+0C95+U+0C82, U+0C85+U+0C82, U+0C82+U+0CA6 |",
         "| Visarga | `ka\u1e25`, `\u015br\u012b\u1e25` | `ಕಃ`, `ಶ್ರೀಃ` | U+0C95+U+0C83, U+0CB6+U+0CCD+U+0CB0+U+0CC0+U+0C83 |",

@@ -1,0 +1,117 @@
+{
+  "training": 9925,
+  "extra": 2342,
+  "per_source": {
+    "Begur 900CE Tondabbe's Husband's Herostone With Inscription": {
+      "baseline": {
+        "reference": 2,
+        "joint": 1,
+        "total": 11,
+        "matched": 3,
+        "detected": 22
+      },
+      "augmented": {
+        "reference": 2,
+        "joint": 1,
+        "total": 11,
+        "matched": 3,
+        "detected": 22
+      }
+    },
+    "Bisanahalli 900CE Saanta's Turugol Herostone With Inscription": {
+      "baseline": {
+        "reference": 4,
+        "joint": 4,
+        "total": 21,
+        "matched": 13,
+        "detected": 27
+      },
+      "augmented": {
+        "reference": 4,
+        "joint": 4,
+        "total": 21,
+        "matched": 13,
+        "detected": 27
+      }
+    },
+    "Kumbalahalli 900CE Nelmalli Herostone With Inscription": {
+      "baseline": {
+        "reference": 26,
+        "joint": 15,
+        "total": 98,
+        "matched": 73,
+        "detected": 95
+      },
+      "augmented": {
+        "reference": 28,
+        "joint": 15,
+        "total": 98,
+        "matched": 73,
+        "detected": 95
+      }
+    },
+    "Kurudusonnenahalli 900CE Sambayya Hero Stone with Inscription": {
+      "baseline": {
+        "reference": 12,
+        "joint": 15,
+        "total": 34,
+        "matched": 29,
+        "detected": 39
+      },
+      "augmented": {
+        "reference": 14,
+        "joint": 13,
+        "total": 34,
+        "matched": 29,
+        "detected": 39
+      }
+    },
+    "Malurpatna 1000CE Kashayya's Herostone With Inscription": {
+      "baseline": {
+        "reference": 2,
+        "joint": 3,
+        "total": 14,
+        "matched": 7,
+        "detected": 14
+      },
+      "augmented": {
+        "reference": 1,
+        "joint": 3,
+        "total": 14,
+        "matched": 7,
+        "detected": 14
+      }
+    },
+    "Nagavara 971CE Herostone With Inscription": {
+      "baseline": {
+        "reference": 31,
+        "joint": 14,
+        "total": 122,
+        "matched": 71,
+        "detected": 133
+      },
+      "augmented": {
+        "reference": 27,
+        "joint": 16,
+        "total": 122,
+        "matched": 71,
+        "detected": 133
+      }
+    }
+  },
+  "baseline": {
+    "reference": 77,
+    "joint": 52,
+    "total": 300,
+    "matched": 196,
+    "detected": 330
+  },
+  "augmented": {
+    "reference": 76,
+    "joint": 52,
+    "total": 300,
+    "matched": 196,
+    "detected": 330
+  },
+  "protocol": "Fixed mask HOG/SVC. Add each nonidentical fit detection matched 1:1 at IoU >= .65. Score all evaluation annotations with detector matches at IoU >= .50."
+}

@@ -34,7 +34,7 @@ const CONSONANTS = [
   ['m', '\u0CAE'],        // ಮ
   ['y', '\u0CAF'],        // ಯ
   ['r', '\u0CB0'],        // ರ
-  ['\u1E5F', '\u0C91'],   // ಱ (ṟ - archaic r)
+  ['\u1E5F', '\u0CB1'],   // ಱ (ṟ - archaic r)
   ['l', '\u0CB2'],        // ಲ
   ['\u1E37', '\u0CB3'],   // ಳ (ḷ)
   ['\u1E3B', '\u0CDE'],   // ೞ (ḻ - archaic l)
@@ -103,7 +103,7 @@ const SPECIAL_MAPPINGS = {
 
 // Archaic to modern letter mappings
 const ARCHAIC_TO_MODERN = {
-  '\u0C91': '\u0CB0',     // ಱ -> ರ
+  '\u0CB1': '\u0CB0',     // ಱ -> ರ
   '\u0CDE': '\u0CB3'      // ೞ -> ಳ
 };
 

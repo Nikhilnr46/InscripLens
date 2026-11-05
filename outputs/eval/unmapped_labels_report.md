@@ -35,7 +35,7 @@ In accordance with strict epigraphic guidelines, any label that cannot be conver
 | Short vowel signs | `kĕ`, `kŏ` | `ಕೆ`, `ಕೊ` | U+0C95+U+0CC6, U+0C95+U+0CCA |
 | Long vowel signs | `ke`, `ko`, `śrī` | `ಕೇ`, `ಕೋ`, `ಶ್ರೀ` | U+0C95+U+0CC7, U+0C95+U+0CCB, U+0CB6+U+0CCD+U+0CB0+U+0CC0 |
 | Vocalic ṛ | `pṛ` | `ಪೃ` | U+0CAA+U+0CC3 |
-| Archaic ṟ | `ṟĕ` | `ಱೆ` | U+0C91+U+0CC6 |
+| Archaic ṟ | `ṟĕ` | `ಱೆ` | U+0CB1+U+0CC6 |
 | Archaic ḻ | `ḻa`, `l̤a` | `ೞ` | U+0CDE |
 | Anusvara | `kaṃ`, `aṃ`, `ṃda` | `ಕಂ`, `ಅಂ`, `ಂದ` | U+0C95+U+0C82, U+0C85+U+0C82, U+0C82+U+0CA6 |
 | Visarga | `kaḥ`, `śrīḥ` | `ಕಃ`, `ಶ್ರೀಃ` | U+0C95+U+0C83, U+0CB6+U+0CCD+U+0CB0+U+0CC0+U+0C83 |

@@ -1,0 +1,149 @@
+{
+  "training": 9566,
+  "extra": 2180,
+  "per_source": {
+    "Aradeshanahalli 900CE Mumennayaga's Turugol Herostone With Inscription": {
+      "baseline": {
+        "reference": 25,
+        "joint": 24,
+        "total": 124,
+        "matched": 97,
+        "detected": 127
+      },
+      "augmented": {
+        "reference": 26,
+        "joint": 23,
+        "total": 124,
+        "matched": 97,
+        "detected": 127
+      }
+    },
+    "Aradeshanahalli 900CE Seemarasa Bhattaraka's Hero Stone Inscription": {
+      "baseline": {
+        "reference": 5,
+        "joint": 3,
+        "total": 23,
+        "matched": 18,
+        "detected": 33
+      },
+      "augmented": {
+        "reference": 5,
+        "joint": 4,
+        "total": 23,
+        "matched": 18,
+        "detected": 33
+      }
+    },
+    "Aradeshanahalli 900CE Tax Collectors Inscription": {
+      "baseline": {
+        "reference": 7,
+        "joint": 2,
+        "total": 21,
+        "matched": 15,
+        "detected": 31
+      },
+      "augmented": {
+        "reference": 7,
+        "joint": 2,
+        "total": 21,
+        "matched": 15,
+        "detected": 31
+      }
+    },
+    "Sadahalli 1328CE Veeraballala Inscription (Not Documented Before)": {
+      "baseline": {
+        "reference": 8,
+        "joint": 2,
+        "total": 30,
+        "matched": 6,
+        "detected": 80
+      },
+      "augmented": {
+        "reference": 9,
+        "joint": 2,
+        "total": 30,
+        "matched": 6,
+        "detected": 80
+      }
+    },
+    "Sadahalli 800CE Uldanapitta Kammara's Herostone With Insciption": {
+      "baseline": {
+        "reference": 10,
+        "joint": 5,
+        "total": 58,
+        "matched": 34,
+        "detected": 53
+      },
+      "augmented": {
+        "reference": 13,
+        "joint": 5,
+        "total": 58,
+        "matched": 34,
+        "detected": 53
+      }
+    },
+    "Srinivagilu 800CE Palchatereyamma's Turugol Herostone With Inscription": {
+      "baseline": {
+        "reference": 6,
+        "joint": 2,
+        "total": 27,
+        "matched": 21,
+        "detected": 29
+      },
+      "augmented": {
+        "reference": 8,
+        "joint": 3,
+        "total": 27,
+        "matched": 21,
+        "detected": 29
+      }
+    },
+    "T Dasarahalli 800CE Kosigaramalta Guramareya's Turugol Herostone Inscription": {
+      "baseline": {
+        "reference": 3,
+        "joint": 3,
+        "total": 28,
+        "matched": 19,
+        "detected": 28
+      },
+      "augmented": {
+        "reference": 4,
+        "joint": 3,
+        "total": 28,
+        "matched": 19,
+        "detected": 28
+      }
+    },
+    "T Dasarahalli 800CE Turugol Herostone With Inscription": {
+      "baseline": {
+        "reference": 14,
+        "joint": 8,
+        "total": 48,
+        "matched": 44,
+        "detected": 54
+      },
+      "augmented": {
+        "reference": 13,
+        "joint": 8,
+        "total": 48,
+        "matched": 44,
+        "detected": 54
+      }
+    }
+  },
+  "baseline": {
+    "reference": 78,
+    "joint": 49,
+    "total": 359,
+    "matched": 254,
+    "detected": 435
+  },
+  "augmented": {
+    "reference": 85,
+    "joint": 50,
+    "total": 359,
+    "matched": 254,
+    "detected": 435
+  },
+  "protocol": "Fixed mask HOG/SVC. Add each nonidentical fit detection matched 1:1 at IoU >= .65. Score all evaluation annotations with detector matches at IoU >= .50."
+}
