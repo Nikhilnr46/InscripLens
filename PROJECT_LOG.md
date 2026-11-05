@@ -1,5 +1,17 @@
 # InscripLens Studio Project Log
 
+## 5 November: Studio UI batch 2 layout of controls
+
+Reorganized Studio viewer toolbar and bottom gallery strip:
+- Top toolbar: grouped Boxes toggle (with count pill) and Curtain control (label and percentage) on the left. Placed Script segmented control (sliding highlight for Kannada and Roman, keyboard accessible), Display options popover (gear icon, Kannada-only, hosting Modern letters switch and lossy warning), Zoom group (Fit, minus, zoom level, plus), and Export dropdown menu ("Download mask") on the right.
+- Container query responsive behavior: below 1100 px panel width, automatically collapses Script control, Display options, and Export into a unified "View" dropdown button while keeping zoom controls always visible.
+- Bottom gallery bar: restructured left section to feature "Classify All (N)" as a single primary button, transforming into "Re-run" with a "133 classified" status pill after classification, placed next to candidate filter segmented control (All, Predicted, Reviewed with count pills). Right section holds compact "Hide tiny" switch chip with count pill and keyboard navigation arrow hint (fades out after first arrow key navigation, remembered in localStorage, accessible via tooltip).
+- Verified responsive layout across 1280, 1366, 1440, 1536, and 1920 px viewports in light and dark themes with sidebar expanded and collapsed; regression tested demo, file upload, high accuracy enhancement, batch classification, filters, review persistence, and mask export.
+
+## 5 November: Studio UI batch 1 quick edits
+
+Completed Studio batch 1 UI edits: restyled Home pill, removed header About, renamed Upload to "Try another", conditioned Demo button visibility, removed STANDARD badge, enlarged curtain divider and handle to 3px/32px, styled 12px candidate scrollbar, softened inspector spotlight, and verified dark/light layouts at 1366, 1536, and 1920.
+
 ## 5 November: first larger sequence diagnostic
 
 Fixed10-epoch CNN-BiLSTM-CTC run on124 screened fit lines,7 separate development lines. Alphabet fit-only, source-disjoint splits, image-only resizing height48/minimum width256/max1024. Initial minimum64 failed CTC capacity on a training line, so fixed minimum256 before training. No validation-stone access or model promotion.
