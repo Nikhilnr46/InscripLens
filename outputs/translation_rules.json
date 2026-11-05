@@ -1,0 +1,329 @@
+{
+  "metadata": {
+    "version": "2.1",
+    "title": "Documented Epigraphical Kannada Translation & Normalization Rules",
+    "policy": "Unmatched words pass through unchanged and flagged as untranslated. Strict native root allowlist for phonology. No narrative guessing."
+  },
+  "phonological_rules": [
+    {
+      "id": "PHONO_P_TO_H_ALLOWLIST",
+      "name": "Initial p- to h- shift",
+      "method": "allowlist",
+      "provenance_status": "unverified",
+      "source": "Unverified - pending historical dictionary citation check",
+      "context": "Documented indigenous Dravidian roots only; word-initial p- followed by vowel",
+      "allowlist": {
+        "pālu": "hālu",
+        "palu": "halu",
+        "pāḍu": "hāḍu",
+        "padu": "hadu",
+        "puli": "huli",
+        "pū": "hū",
+        "poḻal": "hoḷalu",
+        "polal": "holalu",
+        "pesaru": "hesaru",
+        "pattu": "hattu",
+        "pari": "hari",
+        "poḻadu": "hoḷadu",
+        "paḻa": "haḷeya",
+        "pala": "halavu",
+        "poge": "hoge",
+        "puge": "huge",
+        "poy": "hoy",
+        "perame": "herame",
+        "pora": "hora",
+        "punise": "hunise",
+        "piḍi": "hiḍi",
+        "pōgu": "hōgu",
+        "poṟe": "hore"
+      }
+    },
+    {
+      "id": "PHONO_RETROFLEX_MERGER",
+      "name": "Archaic retroflex consonant merger",
+      "provenance_status": "unverified",
+      "source": "Unverified - pending historical grammar citation check",
+      "context": "Orthographic normalization of archaic liquid phonemes to modern equivalents",
+      "substitutions": [
+        {
+          "archaic": "ḻ",
+          "modern": "ḷ"
+        },
+        {
+          "archaic": "ṟ",
+          "modern": "r"
+        }
+      ]
+    }
+  ],
+  "case_markers": [
+    {
+      "id": "CASE_ACCUSATIVE_AM",
+      "halegannada_pattern": "([a-zāīūṛēōḷḻṟ])am$",
+      "modern_replacement": "\\1annu",
+      "case_name": "Accusative (-am -> -annu)",
+      "provenance_status": "unverified",
+      "source": "Unverified - pending sutra citation check",
+      "context": "Nominal bases functioning as direct objects in accusative case",
+      "exceptions": [
+        "rājyam",
+        "kāḷagam",
+        "dānam",
+        "śāsanam",
+        "puṇyam",
+        "padam",
+        "akkum",
+        "sallakkum"
+      ]
+    },
+    {
+      "id": "CASE_ACCUSATIVE_AN",
+      "halegannada_pattern": "([a-zāīūṛēōḷḻṟ])an$",
+      "modern_replacement": "\\1annu",
+      "case_name": "Accusative (-an -> -annu)",
+      "provenance_status": "unverified",
+      "source": "Unverified - pending sutra citation check",
+      "context": "Masculine/rational singular direct objects",
+      "exceptions": [
+        "rājan",
+        "brahman"
+      ]
+    },
+    {
+      "id": "CASE_INSTRUMENTAL_INDAM",
+      "halegannada_pattern": "([a-zāīūṛēōḷḻṟ])indam$",
+      "modern_replacement": "\\1inda",
+      "case_name": "Instrumental (-indam -> -inda)",
+      "provenance_status": "unverified",
+      "source": "Unverified - pending sutra citation check",
+      "context": "Nominal instrumental case ending",
+      "exceptions": []
+    },
+    {
+      "id": "CASE_LOCATIVE_OL",
+      "halegannada_pattern": "([a-zāīūṛēōḷḻṟ])oḷ$",
+      "modern_replacement": "\\1alli",
+      "case_name": "Locative (-oḷ -> -alli)",
+      "provenance_status": "unverified",
+      "source": "Unverified - pending sutra citation check",
+      "context": "Polysyllabic noun stems in locative",
+      "exceptions": [
+        "toḷ",
+        "koḷ",
+        "oḷ"
+      ]
+    }
+  ],
+  "verb_markers": [
+    {
+      "id": "VERB_PAST_PLURAL_DAR",
+      "halegannada_pattern": "([a-zāīūṛēōḷḻṟ])(d|id)ār$",
+      "modern_replacement": "\\1\\2aru",
+      "category": "Past honorific 3rd plural (-dār / -idār -> -daru / -idaru)",
+      "provenance_status": "unverified",
+      "source": "Unverified - pending sutra citation check",
+      "context": "Past tense finite verbs with dental or vocalic past infixes",
+      "exceptions": [
+        "kammāra",
+        "sūtradhāra",
+        "bēgāra"
+      ]
+    }
+  ],
+  "formulaic_lexicon": [
+    {
+      "id": "FORMULA_INVOCATION_SVASTI_SRI",
+      "key": "svasti śrī",
+      "variants": [
+        "svasti sri",
+        "svasti"
+      ],
+      "category": "invocation",
+      "modern_kannada": "śubhavāgali śrī (ಸ್ವಸ್ತಿ ಶ್ರೀ)",
+      "english_translation": "Hail! Auspicious fortune.",
+      "provenance_status": "unverified",
+      "source": "Unverified - pending publication check"
+    },
+    {
+      "id": "FORMULA_HONORIFIC_SRI",
+      "key": "śrī",
+      "variants": [
+        "sri"
+      ],
+      "category": "honorific",
+      "modern_kannada": "śrī (ಶ್ರೀ)",
+      "english_translation": "prosperous / glorious",
+      "provenance_status": "unverified",
+      "source": "Unverified - pending publication check"
+    },
+    {
+      "id": "FORMULA_REGNAL_EARTH_RULE",
+      "key": "pṛthivī-rājyam geye",
+      "variants": [
+        "pṛthivī rājyaṃ geye",
+        "pṛthuvī rājyaṃ gĕyĕ",
+        "pṛthuvī rājyaṃ geye",
+        "pṛthivī rājyam geye",
+        "pṛthivī-rājyam",
+        "pṛthuvī rājyaṃ",
+        "pṛthivī rājyaṃ"
+      ],
+      "category": "regnal_formula",
+      "modern_kannada": "bhūmiya rājyavannu āḷuttiruvāga (ಪೃಥಿವೀ ರಾಜ್ಯವನ್ನು ಆಳುತ್ತಿರುವಾಗ)",
+      "english_translation": "while ruling the kingdom of the earth:",
+      "provenance_status": "confirmed from a repo file",
+      "source": "Confirmed from outputs/context_reading/HS024_reference.json (EC IX Hoskote 110, p. 102)"
+    },
+    {
+      "id": "FORMULA_TEMPORAL_GEYE",
+      "key": "geye",
+      "variants": [
+        "gĕyĕ"
+      ],
+      "category": "temporal_participle",
+      "modern_kannada": "māḍuvāga / āḷuvāga (ಮಾಡುತ್ತಿರುವಾಗ)",
+      "english_translation": "while governing / while doing",
+      "provenance_status": "unverified",
+      "source": "Unverified - pending citation check"
+    },
+    {
+      "id": "FORMULA_MILITARY_KALAGADOL",
+      "key": "kāḷagadoḷ",
+      "variants": [
+        "kāḷagadol",
+        "kalagadol"
+      ],
+      "category": "military",
+      "modern_kannada": "yuddhadalli (ಕಾಳಗದಲ್ಲಿ)",
+      "english_translation": "in the battle,",
+      "provenance_status": "unverified",
+      "source": "Unverified - pending publication check"
+    },
+    {
+      "id": "FORMULA_MILITARY_KALAGAM",
+      "key": "kāḷagam",
+      "variants": [
+        "kāḷaga"
+      ],
+      "category": "military",
+      "modern_kannada": "yuddha (ಕಾಳಗ / ಯುದ್ಧ)",
+      "english_translation": "battle / combat",
+      "provenance_status": "unverified",
+      "source": "Unverified - pending publication check"
+    },
+    {
+      "id": "FORMULA_HEROIC_TURUGOL",
+      "key": "turugōḷ",
+      "variants": [
+        "turu-goḷal",
+        "turuvam koḷal",
+        "turugol",
+        "turuvam"
+      ],
+      "category": "heroic_context",
+      "modern_kannada": "danagaḷannu kāpāḍuvāga (ದನಗಳನ್ನು ರಕ್ಷಿಸುವಾಗ)",
+      "english_translation": "while rescuing the cattle,",
+      "provenance_status": "confirmed from a repo file",
+      "source": "Confirmed from outputs/context_reading/HS024_reference.json (EC IX Hoskote 110, p. 102)"
+    },
+    {
+      "id": "FORMULA_MEMORIAL_SARGGAMERIDAR",
+      "key": "sarggamēṟidār",
+      "variants": [
+        "svarggam ēṟidār",
+        "sarggam ēṟidār",
+        "svarggamēṟidār",
+        "svarggam eridar"
+      ],
+      "category": "memorial",
+      "modern_kannada": "svargavannu ēridaru (ಸ್ವರ್ಗವನ್ನು ಏರಿದರು)",
+      "english_translation": "he ascended to heaven.",
+      "provenance_status": "unverified",
+      "source": "Unverified - pending publication check"
+    },
+    {
+      "id": "FORMULA_COMMEMORATION_KALLA_NIRISIDAR",
+      "key": "kalla niṟisidār",
+      "variants": [
+        "kallam niṟisidār",
+        "kalla nillisidār",
+        "kalla nirisidar"
+      ],
+      "category": "commemoration",
+      "modern_kannada": "kallannu nillisidaru (ಕಲ್ಲನ್ನು ನಿಲ್ಲಿಸಿದರು)",
+      "english_translation": "erected this memorial stone.",
+      "provenance_status": "unverified",
+      "source": "Unverified - pending publication check"
+    },
+    {
+      "id": "FORMULA_EPIGRAPH_KALLAM",
+      "key": "kallam",
+      "variants": [
+        "kalla"
+      ],
+      "category": "epigraph",
+      "modern_kannada": "kallannu (ಕಲ್ಲನ್ನು / ವೀರಗಲ್ಲನ್ನು)",
+      "english_translation": "the memorial stone",
+      "provenance_status": "unverified",
+      "source": "Unverified - pending publication check"
+    },
+    {
+      "id": "FORMULA_LAND_GRANT_BALGACCU",
+      "key": "bāḷgaccu",
+      "variants": [
+        "balgaccu"
+      ],
+      "category": "land_grant",
+      "modern_kannada": "bāḷgaccu bhūmi (ಬಾಳ್ಗಚ್ಚು - ಕತ್ತಿ ತೊಳೆದ ವೀರಭೂಮಿ ದಾನ)",
+      "english_translation": "sword-washing land grant (bāḷgaccu).",
+      "provenance_status": "confirmed from a repo file",
+      "source": "Confirmed from outputs/context_reading/HS024_reference.json (EC IX Hoskote 110, p. 102)"
+    },
+    {
+      "id": "FORMULA_GRANT_KOTTAR",
+      "key": "koṭṭār",
+      "variants": [
+        "kottar"
+      ],
+      "category": "grant",
+      "modern_kannada": "koṭṭaru (ಕೊಟ್ಟರು)",
+      "english_translation": "they granted / gave",
+      "provenance_status": "unverified",
+      "source": "Unverified - pending publication check"
+    },
+    {
+      "id": "FORMULA_GRANT_KOTTODU",
+      "key": "koṭṭodu",
+      "variants": [
+        "kottodu"
+      ],
+      "category": "grant",
+      "modern_kannada": "koṭṭaddu (ಕೊಟ್ಟದ್ದು)",
+      "english_translation": "that which was granted",
+      "provenance_status": "unverified",
+      "source": "Unverified - pending publication check"
+    },
+    {
+      "id": "FORMULA_IMPRECATION_MAHAPATAKA",
+      "key": "mahāpātaka",
+      "variants": [
+        "mahapataka"
+      ],
+      "category": "imprecation",
+      "modern_kannada": "mahāpāpavu (ಮಹಾ ಪಾಪವು)",
+      "english_translation": "a grave sin / sacrilege",
+      "provenance_status": "unverified",
+      "source": "Unverified - pending publication check"
+    },
+    {
+      "id": "FORMULA_VERB_AKKUM",
+      "key": "akkum",
+      "variants": [],
+      "category": "verb",
+      "modern_kannada": "āguttade (ಆಗುತ್ತದೆ)",
+      "english_translation": "shall befall / will happen",
+      "provenance_status": "unverified",
+      "source": "Unverified - pending publication check"
+    }
+  ]
+}

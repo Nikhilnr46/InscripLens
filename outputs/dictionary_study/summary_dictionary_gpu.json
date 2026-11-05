@@ -1,0 +1,18 @@
+{
+  "model": "Historical Kannada KittelLM (GPU accelerated)",
+  "source_text": "Rev. F. Kittel's A Kannada-English Dictionary (1894)",
+  "corpus_characters": 1464120,
+  "vocab_size": 120,
+  "train_sequences": 41176,
+  "val_sequences": 2286,
+  "sequence_length": 64,
+  "device": "cuda",
+  "gpu_name": "NVIDIA GeForce RTX 3050 Laptop GPU",
+  "peak_vram_mb": 217.87,
+  "best_val_loss": 2.3149,
+  "best_val_perplexity": 10.12,
+  "best_val_char_accuracy": 0.4247,
+  "epochs": 15,
+  "total_training_seconds": 88.75,
+  "checkpoint_path": "C:\\nikhil\\outputs\\dictionary_study\\kittel_lm_gpu.pth"
+}

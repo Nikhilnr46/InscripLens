@@ -1,0 +1,16 @@
+{
+  "model": "Broad EpiSAM CharacterCNN (GPU)",
+  "device": "cuda",
+  "gpu_name": "NVIDIA GeForce RTX 3050 Laptop GPU",
+  "peak_vram_mb": 383.55,
+  "training_samples": 10281,
+  "classes": 781,
+  "validation_samples_total": 2422,
+  "validation_samples_seen": 2363,
+  "best_val_top1_correct": 548,
+  "best_val_top1_accuracy": 0.2319,
+  "final_val_top3_accuracy": 0.38,
+  "epochs": 20,
+  "total_training_seconds": 60.57,
+  "checkpoint_path": "C:\\nikhil\\outputs\\cnn_study\\character_cnn_episam_gpu.pth"
+}

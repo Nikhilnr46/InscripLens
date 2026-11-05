@@ -1,0 +1,188 @@
+{
+  "total_evaluated_entries": 3,
+  "total_tokens": 15,
+  "matched_tokens": 12,
+  "token_rule_match_rate": 0.8,
+  "formula_match_rate": 1.0,
+  "results": [
+    {
+      "entry_id": "EC9_HT110_Kumbalahalli_opening",
+      "stone_id": "HS024",
+      "input_passage": "svasti śrī śrī nŏḻambaṃ pṛthuvī rājyaṃ gĕyĕ",
+      "published_english": "Hail! While the glorious Nolamba king was ruling the kingdom of the earth:",
+      "status": "Machine draft, unverified",
+      "engine_modern_kannada": "śubhavāgali śrī (ಸ್ವಸ್ತಿ ಶ್ರೀ) śrī (ಶ್ರೀ) śrī (ಶ್ರೀ) nŏḷambaṃ [untranslated: pṛthuvī] [untranslated: rājyaṃ] māḍuvāga / āḷuvāga (ಮಾಡುತ್ತಿರುವಾಗ)",
+      "engine_english": "Hail! Auspicious fortune. while ruling the kingdom of the earth:",
+      "detected_formulas": [
+        "svasti śrī",
+        "pṛthivī-rājyam geye"
+      ],
+      "token_match_count": "5/7",
+      "rule_provenance": [
+        "Formula template 'svasti śrī' matched span 'svasti śrī' (Standard South Indian inscriptional opening invocation)",
+        "Formula template 'pṛthivī-rājyam geye' matched span 'pṛthuvī rājyaṃ gĕyĕ' (Ganga, Nolamba, and Chalukya standard regnal formula)",
+        "Token 'svasti': Lexicon template 'svasti śrī' (Standard South Indian inscriptional opening invocation)",
+        "Token 'śrī': Lexicon template 'śrī' (Honorific epithet)",
+        "Token 'śrī': Lexicon template 'śrī' (Honorific epithet)",
+        "Token 'nŏḻambaṃ': Archaic retroflex liquid merger (ḻ -> ḷ, ṟ -> r)",
+        "Token 'gĕyĕ': Lexicon template 'geye' (Sabdamanidarpana; present/durative verbal participle)"
+      ],
+      "tokens_detail": [
+        {
+          "original": "svasti",
+          "modern": "śubhavāgali śrī (ಸ್ವಸ್ತಿ ಶ್ರೀ)",
+          "rule_id": "FORMULA_INVOCATION_SVASTI_SRI",
+          "rule_provenance": "Lexicon template 'svasti śrī' (Standard South Indian inscriptional opening invocation)",
+          "status": "matched"
+        },
+        {
+          "original": "śrī",
+          "modern": "śrī (ಶ್ರೀ)",
+          "rule_id": "FORMULA_HONORIFIC_SRI",
+          "rule_provenance": "Lexicon template 'śrī' (Honorific epithet)",
+          "status": "matched"
+        },
+        {
+          "original": "śrī",
+          "modern": "śrī (ಶ್ರೀ)",
+          "rule_id": "FORMULA_HONORIFIC_SRI",
+          "rule_provenance": "Lexicon template 'śrī' (Honorific epithet)",
+          "status": "matched"
+        },
+        {
+          "original": "nŏḻambaṃ",
+          "modern": "nŏḷambaṃ",
+          "rule_id": "PHONO_RETROFLEX_MERGER",
+          "rule_provenance": "Archaic retroflex liquid merger (ḻ -> ḷ, ṟ -> r)",
+          "status": "matched"
+        },
+        {
+          "original": "pṛthuvī",
+          "modern": "[untranslated: pṛthuvī]",
+          "rule_id": "NONE_UNMATCHED",
+          "rule_provenance": "No documented rule match; passed through unchanged",
+          "status": "unmatched"
+        },
+        {
+          "original": "rājyaṃ",
+          "modern": "[untranslated: rājyaṃ]",
+          "rule_id": "NONE_UNMATCHED",
+          "rule_provenance": "No documented rule match; passed through unchanged",
+          "status": "unmatched"
+        },
+        {
+          "original": "gĕyĕ",
+          "modern": "māḍuvāga / āḷuvāga (ಮಾಡುತ್ತಿರುವಾಗ)",
+          "rule_id": "FORMULA_TEMPORAL_GEYE",
+          "rule_provenance": "Lexicon template 'geye' (Sabdamanidarpana; present/durative verbal participle)",
+          "status": "matched"
+        }
+      ]
+    },
+    {
+      "entry_id": "EC9_NL027_Nagavara_opening",
+      "stone_id": "HS027",
+      "input_passage": "svasti śrī",
+      "published_english": "Hail! Auspicious fortune.",
+      "status": "Machine draft, unverified",
+      "engine_modern_kannada": "śubhavāgali śrī (ಸ್ವಸ್ತಿ ಶ್ರೀ) śrī (ಶ್ರೀ)",
+      "engine_english": "Hail! Auspicious fortune.",
+      "detected_formulas": [
+        "svasti śrī"
+      ],
+      "token_match_count": "2/2",
+      "rule_provenance": [
+        "Formula template 'svasti śrī' matched span 'svasti śrī' (Standard South Indian inscriptional opening invocation)",
+        "Token 'svasti': Lexicon template 'svasti śrī' (Standard South Indian inscriptional opening invocation)",
+        "Token 'śrī': Lexicon template 'śrī' (Honorific epithet)"
+      ],
+      "tokens_detail": [
+        {
+          "original": "svasti",
+          "modern": "śubhavāgali śrī (ಸ್ವಸ್ತಿ ಶ್ರೀ)",
+          "rule_id": "FORMULA_INVOCATION_SVASTI_SRI",
+          "rule_provenance": "Lexicon template 'svasti śrī' (Standard South Indian inscriptional opening invocation)",
+          "status": "matched"
+        },
+        {
+          "original": "śrī",
+          "modern": "śrī (ಶ್ರೀ)",
+          "rule_id": "FORMULA_HONORIFIC_SRI",
+          "rule_provenance": "Lexicon template 'śrī' (Honorific epithet)",
+          "status": "matched"
+        }
+      ]
+    },
+    {
+      "entry_id": "TEMPLATE_CATTLE_RAID_MARTYRDOM",
+      "stone_id": null,
+      "input_passage": "kāḷagadoḷ turuvam koḷal sarggamēṟidār kalla niṟisidār",
+      "published_english": "In the battle while rescuing the cattle, he ascended to heaven; this memorial stone was erected.",
+      "status": "Machine draft, unverified",
+      "engine_modern_kannada": "yuddhadalli (ಕಾಳಗದಲ್ಲಿ) danagaḷannu kāpāḍuvāga (ದನಗಳನ್ನು ರಕ್ಷಿಸುವಾಗ) [untranslated: koḷal] svargavannu ēridaru (ಸ್ವರ್ಗವನ್ನು ಏರಿದರು) kallannu (ಕಲ್ಲನ್ನು / ವೀರಗಲ್ಲನ್ನು) nirisidaru",
+      "engine_english": "in the battle, while rescuing the captured cattle, he ascended to heaven. erected this memorial stone.",
+      "detected_formulas": [
+        "kāḷagadoḷ",
+        "turugōḷ",
+        "sarggamēṟidār",
+        "kalla niṟisidār"
+      ],
+      "token_match_count": "5/6",
+      "rule_provenance": [
+        "Formula template 'kāḷagadoḷ' matched span 'kāḷagadoḷ' (Epigraphia Carnatica standard viragallu locative)",
+        "Formula template 'turugōḷ' matched span 'turuvam koḷal' (Epigraphia Carnatica; cattle raid defense formula (turugol viragallu))",
+        "Formula template 'sarggamēṟidār' matched span 'sarggamēṟidār' (Hero stone martyrdom formula (svargam + ēṟidār, literally: climbed to heaven))",
+        "Formula template 'kalla niṟisidār' matched span 'kalla niṟisidār' (Viragallu commemorative erection formula)",
+        "Token 'kāḷagadoḷ': Lexicon template 'kāḷagadoḷ' (Epigraphia Carnatica standard viragallu locative)",
+        "Token 'turuvam': Lexicon template 'turugōḷ' (Epigraphia Carnatica; cattle raid defense formula (turugol viragallu))",
+        "Token 'sarggamēṟidār': Lexicon template 'sarggamēṟidār' (Hero stone martyrdom formula (svargam + ēṟidār, literally: climbed to heaven))",
+        "Token 'kalla': Lexicon template 'kallam' (Noun base (accusative))",
+        "Token 'niṟisidār': Past honorific 3rd plural (-dār / -idār -> -daru / -idaru) (Sabdamanidarpana sutra 220 (Kriyāpada))"
+      ],
+      "tokens_detail": [
+        {
+          "original": "kāḷagadoḷ",
+          "modern": "yuddhadalli (ಕಾಳಗದಲ್ಲಿ)",
+          "rule_id": "FORMULA_MILITARY_KALAGADOL",
+          "rule_provenance": "Lexicon template 'kāḷagadoḷ' (Epigraphia Carnatica standard viragallu locative)",
+          "status": "matched"
+        },
+        {
+          "original": "turuvam",
+          "modern": "danagaḷannu kāpāḍuvāga (ದನಗಳನ್ನು ರಕ್ಷಿಸುವಾಗ)",
+          "rule_id": "FORMULA_HEROIC_TURUGOL",
+          "rule_provenance": "Lexicon template 'turugōḷ' (Epigraphia Carnatica; cattle raid defense formula (turugol viragallu))",
+          "status": "matched"
+        },
+        {
+          "original": "koḷal",
+          "modern": "[untranslated: koḷal]",
+          "rule_id": "NONE_UNMATCHED",
+          "rule_provenance": "No documented rule match; passed through unchanged",
+          "status": "unmatched"
+        },
+        {
+          "original": "sarggamēṟidār",
+          "modern": "svargavannu ēridaru (ಸ್ವರ್ಗವನ್ನು ಏರಿದರು)",
+          "rule_id": "FORMULA_MEMORIAL_SARGGAMERIDAR",
+          "rule_provenance": "Lexicon template 'sarggamēṟidār' (Hero stone martyrdom formula (svargam + ēṟidār, literally: climbed to heaven))",
+          "status": "matched"
+        },
+        {
+          "original": "kalla",
+          "modern": "kallannu (ಕಲ್ಲನ್ನು / ವೀರಗಲ್ಲನ್ನು)",
+          "rule_id": "FORMULA_EPIGRAPH_KALLAM",
+          "rule_provenance": "Lexicon template 'kallam' (Noun base (accusative))",
+          "status": "matched"
+        },
+        {
+          "original": "niṟisidār",
+          "modern": "nirisidaru",
+          "rule_id": "VERB_PAST_PLURAL_DAR",
+          "rule_provenance": "Past honorific 3rd plural (-dār / -idār -> -daru / -idaru) (Sabdamanidarpana sutra 220 (Kriyāpada))",
+          "status": "matched"
+        }
+      ]
+    }
+  ]
+}

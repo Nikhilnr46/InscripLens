@@ -1,0 +1,560 @@
+{
+  "model": "LineUNet (line_segmentation_episam_gpu.pth)",
+  "eval_dataset": "episam/lines/val",
+  "num_eval_inscriptions": 31,
+  "metrics_connected_components_raw": {
+    "total_gold_lines": 254,
+    "total_pred_lines": 56,
+    "exact_line_count_accuracy": 0.0,
+    "mean_absolute_line_count_error": 6.65,
+    "instance_true_positives": 7,
+    "instance_false_positives": 49,
+    "instance_false_negatives": 247,
+    "instance_precision_iou50": 0.125,
+    "instance_recall_iou50": 0.0276,
+    "instance_f1_iou50": 0.0452
+  },
+  "metrics_horizontal_valley_splitting": {
+    "total_gold_lines": 254,
+    "total_pred_lines": 59,
+    "exact_line_count_accuracy": 0.0645,
+    "mean_absolute_line_count_error": 6.29,
+    "instance_true_positives": 13,
+    "instance_false_positives": 46,
+    "instance_false_negatives": 241,
+    "instance_precision_iou50": 0.2203,
+    "instance_recall_iou50": 0.0512,
+    "instance_f1_iou50": 0.0831
+  },
+  "worst_cases_evaluated": [
+    {
+      "rank": 1,
+      "inscription": "Hale Nijagal 1280CE Temple Donation Inscription",
+      "gold_lines": 21,
+      "raw_pred_cc_lines": 4,
+      "valley_pred_lines": 3,
+      "overlay_path": "outputs\\eval\\line_overlays\\worst_case_1_Hale_Nijagal_1280CE_Temple_Don.png"
+    },
+    {
+      "rank": 2,
+      "inscription": "Nagavara 971CE Herostone With Inscription",
+      "gold_lines": 17,
+      "raw_pred_cc_lines": 1,
+      "valley_pred_lines": 2,
+      "overlay_path": "outputs\\eval\\line_overlays\\worst_case_2_Nagavara_971CE_Herostone_With_.png"
+    },
+    {
+      "rank": 3,
+      "inscription": "Jalige 1345CE Pemmeyanayaka's Donation Inscription backside",
+      "gold_lines": 14,
+      "raw_pred_cc_lines": 1,
+      "valley_pred_lines": 1,
+      "overlay_path": "outputs\\eval\\line_overlays\\worst_case_3_Jalige_1345CE_Pemmeyanayaka's_.png"
+    }
+  ],
+  "non_episam_photographs_eval": [
+    {
+      "stone_id": "HS022",
+      "photo_file": "outputs\\full_binarizer\\HS022_original.png",
+      "mask_file": "outputs\\full_binarizer\\HS022_mask.png",
+      "image_dimensions": [
+        1043,
+        1080
+      ],
+      "pred_foreground_fraction": 0.0429,
+      "predicted_line_instances_cc": 6,
+      "predicted_line_instances_valleys": 2
+    },
+    {
+      "stone_id": "HS024",
+      "photo_file": "outputs\\full_binarizer\\HS024_original.png",
+      "mask_file": "outputs\\full_binarizer\\HS024_mask.png",
+      "image_dimensions": [
+        826,
+        1080
+      ],
+      "pred_foreground_fraction": 0.2684,
+      "predicted_line_instances_cc": 4,
+      "predicted_line_instances_valleys": 3
+    },
+    {
+      "stone_id": "HS027",
+      "photo_file": "outputs\\full_binarizer\\HS027_original.png",
+      "mask_file": "outputs\\full_binarizer\\HS027_mask.png",
+      "image_dimensions": [
+        525,
+        1080
+      ],
+      "pred_foreground_fraction": 0.3868,
+      "predicted_line_instances_cc": 1,
+      "predicted_line_instances_valleys": 2
+    }
+  ],
+  "per_image_results": [
+    {
+      "name": "Bannerughatta 1400CE Sovappa Odeya Damodara Temple Donation Inscription",
+      "dimensions": [
+        1027,
+        1080
+      ],
+      "gold_lines": 6,
+      "cc_pred_lines": 1,
+      "cc_tp": 0,
+      "cc_count_error": 5,
+      "valley_pred_lines": 1,
+      "valley_tp": 0,
+      "valley_count_error": 5,
+      "mask_file": "episam\\episam_dataset\\episam_dataset\\binary_images\\val\\Bannerughatta 1400CE Sovappa Odeya Damodara Temple Donation Inscription.png"
+    },
+    {
+      "name": "Basavanagudi 1600CE Birth of Vrishabhavathi River Peeta Inscription",
+      "dimensions": [
+        1920,
+        418
+      ],
+      "gold_lines": 2,
+      "cc_pred_lines": 1,
+      "cc_tp": 1,
+      "cc_count_error": 1,
+      "valley_pred_lines": 2,
+      "valley_tp": 2,
+      "valley_count_error": 0,
+      "mask_file": "episam\\episam_dataset\\episam_dataset\\binary_images\\val\\Basavanagudi 1600CE Birth of Vrishabhavathi River Peeta Inscription.png"
+    },
+    {
+      "name": "Begur 900CE Pervvonashetti",
+      "dimensions": [
+        633,
+        1080
+      ],
+      "gold_lines": 7,
+      "cc_pred_lines": 1,
+      "cc_tp": 0,
+      "cc_count_error": 6,
+      "valley_pred_lines": 1,
+      "valley_tp": 0,
+      "valley_count_error": 6,
+      "mask_file": "episam\\episam_dataset\\episam_dataset\\binary_images\\val\\Begur 900CE Pervvonashetti.png"
+    },
+    {
+      "name": "Begur 900CE Tondabbe Sanyasana Inscription",
+      "dimensions": [
+        455,
+        1080
+      ],
+      "gold_lines": 6,
+      "cc_pred_lines": 1,
+      "cc_tp": 0,
+      "cc_count_error": 5,
+      "valley_pred_lines": 1,
+      "valley_tp": 0,
+      "valley_count_error": 5,
+      "mask_file": "episam\\episam_dataset\\episam_dataset\\binary_images\\val\\Begur 900CE Tondabbe Sanyasana Inscription.png"
+    },
+    {
+      "name": "Begur 900CE Tondabbe's Husband's Herostone With Inscription",
+      "dimensions": [
+        1043,
+        1080
+      ],
+      "gold_lines": 4,
+      "cc_pred_lines": 1,
+      "cc_tp": 0,
+      "cc_count_error": 3,
+      "valley_pred_lines": 2,
+      "valley_tp": 1,
+      "valley_count_error": 2,
+      "mask_file": "episam\\episam_dataset\\episam_dataset\\binary_images\\val\\Begur 900CE Tondabbe's Husband's Herostone With Inscription.png"
+    },
+    {
+      "name": "Bisanahalli 900CE Saanta's Turugol Herostone With Inscription",
+      "dimensions": [
+        1337,
+        1080
+      ],
+      "gold_lines": 6,
+      "cc_pred_lines": 3,
+      "cc_tp": 2,
+      "cc_count_error": 3,
+      "valley_pred_lines": 2,
+      "valley_tp": 0,
+      "valley_count_error": 4,
+      "mask_file": "episam\\episam_dataset\\episam_dataset\\binary_images\\val\\Bisanahalli 900CE Saanta's Turugol Herostone With Inscription.png"
+    },
+    {
+      "name": "Chikkajala 1382CE Devarasa's Keshavanatha Temple Donation Inscriptiona",
+      "dimensions": [
+        1404,
+        1080
+      ],
+      "gold_lines": 8,
+      "cc_pred_lines": 4,
+      "cc_tp": 0,
+      "cc_count_error": 4,
+      "valley_pred_lines": 2,
+      "valley_tp": 0,
+      "valley_count_error": 6,
+      "mask_file": "episam\\episam_dataset\\episam_dataset\\binary_images\\val\\Chikkajala 1382CE Devarasa's Keshavanatha Temple Donation Inscriptiona.png"
+    },
+    {
+      "name": "Chikkajala 1589CE Baireyanayaka's Garuda Pillar Inscription",
+      "dimensions": [
+        962,
+        1080
+      ],
+      "gold_lines": 9,
+      "cc_pred_lines": 1,
+      "cc_tp": 0,
+      "cc_count_error": 8,
+      "valley_pred_lines": 1,
+      "valley_tp": 0,
+      "valley_count_error": 8,
+      "mask_file": "episam\\episam_dataset\\episam_dataset\\binary_images\\val\\Chikkajala 1589CE Baireyanayaka's Garuda Pillar Inscription.png"
+    },
+    {
+      "name": "Devishettihalli 1526CE Vogatta Temple Donation Inscription",
+      "dimensions": [
+        1738,
+        1080
+      ],
+      "gold_lines": 13,
+      "cc_pred_lines": 1,
+      "cc_tp": 0,
+      "cc_count_error": 12,
+      "valley_pred_lines": 2,
+      "valley_tp": 0,
+      "valley_count_error": 11,
+      "mask_file": "episam\\episam_dataset\\episam_dataset\\binary_images\\val\\Devishettihalli 1526CE Vogatta Temple Donation Inscription.png"
+    },
+    {
+      "name": "Gangavara 1371CE Three Priests Inscription",
+      "dimensions": [
+        1920,
+        758
+      ],
+      "gold_lines": 6,
+      "cc_pred_lines": 1,
+      "cc_tp": 0,
+      "cc_count_error": 5,
+      "valley_pred_lines": 1,
+      "valley_tp": 0,
+      "valley_count_error": 5,
+      "mask_file": "episam\\episam_dataset\\episam_dataset\\binary_images\\val\\Gangavara 1371CE Three Priests Inscription.png"
+    },
+    {
+      "name": "Hale Nijagal 1280CE Temple Donation Inscription",
+      "dimensions": [
+        640,
+        1080
+      ],
+      "gold_lines": 21,
+      "cc_pred_lines": 4,
+      "cc_tp": 1,
+      "cc_count_error": 17,
+      "valley_pred_lines": 3,
+      "valley_tp": 0,
+      "valley_count_error": 18,
+      "mask_file": "episam\\episam_dataset\\episam_dataset\\binary_images\\val\\Hale Nijagal 1280CE Temple Donation Inscription.png"
+    },
+    {
+      "name": "Jakkur 1432CE God Allalanatha inscription",
+      "dimensions": [
+        378,
+        1080
+      ],
+      "gold_lines": 9,
+      "cc_pred_lines": 1,
+      "cc_tp": 0,
+      "cc_count_error": 8,
+      "valley_pred_lines": 1,
+      "valley_tp": 0,
+      "valley_count_error": 8,
+      "mask_file": "episam\\episam_dataset\\episam_dataset\\binary_images\\val\\Jakkur 1432CE God Allalanatha inscription.png"
+    },
+    {
+      "name": "Jalige 1345CE Pemmeyanayaka's Donation Inscription",
+      "dimensions": [
+        744,
+        1080
+      ],
+      "gold_lines": 10,
+      "cc_pred_lines": 1,
+      "cc_tp": 0,
+      "cc_count_error": 9,
+      "valley_pred_lines": 1,
+      "valley_tp": 0,
+      "valley_count_error": 9,
+      "mask_file": "episam\\episam_dataset\\episam_dataset\\binary_images\\val\\Jalige 1345CE Pemmeyanayaka's Donation Inscription.png"
+    },
+    {
+      "name": "Jalige 1345CE Pemmeyanayaka's Donation Inscription backside",
+      "dimensions": [
+        798,
+        1080
+      ],
+      "gold_lines": 14,
+      "cc_pred_lines": 1,
+      "cc_tp": 0,
+      "cc_count_error": 13,
+      "valley_pred_lines": 1,
+      "valley_tp": 0,
+      "valley_count_error": 13,
+      "mask_file": "episam\\episam_dataset\\episam_dataset\\binary_images\\val\\Jalige 1345CE Pemmeyanayaka's Donation Inscription backside.png"
+    },
+    {
+      "name": "K R Puram 750CE Posauraralgeya",
+      "dimensions": [
+        1707,
+        1080
+      ],
+      "gold_lines": 3,
+      "cc_pred_lines": 2,
+      "cc_tp": 0,
+      "cc_count_error": 1,
+      "valley_pred_lines": 2,
+      "valley_tp": 0,
+      "valley_count_error": 1,
+      "mask_file": "episam\\episam_dataset\\episam_dataset\\binary_images\\val\\K R Puram 750CE Posauraralgeya.png"
+    },
+    {
+      "name": "Kambipura 1651CE Donation Inscription",
+      "dimensions": [
+        1841,
+        1080
+      ],
+      "gold_lines": 4,
+      "cc_pred_lines": 8,
+      "cc_tp": 0,
+      "cc_count_error": 4,
+      "valley_pred_lines": 4,
+      "valley_tp": 0,
+      "valley_count_error": 0,
+      "mask_file": "episam\\episam_dataset\\episam_dataset\\binary_images\\val\\Kambipura 1651CE Donation Inscription.png"
+    },
+    {
+      "name": "Kudluru 1000 CE Dantala Basadi Donation Inscription",
+      "dimensions": [
+        566,
+        1080
+      ],
+      "gold_lines": 9,
+      "cc_pred_lines": 1,
+      "cc_tp": 0,
+      "cc_count_error": 8,
+      "valley_pred_lines": 2,
+      "valley_tp": 0,
+      "valley_count_error": 7,
+      "mask_file": "episam\\episam_dataset\\episam_dataset\\binary_images\\val\\Kudluru 1000 CE Dantala Basadi Donation Inscription.png"
+    },
+    {
+      "name": "Kumbalahalli 900CE Nelmalli Herostone With Inscription",
+      "dimensions": [
+        826,
+        1080
+      ],
+      "gold_lines": 8,
+      "cc_pred_lines": 3,
+      "cc_tp": 1,
+      "cc_count_error": 5,
+      "valley_pred_lines": 3,
+      "valley_tp": 1,
+      "valley_count_error": 5,
+      "mask_file": "episam\\episam_dataset\\episam_dataset\\binary_images\\val\\Kumbalahalli 900CE Nelmalli Herostone With Inscription.png"
+    },
+    {
+      "name": "Kurudusonnenahalli 900CE Sambayya Hero Stone with Inscription",
+      "dimensions": [
+        1272,
+        1080
+      ],
+      "gold_lines": 9,
+      "cc_pred_lines": 2,
+      "cc_tp": 0,
+      "cc_count_error": 7,
+      "valley_pred_lines": 2,
+      "valley_tp": 0,
+      "valley_count_error": 7,
+      "mask_file": "episam\\episam_dataset\\episam_dataset\\binary_images\\val\\Kurudusonnenahalli 900CE Sambayya Hero Stone with Inscription.png"
+    },
+    {
+      "name": "Kutaganahalli 1800CE Yelechikkana Lake Construction Inscription",
+      "dimensions": [
+        633,
+        1080
+      ],
+      "gold_lines": 4,
+      "cc_pred_lines": 1,
+      "cc_tp": 0,
+      "cc_count_error": 3,
+      "valley_pred_lines": 2,
+      "valley_tp": 1,
+      "valley_count_error": 2,
+      "mask_file": "episam\\episam_dataset\\episam_dataset\\binary_images\\val\\Kutaganahalli 1800CE Yelechikkana Lake Construction Inscription.png"
+    },
+    {
+      "name": "Malurpatna 1000CE Kashayya's Herostone With Inscription",
+      "dimensions": [
+        901,
+        1080
+      ],
+      "gold_lines": 2,
+      "cc_pred_lines": 1,
+      "cc_tp": 1,
+      "cc_count_error": 1,
+      "valley_pred_lines": 1,
+      "valley_tp": 1,
+      "valley_count_error": 1,
+      "mask_file": "episam\\episam_dataset\\episam_dataset\\binary_images\\val\\Malurpatna 1000CE Kashayya's Herostone With Inscription.png"
+    },
+    {
+      "name": "Mutkur 1400CE Agrahara Inscription (Not Documented Before)",
+      "dimensions": [
+        1646,
+        1080
+      ],
+      "gold_lines": 3,
+      "cc_pred_lines": 1,
+      "cc_tp": 0,
+      "cc_count_error": 2,
+      "valley_pred_lines": 1,
+      "valley_tp": 0,
+      "valley_count_error": 2,
+      "mask_file": "episam\\episam_dataset\\episam_dataset\\binary_images\\val\\Mutkur 1400CE Agrahara Inscription (Not Documented Before).png"
+    },
+    {
+      "name": "Muttanallur 1618CE Thimmarakka's Nagastone Inscription",
+      "dimensions": [
+        761,
+        1080
+      ],
+      "gold_lines": 6,
+      "cc_pred_lines": 1,
+      "cc_tp": 0,
+      "cc_count_error": 5,
+      "valley_pred_lines": 1,
+      "valley_tp": 0,
+      "valley_count_error": 5,
+      "mask_file": "episam\\episam_dataset\\episam_dataset\\binary_images\\val\\Muttanallur 1618CE Thimmarakka's Nagastone Inscription.png"
+    },
+    {
+      "name": "Nagavara 971CE Herostone With Inscription",
+      "dimensions": [
+        525,
+        1080
+      ],
+      "gold_lines": 17,
+      "cc_pred_lines": 1,
+      "cc_tp": 0,
+      "cc_count_error": 16,
+      "valley_pred_lines": 2,
+      "valley_tp": 0,
+      "valley_count_error": 15,
+      "mask_file": "episam\\episam_dataset\\episam_dataset\\binary_images\\val\\Nagavara 971CE Herostone With Inscription.png"
+    },
+    {
+      "name": "Rajapura 1400CE Donation Inscription",
+      "dimensions": [
+        869,
+        1080
+      ],
+      "gold_lines": 9,
+      "cc_pred_lines": 1,
+      "cc_tp": 0,
+      "cc_count_error": 8,
+      "valley_pred_lines": 1,
+      "valley_tp": 0,
+      "valley_count_error": 8,
+      "mask_file": "episam\\episam_dataset\\episam_dataset\\binary_images\\val\\Rajapura 1400CE Donation Inscription.png"
+    },
+    {
+      "name": "Sadenahalli 1342CE Endedevarasa's Donation Inscription",
+      "dimensions": [
+        501,
+        1080
+      ],
+      "gold_lines": 11,
+      "cc_pred_lines": 1,
+      "cc_tp": 0,
+      "cc_count_error": 10,
+      "valley_pred_lines": 2,
+      "valley_tp": 0,
+      "valley_count_error": 9,
+      "mask_file": "episam\\episam_dataset\\episam_dataset\\binary_images\\val\\Sadenahalli 1342CE Endedevarasa's Donation Inscription.png"
+    },
+    {
+      "name": "Sarjapura 1429CE Mayileya Nayaka's Lunar Eclipse Inscription",
+      "dimensions": [
+        1876,
+        1080
+      ],
+      "gold_lines": 6,
+      "cc_pred_lines": 1,
+      "cc_tp": 0,
+      "cc_count_error": 5,
+      "valley_pred_lines": 1,
+      "valley_tp": 0,
+      "valley_count_error": 5,
+      "mask_file": "episam\\episam_dataset\\episam_dataset\\binary_images\\val\\Sarjapura 1429CE Mayileya Nayaka's Lunar Eclipse Inscription.png"
+    },
+    {
+      "name": "Tharalu 1561CE Bingiyappa Gowda",
+      "dimensions": [
+        1142,
+        1080
+      ],
+      "gold_lines": 10,
+      "cc_pred_lines": 4,
+      "cc_tp": 0,
+      "cc_count_error": 6,
+      "valley_pred_lines": 2,
+      "valley_tp": 0,
+      "valley_count_error": 8,
+      "mask_file": "episam\\episam_dataset\\episam_dataset\\binary_images\\val\\Tharalu 1561CE Bingiyappa Gowda.png"
+    },
+    {
+      "name": "Tindlu 1368CE Donation Inscription",
+      "dimensions": [
+        545,
+        1080
+      ],
+      "gold_lines": 15,
+      "cc_pred_lines": 2,
+      "cc_tp": 0,
+      "cc_count_error": 13,
+      "valley_pred_lines": 2,
+      "valley_tp": 0,
+      "valley_count_error": 13,
+      "mask_file": "episam\\episam_dataset\\episam_dataset\\binary_images\\val\\Tindlu 1368CE Donation Inscription.png"
+    },
+    {
+      "name": "Totagere 750CE Inscription",
+      "dimensions": [
+        1080,
+        1080
+      ],
+      "gold_lines": 8,
+      "cc_pred_lines": 1,
+      "cc_tp": 0,
+      "cc_count_error": 7,
+      "valley_pred_lines": 7,
+      "valley_tp": 6,
+      "valley_count_error": 1,
+      "mask_file": "episam\\episam_dataset\\episam_dataset\\binary_images\\val\\Totagere 750CE Inscription.png"
+    },
+    {
+      "name": "Vagata 1028CE Sevachari Makara Torana Inscription",
+      "dimensions": [
+        1712,
+        1080
+      ],
+      "gold_lines": 9,
+      "cc_pred_lines": 3,
+      "cc_tp": 1,
+      "cc_count_error": 6,
+      "valley_pred_lines": 3,
+      "valley_tp": 1,
+      "valley_count_error": 6,
+      "mask_file": "episam\\episam_dataset\\episam_dataset\\binary_images\\val\\Vagata 1028CE Sevachari Makara Torana Inscription.png"
+    }
+  ]
+}

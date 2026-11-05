@@ -32,6 +32,9 @@ python launch_studio.py
 | Privacy scrub (paths & model names) | Done | `api/server.py`, `App.jsx` | Internal filenames masked to "Experimental recognizer"; file paths masked to web URLs. |
 | Curated demo stone metrics | Done | `TabletIllustration.tsx`, `full_binarizer/HS027_original.png` | Fixed chips ("EPOCH 8th C. CE", "REGIONS 133 localized") reflect Nagavara benchmark stone. |
 | Interactive headline hover color (Step C2) | Done | `frontend/src/index.css`, `frontend/src/pages/LandingPage.jsx` | rAF-throttled layered background-clip text spotlight with dynamic hue shift and 300ms leave transition. |
+| Multi-scale stroke enhancement | Done | `outputs/app_backend.py`, `api/server.py`, `frontend/src/App.jsx` | High accuracy mode via enhance_multiscale; auto GPU fallback; +20.23% faint stroke recovery on Nagavara demo. |
+| Kannada script display converter | Done | `outputs/kannada_converter.py`, `frontend/src/utils/kannadaConverter.js`, `frontend/src/App.jsx` | Display-only NFC converter; 751/764 classes mapped; modern lossy substitution tier; candidate #1 crop fix. |
+| Toolbar layout hardening & crop loader fix | Done | `frontend/src/App.jsx`, `frontend/src/index.css`, `api/server.py` | 3 non-wrapping toolbar groups; container-query View dropdown; 8s crop timeout + retry; server model caching; 19/19 audit passed. |
 | Mobile low-power / lite-mode audit | Not done | Backlog item | Planned battery/GPU reduction tier; deferred as rAF loops already pause when idle. |
 | Automated line transcription / reading order | Not done | `outputs/sequence_data_audit/` | Line-level sequence OCR is not yet implemented. |
 | Historical Kannada to English translation | Not done | Stated in limitations | Outside project scope; unverified for general epigraphy. |
@@ -160,3 +163,66 @@ When making significant updates to InscripLens Studio, append a new dated entry 
 - The original Phase 2 translation objective remains unfinished; it has not been silently removed from the presentation scope.
 - Detailed results, local environment command and remaining migration gaps: outputs/STUDIO_STARTUP_VERIFICATION.md.
 - Next: validate paired image/mask features and improve verified sequence supervision.
+
+
+
+### [2026-11-05] Multi-Scale Enhancement Integration and Verification
+- What changed:
+  - Added optional `mode` parameter ("standard" default, "high_accuracy") to `POST /api/analyse` in `outputs/app_backend.py` and `api/server.py`.
+  - Integrated `enhance_multiscale` from `outputs/binarizer_core.py` without modifying the core function, evaluating scales 256, 384, and 512 with max-probability fusion.
+  - Implemented automatic fallback to standard mode on GPU memory exhaustion (4 GB VRAM limit) or subprocess failure, returning a plain error notification (`fallback_note`).
+  - Added "High accuracy mode" switch in frontend Studio with exact note: "Finds more faint strokes. Slower, and may add a few false strokes.", live progress feedback, and direct mask download button.
+  - Persisted mode label in SQLite run history and export payloads (sanitized of internal model names and paths).
+  - Verified on Nagavara demo stone (`HS027`): Standard mode (133 candidates, 49,848 stroke px, 2.33s), High accuracy mode (118 candidates, 59,129 stroke px, +20.23% faint stroke recovery, 2.95s).
+  - Saved visual comparison to `outputs/eval/mask_mode_comparison_nagavara.png` and numerical audit to `outputs/eval/nagavara_mode_comparison_report.json`.
+- Why: Give epigraphists the ability to recover eroded, faint incisions while preserving fast default scanning and zero regression on standard runs.
+- Status: Done.
+- Next step: Investigate line and sequence reading along inscribed stone registers.
+
+
+### [2026-11-05] Kannada Script Display and Transliteration Converter Integration
+- What changed:
+  - Developed reversible display-layer Roman-to-Kannada converter in Python (`outputs/kannada_converter.py`) and JavaScript (`frontend/src/utils/kannadaConverter.js`).
+  - Audited all 764 recognizer classes: 751 mapped with 100% certainty in Unicode NFC; 13 unmapped/ambiguous labels withheld from guessing and documented in `outputs/eval/unmapped_labels_report.md`.
+  - Added "Script: Kannada / Roman" toggle in Studio toolbar (default Kannada, persisted in localStorage with try/catch).
+  - Added "Modern letters" switch replacing archaic ಱ (`U+0C91`) and ೞ (`U+0CDE`) with modern ರ (`U+0CB0`) and ಳ (`U+0CB3`) flagged with small "lossy" tags.
+  - Candidate chips display large Kannada glyph with small Roman underneath (hidden when Roman-only active); confidence bars and uncertain dimming preserved.
+  - Glyph Inspector displays large Kannada with Roman label in parentheses; alternatives shown as Kannada chips with Roman tooltip; review form maintains Roman input with live Kannada preview beside it.
+  - Tiny regions (< 10x10 px) demarcated with "Too small to read" and no confidence bar; crop preview skeleton loading bug on candidate #1 resolved.
+  - Run History and JSON exports updated to include both Roman and Kannada representations.
+  - Verified with 5/5 converter unit tests and 9/9 end-to-end API regression tests.
+- Why: Provide native Kannada script visualization for epigraphists while maintaining strict data integrity by preserving stored Roman transliterations throughout models and database records.
+- Status: Done.
+- Next step: Investigate line and sequence reading along inscribed stone registers.
+
+
+### Milestone 5: Layout Hardening, Responsive Controls & Crop Loader Resilience (2026-11-05)
+- Studio Toolbar Restructuring: Rebuilt the canvas viewer toolbar into three discrete flex groups (Left: Curtain, Boxes, Mode, Mask; Middle: Script switch & Modern letters; Right: Fit & Zoom controls) with `white-space: nowrap` and fixed minimum widths to prevent wrapping.
+- Responsive Container Queries: Added a viewer panel container query observer (`ResizeObserver` on `.canvas-panel`). Automatically moves Script and Modern letters controls into a "View" dropdown button below 1100 px, and additionally moves Mask and Mode badge into it below 900 px. Fit and zoom controls remain pinned and visible at all resolutions.
+- Status Badge Relocation: Relocated "N regions classified" status and the Re-run button to the bottom filter bar before the "Hide tiny" toggle.
+- Auto-Collapsing Sidebar: Implemented automatic icon-rail sidebar collapsing on window widths < 1500 px while preserving manual user preference in `localStorage`.
+- Single-Row Header: Refactored the Studio header into a single non-wrapping row, replacing the multiline note under High accuracy mode with an accessible info icon tooltip, and truncating the stone name with an ellipsis and full hover tooltip.
+- Crop Loader Stall Resolution: Diagnosed and fixed the stuck "Loading crop..." condition. Preloaded and cached recognition model weights in `api/server.py` on server start, and added an `AbortController` with an 8-second timeout in `predictBox`. Replaced infinite skeletons with short error feedback, a "Retry" button, and `"Alternatives unavailable"` fallback while displaying the candidate's known strip label immediately.
+- Comprehensive Responsive Audit: Verified across 19 permutations covering window widths 1280, 1366, 1440, 1536, and 1920 px, zoom levels 100% and 125%, open and collapsed sidebar states, and dark obsidian / light parchment themes (`outputs/eval/run_responsive_audit.py`).
+
+## 2026-11-05: Git Push Readiness & Automated GPU Installation
+
+### Context
+Pre-push repository audit and automated environment setup preparation to allow any collaborator or evaluator to install dependencies, configure GPU acceleration with CUDA, build the React frontend, and run the Studio with zero friction.
+
+### Key Actions
+1. Repository Hygiene:
+   - Added *.pdf (excluding 1.51 GB literature dictionaries), episam/ (440 MB raw dataset), dom*.txt (browser debug dumps), and eergallu images/ to .gitignore.
+   - Verified that no file exceeding GitHub's 100 MB upload limit is staged or tracked.
+2. Inference Python Resolution:
+   - Updated outputs/app_backend.py and pi/server.py to flexibly locate Python across work/binarizer_env, .venv, and sys.executable on both Windows and Linux.
+3. Automated Installation Scripts:
+   - Created setup_gpu.bat (Windows automated 1-click GPU setup).
+   - Created setup_gpu.sh (Linux/macOS automated setup).
+   - Created comprehensive INSTALL.md guide covering prerequisites, CUDA 12.4 PyTorch wheels, asset layouts, and verification.
+   - Updated 
+equirements.txt and created 
+equirements-gpu.txt.
+   - Updated launch_studio.py to detect and build missing frontend assets automatically.
+4. Verification:
+   - Executed full 9-stage regression suite (outputs/eval/verify_kannada_regression.py): 9/9 passed.

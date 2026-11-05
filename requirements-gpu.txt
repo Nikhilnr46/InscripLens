@@ -1,0 +1,6 @@
+# InscripLens GPU Acceleration Requirements
+# For NVIDIA CUDA GPU acceleration, install PyTorch with the CUDA wheel index:
+# pip install torch torchvision --index-url https://download.pytorch.org/whl/cu124
+-r requirements.txt
+torch>=2.4.0
+torchvision>=0.19.0

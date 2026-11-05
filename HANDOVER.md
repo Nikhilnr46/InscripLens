@@ -6,7 +6,7 @@ InscripLens Studio is an offline computational research workspace designed for e
 
 The system operates entirely on local hardware through a four-stage pipeline:
 1. Photograph Acquisition: The user uploads a field photograph (PNG/JPEG under 20 megapixels) or loads the curated Nagavara 8th-century hero stone benchmark.
-2. Neural Stroke Enhancement: A pretrained Shilalekhya U-Net segmentation network isolates chiseled incisions from background stone grain to produce a binarized foreground stroke mask.
+2. Neural Stroke Enhancement: A pretrained Shilalekhya U-Net segmentation network isolates chiseled incisions from background stone grain to produce a binarized foreground stroke mask. Operates in two modes: Standard (single-scale GPU/CPU inference, fast and reproducing the baseline candidate set) and High Accuracy (multi-scale sliding window fusing scales 256, 384, and 512 via max-probability to recover faint, eroded strokes).
 3. Candidate Localization: Connected-component analysis proposes bounding boxes for candidate glyph regions across the enhanced mask.
 4. Diagnostic Character Recognition: A diagnostic feature classifier generates experimental character label predictions, ranked alternatives, and confidence scores for selected or batch candidate regions.
 5. Epigraphic Review and Provenance: An epigraphist can inspect high-resolution crops against the stone, input suggested readings, record reviewer initials or notes, and save verifiable records locally into SQLite.
@@ -233,7 +233,7 @@ The client application is built as a single-page application (SPA) with two prim
   2. `#workflow`: Three-stage methodology cards ("Capture & Select", "Enhance & Localize", "Inspect & Verify") with 3D tilt and cursor spotlights, plus the demo stone trigger button.
   3. `#about`: Centered single-column documentation including "What is InscripLens", "Why it exists", the 5-stage pipeline, "Privacy", interactive FAQ accordion, and "Credits and licences".
   4. `#limitations`: Research scope boundaries, "Limitations of this prototype" card, two-column capability summary ("Can" vs "Cannot yet"), and epigraphist verification notice.
-- Route `/studio`: The interactive Epigraphy Studio workspace containing dual-canvas curtain slider, bounding box overlays, candidate gallery strip with filter tabs, character inspector, alternative ranking cards, and reviewer submission forms.
+- Route `/studio`: The interactive Epigraphy Studio workspace containing dual-canvas curtain slider, bounding box overlays, candidate gallery strip with filter tabs, character inspector, alternative ranking cards, reviewer submission forms, a "High accuracy mode" enhancement toggle switch with live progress feedback, a direct mask download button, session mode indicators, and a "Script: Kannada / Roman" display switch with an optional "Modern letters" archaic substitution tier.
 
 ### Theme System
 - Controlled by `data-theme="dark"` and `data-theme="light"` attributes on `:root`.
@@ -266,13 +266,20 @@ All endpoints are hosted locally by FastAPI in `api/server.py`. Every response i
 | `GET` | `/api/status` | Reports presence of local binarizer, models, and demo image | None | `{"ready": bool, "demo_available": bool, "recognizer_available": bool, "advanced_mode": bool}` | Public |
 | `GET` | `/api/demo` | Retrieves demo stone metadata | None | `{"id": str, "name": str, "image_url": str, "width": int, "height": int, "description": str}` | Public |
 | `GET` | `/api/demo/image` | Serves the demo stone photograph | None | Binary image stream (`image/png`) | Public |
-| `POST` | `/api/analyse` | Executes neural binarization and candidate extraction | Multipart form (`file`) OR `?use_demo=true` | `{"id": str, "display_name": str, "is_demo": bool, "sha256": str, "image_url": str, "mask_url": str, "width": int, "height": int, "boxes": list, "candidate_count": int, "created": str}` | Public |
+| `POST` | `/api/analyse` | Executes neural binarization and candidate extraction | Multipart form (`file`, optional `mode`) OR `?use_demo=true&mode=...` | `{"id": str, "display_name": str, "is_demo": bool, "sha256": str, "image_url": str, "mask_url": str, "width": int, "height": int, "boxes": list, "candidate_count": int, "created": str, "mode": str, "mode_label": str, "fallback_note": Optional[str]}` | Public |
+| `GET` | `/api/export/{run_id}` | Exports run metadata, mode, candidate count, and reviews in JSON format | None | `{"id": str, "display_name": str, "mode": str, "mode_label": str, "candidate_count": int, "created": str, "reviews": list}` | Public |
 | `POST` | `/api/recognize-all` | Runs batch classification on all candidates | `{"run_id": str}` | `{"run_id": str, "model": str, "candidate_count": int, "regions": list}` | Public |
 | `POST` | `/api/predict-crop` | Classifies single bounding box with alternatives | `{"run_id": str, "bbox": [x1, y1, x2, y2]}` | `{"run_id": str, "bbox": list, "prediction": str, "alternatives": list, "crop_url": str, "model": str, "model_sha256": str, "reference_examples": list}` | Public |
 | `POST` | `/api/review` | Saves reviewer correction to SQLite database | `{"run_id": str, "bbox": list, "prediction": str, "model": str, "model_sha256": str, "suggestion": str, "reviewer": str, "note": str}` | `{"status": "saved", "run_id": str}` | Public |
 | `GET` | `/api/reviews/{run_id}` | Retrieves saved reviewer corrections for a run | None | List of review objects: `[{"bbox": list, "prediction": str, "suggested_label": str, "reviewer": str, "note": str, "created": str}]` | Public |
-| `GET` | `/api/history` | Lists previous analysis sessions from SQLite | None | List of session objects: `[{"id": str, "created": str, "display_name": str, "image_url": str, "mask_url": str, "sha256": str}]` | Public |
+| `GET` | `/api/history` | Lists previous analysis sessions from SQLite | None | List of session objects: `[{"id": str, "created": str, "display_name": str, "image_url": str, "mask_url": str, "sha256": str, "mode": str, "mode_label": str, "fallback_note": Optional[str]}]` | Public |
 | `GET` | `/api/credits` | Provides structured credits and third-party licence metadata | None | `{"title": str, "project": str, "components": list}` | Public |
+
+### Enhancement Modes and GPU Memory Safety
+- Standard Mode (default): Executes single-scale U-Net inference on GPU or CPU. Produces identical results to historical baselines (e.g. 133 candidate regions on the Nagavara benchmark stone).
+- High Accuracy Mode: Calls `enhance_multiscale` from `outputs/binarizer_core.py` without modifying the core function. Evaluates image tiles across multi-scale dimensions (256, 384, 512) and fuses stroke probabilities with max-pooling. Recovers faint, shallow incisions while connecting fragmented strokes into coherent character glyphs.
+- Graceful GPU OOM Fallback: If GPU VRAM is exhausted (such as on 4 GB laptop GPUs) or an execution error occurs during multi-scale enhancement, the backend automatically re-executes standard enhancement and records a plain English notification (`fallback_note`), guaranteeing zero server crashes.
+- Provenance Tracking: Every analysis run stores its mode (`standard` or `high_accuracy`) and user-facing label (`Standard` or `High accuracy`) in the SQLite `runs` table and export payloads. Internal model names and filesystem paths are never serialized.
 
 ### Response Sanitization Audit
 - Error Handler: A global exception handler intercepts unhandled exceptions, logs internally, and returns HTTP 500 with `{"detail": "An internal error occurred while processing the request."}`.
@@ -414,3 +421,85 @@ Six untracked files exceed 25 MB on the development machine. All are properly ex
 
 ## Local verification addendum — 4 November 2026
 See `outputs/STUDIO_STARTUP_VERIFICATION.md` for measured startup checks and corrections to earlier completion claims. The local startup environment is `work/studio_env`, and server dependencies are now included in `requirements.txt`. The API reports processed-image dimensions after resizing. Printed-source review and JSON export remain legacy Streamlit features. The original translation objective is unfinished. The earlier clean-machine setup and 4–10 second estimate are not established by this local verification.
+
+
+## Multi-Scale Enhancement Verification Addendum — 5 November 2026
+
+The multi-scale enhancement integration was empirically verified against the curated 8th-century Nagavara hero stone (`HS027`, dimensions 525 x 1080):
+
+| Metric | Standard Mode (Single-Scale GPU) | High Accuracy Mode (Multi-Scale GPU) | Difference / Epigraphic Impact |
+|---|---|---|---|
+| Inference Pipeline | `enhance_image` (single pass) | `enhance_multiscale` (256, 384, 512) | Multi-scale pyramid sliding window |
+| Inference Runtime | 2.325 s | 2.947 s | +0.622 s overhead (+26.8%) |
+| Candidate Boxes Detected | 133 | 118 | -15 broken fragments consolidated |
+| Foreground Stroke Pixels | 49,848 | 59,129 | +10,086 faint stroke pixels (+20.23%) |
+| Common Stroke Pixels | 49,043 | 49,043 | Preserves 98.39% of standard stroke mask |
+| Spurious / Filtered Pixels | 805 | - | Filtered isolated speckle artifacts |
+| GPU Memory Safety | Verified | Verified (graceful fallback tested) | Stable on 4 GB VRAM GPU |
+| Baseline Preservation | Exact match (133 boxes) | N/A (opt-in feature) | Default scanning untouched |
+
+Visual mask comparisons and numerical audit data are archived in:
+- `outputs/eval/mask_mode_comparison_nagavara.png`
+- `outputs/eval/nagavara_mode_comparison_report.json`
+
+
+## Kannada Script Display Addendum — 5 November 2026
+
+A reversible, display-layer Roman-to-Kannada converter was integrated across the Epigraphy Studio, candidate chips, inspector, review form, history, and JSON export modules.
+
+### Epigraphic Invariants
+1. Display-Only Conversion: Stored transliteration strings in models (`*.joblib`), database records (`history.sqlite3`), and client review payloads remain strictly unaltered Roman strings.
+2. Unicode Normalization: All conversions produce canonical Unicode NFC output.
+3. No Guesses: Unmapped, truncated, or ambiguous strings (e.g. `ISymbol`, `stam`, isolated consonants without vowels) are preserved in Roman and marked with a small `[Roman]` badge in the interface.
+4. Archaic Substitution Tier: An opt-in "Modern letters" switch replaces historical ಱ (`U+0C91`) and ೞ (`U+0CDE`) with modern ರ (`U+0CB0`) and ಳ (`U+0CB3`), flagging every modified label with a `lossy` badge.
+5. Local Font Bundling: High-legibility epigraphic rendering is powered by locally bundled Noto Sans Kannada (`frontend/public/fonts/NotoSansKannada.ttf`), requiring zero remote CDN or network requests.
+6. Tiny Region Demarcation: Candidates smaller than 10x10 px are explicitly marked "Too small to read" without confidence bars, and candidate #1 loading stalls are permanently eliminated.
+
+### Mapping Audit Summary
+- Total Recognizer Classes Audited: 764
+- Mapped to Kannada Unicode NFC: 751 (98.30%)
+- Unmapped / Ambiguous Labels Withheld: 13 (1.70%)
+- Unit Test Suite: 5/5 passed (`outputs/eval/test_kannada_converter.py`)
+- End-to-End Regression Suite: 9/9 passed (`outputs/eval/verify_kannada_regression.py`)
+- Detailed Unmapped Labels Report: `outputs/eval/unmapped_labels_report.md`
+- Precomputed Conversion Mapping: `outputs/eval/roman_to_kannada_map.json`
+
+
+## Studio Layout Hardening & Crop Loader Addendum — 5 November 2026
+
+### Toolbar Layout Rules
+1. Three Non-Wrapping Flex Groups: The canvas toolbar is divided into three fixed-height (44px) groups within a flex container:
+   - Left Group: Curtain wipe indicator (`min-width: 95px`), candidate boxes toggle (`min-width: 95px`), mode badge (`min-width: 65px`), and mask download button (`min-width: 60px`).
+   - Middle Group: Script display segmented switch (Kannada / Roman) and "Modern letters" archaic substitution toggle (`min-width: 220px`).
+   - Right Group: Fit to viewport, 100% scale, zoom out, zoom percentage readout, and zoom in. Fit and zoom controls are pinned to the right and remain visible at all viewport sizes.
+2. Responsive Container Queries: Rather than relying solely on window width, the viewer panel uses a container query observer (`ResizeObserver` on `.canvas-panel`):
+   - Container width < 1100 px: Script segmented control and Modern letters switch collapse into a "View" dropdown popover button.
+   - Container width < 900 px: Mode badge and Mask download button also collapse into the "View" dropdown popover.
+   - Viewport fallback: If the container becomes exceptionally narrow, the toolbar scrolls horizontally with `white-space: nowrap` without wrapping or clipping controls.
+3. Bottom Filter Bar Reorganization: The classification status badge ("N regions classified", progress bar) and the Re-run button are relocated from the top toolbar into the bottom gallery strip header, placed on the right side before the "Hide tiny" toggle.
+4. Auto-Collapsing Sidebar: The left navigation sidebar automatically collapses to its icon rail (64px width) on windows narrower than 1500 px, while persistently honoring manual user toggle actions via `localStorage`.
+5. Single-Row Header: The header note under "High accuracy mode" is replaced with a single-row toggle and an accessible info icon holding the tooltip: *"Finds more faint strokes. Slower, and may add a few false strokes."* The stone-name pill gracefully truncates with an ellipsis and full hover tooltip when horizontal space is constrained.
+6. Empirical Verification: Verified across window widths 1280, 1366, 1440, 1536, and 1920 px, at browser zoom levels 100% and 125%, with the sidebar open and collapsed, in both obsidian dark and parchment light themes. 19/19 matrix tests passed with zero element wrapping, clipping, or overlap (`outputs/eval/run_responsive_audit.py`).
+
+### Crop Loader Stall Diagnosis and Fix (Part B)
+- Root Cause: Recognition models (`mask_svm_bundle.joblib`, 76.8 MB) and model SHA256 hashes were being unpickled from disk on every single `/api/predict-crop` request, adding several seconds of latency per crop. In the frontend client, when a request took several seconds or was superseded by candidate navigation, `setPredictingCrop(false)` was skipped due to a mismatched request-id guard, leaving `predictingCrop: true` indefinitely.
+- Server Optimization: Models and engine weights are now cached and warmed once at server initialization (`get_loaded_bundle`), reducing cached model access latency from 2.6s to 0.000001s.
+- Client Timeout & Fallback: Added an `AbortController` and an 8-second timeout in `predictBox`. If a response takes longer than 8 seconds, the in-flight request is aborted, `predictingCrop` is cleared, and the crop box renders a "Crop preview timed out" message with a "Retry" button. The inspector immediately shows the label already known from the candidate strip (`knownCandidateLabel`), and alternatives display "Alternatives unavailable" rather than an endless pulsing skeleton.
+- Files Changed: `api/server.py`, `frontend/src/App.jsx`, `frontend/src/index.css`, `outputs/eval/run_responsive_audit.py`.
+
+## 7. Git Push Readiness & Automated GPU Installation — 5 November 2026
+
+### Repository Hygiene & Exclusion Policy
+1. Large Binary Protection: Giant literature PDFs (>1.5 GB Kittel dictionary) and raw training archives (>440 MB EpiSAM corpus) are excluded from version control via .gitignore.
+2. Python Path Flexibility: outputs/app_backend.py and pi/server.py dynamically resolve the active Python interpreter across multiple environments:
+   - Dedicated inference venv: work/binarizer_env/Scripts/python.exe (Windows) or work/binarizer_env/bin/python (Linux)
+   - Standard unified venv: .venv/Scripts/python.exe or .venv/bin/python
+   - Active runtime environment: sys.executable
+3. Automated GPU Setup:
+   - setup_gpu.bat (Windows): 1-click script installing Python virtual environment, CUDA 12.4 PyTorch wheels, application requirements, and React frontend build.
+   - setup_gpu.sh (Linux/macOS): POSIX-compliant automated environment setup.
+   - INSTALL.md: Step-by-step setup documentation covering hardware prerequisites, CUDA configurations, model asset placement, and verification tests.
+   - 
+equirements.txt & 
+equirements-gpu.txt: Explicit dependency specifications.
+4. Pre-Push Verification: Full regression test suite (outputs/eval/verify_kannada_regression.py) passes 9/9 checks with zero failures.

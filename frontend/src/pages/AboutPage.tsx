@@ -294,8 +294,9 @@ export default function AboutPage({ onNavigateHome, onNavigateStudio }: AboutPag
                   <li>Guarantee correct readings</li>
                   <li>Treat candidate regions as complete characters</li>
                   <li>Provide a verified reading order</li>
-                  <li>Convert to modern Kannada</li>
-                  <li>Translate to English</li>
+                  <li>Translate in the Studio interface (the API only offers a rule-based draft for reviewer-verified formulaic hero-stone text; not wired into the UI)</li>
+
+                  <li>Guarantee unreviewed machine translation accuracy</li>
                 </ul>
               </div>
             </div>

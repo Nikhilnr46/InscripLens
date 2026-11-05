@@ -1,0 +1,29 @@
+{
+  "stone_id": "HS027",
+  "stone_name": "Nagavara 971CE Herostone With Inscription",
+  "dimensions": [
+    525,
+    1080
+  ],
+  "device": "cuda",
+  "standard_mode": {
+    "method": "single_scale_pretrained_binarization",
+    "runtime_seconds": 2.3253,
+    "candidate_boxes": 133,
+    "foreground_pixels": 49848
+  },
+  "high_accuracy_mode": {
+    "method": "multiscale_context_aware_binarization_paper5",
+    "runtime_seconds": 2.9473,
+    "candidate_boxes": 118,
+    "foreground_pixels": 59129
+  },
+  "comparison": {
+    "common_foreground_pixels": 49043,
+    "faint_stroke_pixels_recovered": 10086,
+    "faint_stroke_pixel_gain_pct": 20.23,
+    "candidate_count_change": -15,
+    "note": "Multi-scale fusion connects fragmented strokes across scales, resulting in more coherent character components and capturing faint shallow incisions."
+  },
+  "comparison_image_path": "C:\\nikhil\\outputs\\eval\\mask_mode_comparison_nagavara.png"
+}

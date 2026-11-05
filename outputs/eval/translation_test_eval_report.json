@@ -1,0 +1,113 @@
+{
+  "evaluation_split": "test",
+  "total_test_entries": 2,
+  "total_test_tokens": 8,
+  "token_mismatch_count": 0,
+  "formula_mismatch_count": 0,
+  "token_mismatches": [],
+  "formula_mismatches": [],
+  "entries_detail": [
+    {
+      "entry_id": "EC9_NL027_Nagavara_opening",
+      "stone_id": "HS027",
+      "token_count": 2,
+      "input_text": "svasti śrī",
+      "published_english": "Hail! Auspicious fortune.",
+      "engine_draft": "Hail! Auspicious fortune.",
+      "token_mismatch_count": 0,
+      "tokens": [
+        {
+          "original": "svasti",
+          "modern": "śubhavāgali śrī (ಸ್ವಸ್ತಿ ಶ್ರೀ)",
+          "english": "Hail! Auspicious fortune.",
+          "category": "invocation",
+          "rule_id": "FORMULA_INVOCATION_SVASTI_SRI",
+          "rule_provenance": "Formula template 'svasti śrī' matched span 'svasti śrī' (Unverified source - pending citation)",
+          "consumed_by_formula": "svasti śrī",
+          "status": "matched"
+        },
+        {
+          "original": "śrī",
+          "modern": "śubhavāgali śrī (ಸ್ವಸ್ತಿ ಶ್ರೀ)",
+          "english": "Hail! Auspicious fortune.",
+          "category": "invocation",
+          "rule_id": "FORMULA_INVOCATION_SVASTI_SRI",
+          "rule_provenance": "Formula template 'svasti śrī' matched span 'svasti śrī' (Unverified source - pending citation)",
+          "consumed_by_formula": "svasti śrī",
+          "status": "matched"
+        }
+      ]
+    },
+    {
+      "entry_id": "TEMPLATE_CATTLE_RAID_MARTYRDOM",
+      "stone_id": null,
+      "token_count": 6,
+      "input_text": "kāḷagadoḷ turuvam koḷal sarggamēṟidār kalla niṟisidār",
+      "published_english": "in the battle, while rescuing the cattle, he ascended to heaven. erected this memorial stone.",
+      "engine_draft": "in the battle, while rescuing the cattle, he ascended to heaven. erected this memorial stone.",
+      "token_mismatch_count": 0,
+      "tokens": [
+        {
+          "original": "kāḷagadoḷ",
+          "modern": "yuddhadalli (ಕಾಳಗದಲ್ಲಿ)",
+          "english": "in the battle,",
+          "category": "military",
+          "rule_id": "FORMULA_MILITARY_KALAGADOL",
+          "rule_provenance": "Formula template 'kāḷagadoḷ' matched span 'kāḷagadoḷ' (Unverified source - pending citation)",
+          "consumed_by_formula": "kāḷagadoḷ",
+          "status": "matched"
+        },
+        {
+          "original": "turuvam",
+          "modern": "danagaḷannu kāpāḍuvāga (ದನಗಳನ್ನು ರಕ್ಷಿಸುವಾಗ)",
+          "english": "while rescuing the cattle,",
+          "category": "heroic_context",
+          "rule_id": "FORMULA_HEROIC_TURUGOL",
+          "rule_provenance": "Formula template 'turugōḷ' matched span 'turuvam koḷal' (Confirmed from outputs/context_reading/HS024_reference.json (EC IX Hoskote 110, p. 102))",
+          "consumed_by_formula": "turugōḷ",
+          "status": "matched"
+        },
+        {
+          "original": "koḷal",
+          "modern": "danagaḷannu kāpāḍuvāga (ದನಗಳನ್ನು ರಕ್ಷಿಸುವಾಗ)",
+          "english": "while rescuing the cattle,",
+          "category": "heroic_context",
+          "rule_id": "FORMULA_HEROIC_TURUGOL",
+          "rule_provenance": "Formula template 'turugōḷ' matched span 'turuvam koḷal' (Confirmed from outputs/context_reading/HS024_reference.json (EC IX Hoskote 110, p. 102))",
+          "consumed_by_formula": "turugōḷ",
+          "status": "matched"
+        },
+        {
+          "original": "sarggamēṟidār",
+          "modern": "svargavannu ēridaru (ಸ್ವರ್ಗವನ್ನು ಏರಿದರು)",
+          "english": "he ascended to heaven.",
+          "category": "memorial",
+          "rule_id": "FORMULA_MEMORIAL_SARGGAMERIDAR",
+          "rule_provenance": "Formula template 'sarggamēṟidār' matched span 'sarggamēṟidār' (Unverified source - pending citation)",
+          "consumed_by_formula": "sarggamēṟidār",
+          "status": "matched"
+        },
+        {
+          "original": "kalla",
+          "modern": "kallannu nillisidaru (ಕಲ್ಲನ್ನು ನಿಲ್ಲಿಸಿದರು)",
+          "english": "erected this memorial stone.",
+          "category": "commemoration",
+          "rule_id": "FORMULA_COMMEMORATION_KALLA_NIRISIDAR",
+          "rule_provenance": "Formula template 'kalla niṟisidār' matched span 'kalla niṟisidār' (Unverified source - pending citation)",
+          "consumed_by_formula": "kalla niṟisidār",
+          "status": "matched"
+        },
+        {
+          "original": "niṟisidār",
+          "modern": "kallannu nillisidaru (ಕಲ್ಲನ್ನು ನಿಲ್ಲಿಸಿದರು)",
+          "english": "erected this memorial stone.",
+          "category": "commemoration",
+          "rule_id": "FORMULA_COMMEMORATION_KALLA_NIRISIDAR",
+          "rule_provenance": "Formula template 'kalla niṟisidār' matched span 'kalla niṟisidār' (Unverified source - pending citation)",
+          "consumed_by_formula": "kalla niṟisidār",
+          "status": "matched"
+        }
+      ]
+    }
+  ]
+}

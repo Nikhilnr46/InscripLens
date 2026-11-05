@@ -902,6 +902,11 @@ textarea:focus {
   border-right: 1px solid var(--border-subtle);
 }
 
+.canvas-panel {
+  container-type: inline-size;
+  container-name: viewer;
+}
+
 .canvas-toolbar {
   height: 44px;
   background-color: var(--bg-surface-raised);
@@ -911,11 +916,99 @@ textarea:focus {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 16px;
-  font-size: 0.8rem;
+  gap: 8px;
+  padding: 0 10px;
+  font-size: 0.78rem;
   color: var(--text-muted);
-  z-index: 10;
+  z-index: 20;
   flex-shrink: 0;
+  min-width: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  white-space: nowrap;
+}
+
+.canvas-toolbar::-webkit-scrollbar {
+  height: 3px;
+}
+
+.canvas-toolbar::-webkit-scrollbar-thumb {
+  background: var(--border-subtle);
+  border-radius: 2px;
+}
+
+.toolbar-group-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.toolbar-group-middle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.toolbar-group-right {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: auto;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.toolbar-sep {
+  width: 1px;
+  height: 16px;
+  background-color: var(--border-subtle);
+  flex-shrink: 0;
+}
+
+.toolbar-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  background-color: var(--bg-surface-raised);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+  padding: 12px;
+  z-index: 100;
+  min-width: 210px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.dropdown-section {
+  display: flex;
+  flex-direction: column;
+}
+
+.header-status-line {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.header-status-name {
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: inline-block;
+  vertical-align: middle;
 }
 
 .canvas-viewport {
@@ -1140,7 +1233,7 @@ textarea:focus {
 
 /* Inspector Panel */
 .inspector-panel {
-  width: 380px;
+  width: 350px;
   background-color: var(--bg-surface);
   display: flex;
   flex-direction: column;
@@ -1321,6 +1414,22 @@ textarea:focus {
   overflow: hidden;
   box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.2);
   margin-bottom: 12px;
+}
+
+@keyframes skeleton-pulse {
+  0%, 100% { opacity: 0.35; }
+  50% { opacity: 0.75; }
+}
+
+.skeleton-pulse {
+  animation: skeleton-pulse 1.4s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton-pulse {
+    animation: none !important;
+    opacity: 0.55 !important;
+  }
 }
 
 .alt-chips-container {
@@ -2841,4 +2950,92 @@ a.landing-brand:focus-visible {
   .card-tilt {
     transform: none !important;
   }
+}
+
+.glyph-chip.is-uncertain {
+  opacity: 0.65;
+  border-color: rgba(217, 119, 6, 0.4);
+}
+
+.glyph-chip.is-uncertain:hover {
+  opacity: 0.88;
+  border-color: #D97706;
+}
+
+.uncertain-tag {
+  font-size: 0.58rem;
+  color: #D97706;
+  background-color: rgba(217, 119, 6, 0.15);
+  border: 1px solid rgba(217, 119, 6, 0.3);
+  padding: 1px 4px;
+  border-radius: 3px;
+  font-weight: 600;
+  line-height: 1.1;
+}
+
+.confidence-bar-subtle {
+  width: 100%;
+  height: 3px;
+  background-color: rgba(255, 255, 255, 0.08);
+  border-radius: 2px;
+  overflow: hidden;
+  margin: 2px 0;
+}
+
+.confidence-bar-subtle-fill {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.25s ease-out;
+}
+
+
+/* --------------------------------------------------------------------------
+   Kannada Script & Lossy/Marker Tags
+   -------------------------------------------------------------------------- */
+.lossy-tag {
+  display: inline-block;
+  font-size: 0.58rem;
+  font-weight: 600;
+  color: #D97706;
+  background-color: rgba(217, 119, 6, 0.15);
+  border: 1px solid rgba(217, 119, 6, 0.35);
+  padding: 0 4px;
+  border-radius: 3px;
+  vertical-align: middle;
+  line-height: 1.2;
+  margin-left: 4px;
+  text-transform: lowercase;
+  letter-spacing: 0.02em;
+  font-family: 'Inter', -apple-system, sans-serif;
+}
+
+.roman-marker-tag {
+  display: inline-block;
+  font-size: 0.58rem;
+  font-weight: 600;
+  color: #94A3B8;
+  background-color: rgba(148, 163, 184, 0.15);
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  padding: 0 4px;
+  border-radius: 3px;
+  vertical-align: middle;
+  line-height: 1.2;
+  margin-left: 4px;
+  letter-spacing: 0.02em;
+  font-family: 'Inter', -apple-system, sans-serif;
+}
+
+.tiny-tag {
+  display: inline-block;
+  font-size: 0.58rem;
+  color: #A8A29A;
+  background-color: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 1px 4px;
+  border-radius: 3px;
+  font-weight: 500;
+}
+
+.kannada-text {
+  font-family: 'Noto Sans Kannada', 'Inter', sans-serif;
 }

@@ -1,0 +1,15 @@
+{
+  "model": "LineUNet Segmentation (GPU accelerated)",
+  "device": "cuda",
+  "gpu_name": "NVIDIA GeForce RTX 3050 Laptop GPU",
+  "peak_vram_mb": 1282.03,
+  "training_inscriptions": 117,
+  "training_individual_lines": 912,
+  "validation_inscriptions": 31,
+  "validation_individual_lines": 254,
+  "best_validation_dice": 0.8769,
+  "final_validation_iou": 0.778,
+  "epochs": 20,
+  "total_training_seconds": 34.25,
+  "checkpoint_path": "C:\\nikhil\\outputs\\line_study\\line_segmentation_episam_gpu.pth"
+}

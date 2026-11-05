@@ -32,6 +32,17 @@ from segment_candidates import candidates, overlay
 from recognize_regions import recognize
 from recognition_alternatives import rank_labels, source_examples
 from run_character_benchmark import features
+from translation_core import analyze_inscription_text
+from kannada_converter import to_kannada
+
+# Import calibrated recognizer engine from reading module
+READING_DIR = Path(__file__).resolve().parent / "reading"
+if str(READING_DIR) not in sys.path:
+    sys.path.insert(0, str(READING_DIR))
+try:
+    from recognizer import get_engine
+except Exception:
+    get_engine = None
 
 DATA_DIR = ROOT / "work/app_data"
 DATA_DIR.mkdir(parents=True, exist_ok=True)
@@ -41,6 +52,29 @@ MASK_MODELS = [
     ROOT / "outputs/matched_mask_study/mask_svm_bundle.joblib"
 ]
 CLEAN_MODEL = next((p for p in MASK_MODELS if p.is_file()), MASK_MODELS[-1])
+
+# Cache loaded bundle and SHA256 once at server startup to prevent repetitive 50MB disk reads and unpickling
+_CACHED_BUNDLE = None
+_CACHED_MODEL_PATH = None
+_CACHED_MODEL_SHA = None
+
+def get_loaded_bundle(model_path: Path):
+    global _CACHED_BUNDLE, _CACHED_MODEL_PATH, _CACHED_MODEL_SHA
+    if _CACHED_BUNDLE is None or _CACHED_MODEL_PATH != model_path:
+        if model_path.is_file():
+            _CACHED_BUNDLE = joblib.load(model_path)
+            _CACHED_MODEL_PATH = model_path
+            _CACHED_MODEL_SHA = hashlib.sha256(model_path.read_bytes()).hexdigest()
+    return _CACHED_BUNDLE, _CACHED_MODEL_SHA
+
+# Warm up recognition models once at server startup
+try:
+    if CLEAN_MODEL.is_file():
+        get_loaded_bundle(CLEAN_MODEL)
+    if get_engine is not None:
+        get_engine()
+except Exception:
+    pass
 
 ADVANCED_MODE = os.environ.get("INSCRIPLENS_ADVANCED", "").strip().lower() in ("1", "true", "yes", "on")
 
@@ -81,15 +115,47 @@ class SaveReviewRequest(BaseModel):
     reviewer: Optional[str] = ""
     note: Optional[str] = ""
 
+import sqlite3
+
+# Ensure verified_lines table exists in history.sqlite3 without altering existing tables
+def init_verified_lines_table(db_path: Path):
+    with sqlite3.connect(db_path) as con:
+        con.execute("""
+            CREATE TABLE IF NOT EXISTS verified_lines (
+                line_id TEXT PRIMARY KEY,
+                text_hash TEXT NOT NULL,
+                reviewer TEXT NOT NULL,
+                timestamp TEXT NOT NULL
+            )
+        """)
+
+class TranslateRequest(BaseModel):
+    text: str
+    line_id: Optional[str] = None
+
 @app.get("/api/status")
 def get_status():
     """Return local asset presence and setup status without internal paths."""
-    enhancement_files = [
-        "work/binarizer_env/Scripts/python.exe",
+    py_candidates = [
+        ROOT / "work/binarizer_env/Scripts/python.exe",
+        ROOT / "work/binarizer_env/bin/python",
+        ROOT / ".venv/Scripts/python.exe",
+        ROOT / ".venv/bin/python",
+    ]
+    py_found = any(p.is_file() for p in py_candidates)
+    if not py_found:
+        try:
+            import torch
+            py_found = True
+        except ImportError:
+            py_found = False
+
+    enhancement_models = [
         "work/shilalekhya/Unet/model.py",
         "work/shilalekhya/binarizer.pth"
     ]
-    missing_enhancement = [p for p in enhancement_files if not (ROOT / p).is_file()]
+    missing_models = [p for p in enhancement_models if not (ROOT / p).is_file()]
+    missing_enhancement = ([] if py_found else ["python"]) + missing_models
     demo_path = ROOT / "outputs/full_binarizer/HS027_original.png"
     return {
         "ready": len(missing_enhancement) == 0,
@@ -131,8 +197,11 @@ async def run_analyse(request: Request):
     raw = None
     filename = "stone.png"
 
+    mode = "standard"
     if "multipart/form-data" in content_type:
         form = await request.form()
+        if "mode" in form:
+            mode = str(form["mode"]).strip()
         if "use_demo" in form and str(form["use_demo"]).lower() in ("true", "1"):
             is_demo = True
         elif "file" in form:
@@ -144,6 +213,11 @@ async def run_analyse(request: Request):
         query_demo = request.query_params.get("use_demo")
         if query_demo and query_demo.lower() in ("true", "1"):
             is_demo = True
+        query_mode = request.query_params.get("mode")
+        if query_mode:
+            mode = query_mode.strip()
+
+    mode = "high_accuracy" if mode.lower() in ("high_accuracy", "high-accuracy", "highaccuracy") else "standard"
 
     demo_path = ROOT / "outputs/full_binarizer/HS027_original.png"
     if is_demo:
@@ -162,9 +236,9 @@ async def run_analyse(request: Request):
     except Exception:
         raise HTTPException(status_code=400, detail="Invalid image file. Please provide a standard image below 20 megapixels.")
 
-    # Call existing analyse function
+    # Call existing analyse function with optional mode
     try:
-        record = analyse(raw, filename, DATA_DIR)
+        record = analyse(raw, filename, DATA_DIR, mode=mode)
     except Exception:
         raise HTTPException(status_code=500, detail="Enhancement analysis could not be completed.")
 
@@ -177,8 +251,10 @@ async def run_analyse(request: Request):
     # Clean display name: never expose file names
     display_name = "Nagavara demonstration stone" if is_demo else "Uploaded photograph"
     run_id = record["id"]
+    effective_mode = record.get("mode", mode)
+    mode_label = record.get("mode_label", "High accuracy" if effective_mode == "high_accuracy" else "Standard")
 
-    return {
+    payload = {
         "id": run_id,
         "display_name": display_name,
         "is_demo": is_demo,
@@ -189,8 +265,14 @@ async def run_analyse(request: Request):
         "height": analysis_height,
         "boxes": boxes,
         "candidate_count": len(boxes),
-        "created": record["created"]
+        "created": record["created"],
+        "mode": effective_mode,
+        "mode_label": mode_label
     }
+    if record.get("fallback_note"):
+        payload["fallback_note"] = record["fallback_note"]
+
+    return payload
 
 @app.post("/api/recognize-all")
 def run_recognize_all(payload: dict):
@@ -208,20 +290,30 @@ def run_recognize_all(payload: dict):
 
     try:
         with Image.open(mask_path) as mask:
-            bundle = joblib.load(CLEAN_MODEL)
-            batch = recognize(mask, bundle)
+            engine = get_engine() if get_engine is not None else None
+            if engine is not None and engine.is_available:
+                batch = engine.recognize_all_regions(mask)
+            else:
+                bundle, _ = get_loaded_bundle(CLEAN_MODEL)
+                batch = recognize(mask, bundle)
     except Exception:
         raise HTTPException(status_code=500, detail="Batch character recognition could not be completed.")
 
+    _, clean_sha = get_loaded_bundle(CLEAN_MODEL)
     save_payload = {
         "run_id": run_id,
         "method": "predicted_mask_components_mask_svm",
-        "model_sha256": hashlib.sha256(CLEAN_MODEL.read_bytes()).hexdigest(),
+        "model_sha256": clean_sha or hashlib.sha256(CLEAN_MODEL.read_bytes()).hexdigest(),
         "verified_transcription": False,
         "reading_order_verified": False,
         "regions": batch
     }
     json_path = DATA_DIR / run_id / "automatic_regions.json"
+    for reg in batch:
+        if isinstance(reg, dict):
+            p = reg.get("predicted_source_label") or reg.get("prediction")
+            if p:
+                reg["prediction_kannada"] = to_kannada(p)
     json_path.write_text(json.dumps(save_payload, ensure_ascii=False, indent=2), encoding="utf-8")
 
     return {
@@ -258,10 +350,33 @@ def run_predict_crop(req: PredictCropRequest):
             crop_path = DATA_DIR / run_id / f"crop_{x1}_{y1}_{x2}_{y2}.png"
             crop.save(crop_path)
 
-        bundle = joblib.load(model_path)
+        bundle, model_sha = get_loaded_bundle(model_path)
+        if bundle is None:
+            raise HTTPException(status_code=503, detail="Character recognition is temporarily unavailable.")
         feat = features(crop_path, bundle["preprocessing"])
         alts = rank_labels(bundle["model"], feat, 3)[0]
         pred = alts[0]
+        confidence = None
+        uncertain = False
+        models_agree = None
+        confidence_scores = []
+
+        # Predict with calibrated reading engine if available
+        engine = get_engine() if get_engine is not None else None
+        if engine is not None and engine.is_available:
+            try:
+                with Image.open(crop_path) as crop_im:
+                    res_info = engine.predict_crop(crop_im)
+                if res_info:
+                    pred = res_info.get("prediction", pred)
+                    confidence = res_info.get("confidence")
+                    uncertain = res_info.get("uncertain", False)
+                    models_agree = res_info.get("models_agree")
+                    confidence_scores = res_info.get("confidence_scores", [])
+                    if res_info.get("alternatives"):
+                        alts = res_info["alternatives"]
+            except Exception:
+                pass
 
         # Source examples without file paths
         ref_zip = ROOT / "outputs/recognition_references.zip"
@@ -279,11 +394,16 @@ def run_predict_crop(req: PredictCropRequest):
         "run_id": run_id,
         "bbox": bbox,
         "prediction": pred,
+        "prediction_kannada": to_kannada(pred) if pred else None,
         "alternatives": alts,
         "crop_url": f"/app_data/{run_id}/crop_{x1}_{y1}_{x2}_{y2}.png",
         "model": "Experimental recognizer",
-        "model_sha256": hashlib.sha256(model_path.read_bytes()).hexdigest(),
-        "reference_examples": clean_examples
+        "model_sha256": model_sha or hashlib.sha256(model_path.read_bytes()).hexdigest(),
+        "reference_examples": clean_examples,
+        "confidence": confidence,
+        "uncertain": uncertain,
+        "models_agree": models_agree,
+        "confidence_scores": confidence_scores
     }
 
 @app.post("/api/review")
@@ -337,17 +457,127 @@ def get_analysis_history():
             else:
                 display_name = "Uploaded photograph"
 
-            sanitized.append({
+            details = {}
+            if r.get("details"):
+                try:
+                    details = json.loads(r["details"])
+                except Exception:
+                    pass
+            mode = details.get("mode", "standard")
+            mode_label = details.get("mode_label", "High accuracy" if mode == "high_accuracy" else "Standard")
+
+            item = {
                 "id": r["id"],
                 "created": r["created"],
                 "display_name": display_name,
                 "image_url": f"/app_data/{r['id']}/input.png",
                 "mask_url": f"/app_data/{r['id']}/mask.png",
-                "sha256": r.get("sha256", "")
-            })
+                "sha256": r.get("sha256", ""),
+                "mode": mode,
+                "mode_label": mode_label
+            }
+            if details.get("fallback_note"):
+                item["fallback_note"] = details["fallback_note"]
+
+            try:
+                with sqlite3.connect(DATA_DIR / "history.sqlite3") as con:
+                    cur = con.cursor()
+                    cur.execute("SELECT prediction, suggested_label, reviewer, created FROM character_reviews WHERE run_id = ? ORDER BY created", (r["id"],))
+                    rev_rows = cur.fetchall()
+                run_reviews = []
+                for p_rom, s_rom, rev, ts in rev_rows:
+                    run_reviews.append({
+                        "prediction": p_rom,
+                        "prediction_kannada": to_kannada(p_rom) if p_rom else None,
+                        "suggested_label": s_rom,
+                        "suggested_label_kannada": to_kannada(s_rom) if s_rom else None,
+                        "reviewer": rev,
+                        "created": ts
+                    })
+                item["reviews"] = run_reviews
+                item["review_count"] = len(run_reviews)
+            except Exception:
+                item["reviews"] = []
+                item["review_count"] = 0
+
+            sanitized.append(item)
         return sanitized
     except Exception:
         raise HTTPException(status_code=500, detail="Analysis history could not be retrieved.")
+
+@app.get("/api/export/{run_id}")
+def get_run_export(run_id: str):
+    """Export analysis metadata and character reviews without internal file paths."""
+    try:
+        data = review_export(run_id, DATA_DIR)
+        if "analysis" in data:
+            a = data["analysis"]
+            fname = (a.get("filename") or "").lower()
+            a["filename"] = "Nagavara demonstration stone" if ("hs027" in fname or "demo" in fname) else "Uploaded photograph"
+            a["image_url"] = f"/app_data/{run_id}/input.png"
+            a["mask_url"] = f"/app_data/{run_id}/mask.png"
+            a.pop("image_path", None)
+            a.pop("mask_path", None)
+            details = a.get("details", {})
+            if isinstance(details, dict):
+                details["mode"] = details.get("mode", "standard")
+                details["mode_label"] = details.get("mode_label", "High accuracy" if details["mode"] == "high_accuracy" else "Standard")
+        if "reviews" in data and isinstance(data["reviews"], list):
+            for rev in data["reviews"]:
+                if isinstance(rev, dict):
+                    p_rom = rev.get("prediction")
+                    s_rom = rev.get("suggested_label")
+                    rev["prediction_kannada"] = to_kannada(p_rom) if p_rom else None
+                    rev["suggested_label_kannada"] = to_kannada(s_rom) if s_rom else None
+        return data
+    except ValueError:
+        raise HTTPException(status_code=404, detail="Analysis record not found.")
+    except Exception:
+        raise HTTPException(status_code=500, detail="Review export could not be generated.")
+
+@app.post("/api/translate")
+def run_translate(req: TranslateRequest):
+    """Translate and modernize Halegannada epigraphic text for reviewer-verified lines only."""
+    clean_text = req.text.strip()
+    if not clean_text:
+        raise HTTPException(status_code=400, detail="Text cannot be empty.")
+
+    db_path = DATA_DIR / "history.sqlite3"
+    init_verified_lines_table(db_path)
+
+    # Server-enforced gate: calculate hash of submitted text
+    text_hash = hashlib.sha256(clean_text.encode("utf-8")).hexdigest()
+
+    with sqlite3.connect(db_path) as con:
+        cur = con.cursor()
+        if req.line_id:
+            cur.execute(
+                "SELECT line_id, text_hash, reviewer, timestamp FROM verified_lines WHERE line_id = ? AND text_hash = ?",
+                (req.line_id, text_hash)
+            )
+        else:
+            cur.execute(
+                "SELECT line_id, text_hash, reviewer, timestamp FROM verified_lines WHERE text_hash = ?",
+                (text_hash,)
+            )
+        row = cur.fetchone()
+
+    if not row:
+        raise HTTPException(
+            status_code=422,
+            detail="Translation rejected: submitted text has not been verified in the verification database. The Studio UI does not yet support creating verified line records."
+        )
+
+    matched_line_id, matched_hash, reviewer, ts = row
+    try:
+        result = analyze_inscription_text(clean_text, reviewer_verified=True)
+        result["line_id"] = matched_line_id
+        result["verified_by"] = reviewer
+        result["verified_at"] = ts
+        result["text_hash"] = matched_hash
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Translation analysis could not be completed: {str(e)}")
 
 @app.get("/api/credits")
 def get_credits():

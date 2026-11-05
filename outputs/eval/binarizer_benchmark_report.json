@@ -1,0 +1,1107 @@
+{
+  "benchmark": "InscripLens Attributed Shilalekhya Binarizer Benchmark",
+  "checkpoint": "work/shilalekhya/binarizer.pth (Jena et al., ICVGIP 2025)",
+  "evaluation_mode": "Pixel-level segmentation against gold binary ground truth",
+  "ten_image_three_way_summary": {
+    "num_eval_images": 10,
+    "cpu_single_scale": {
+      "mean_iou": 0.6608,
+      "mean_f_measure": 0.7828,
+      "mean_precision": 0.8028,
+      "mean_recall": 0.7751,
+      "mean_pixel_accuracy": 0.9755,
+      "mean_psnr_db": 16.84,
+      "mean_runtime_seconds": 20.078,
+      "mean_seconds_per_megapixel": 17.318
+    },
+    "gpu_single_scale": {
+      "mean_iou": 0.6608,
+      "mean_f_measure": 0.7828,
+      "mean_precision": 0.8028,
+      "mean_recall": 0.7752,
+      "mean_pixel_accuracy": 0.9755,
+      "mean_psnr_db": 16.84,
+      "mean_runtime_seconds": 1.217,
+      "mean_seconds_per_megapixel": 1.127
+    },
+    "gpu_multi_scale": {
+      "mean_iou": 0.662,
+      "mean_f_measure": 0.7898,
+      "mean_precision": 0.7098,
+      "mean_recall": 0.8986,
+      "mean_pixel_accuracy": 0.9702,
+      "mean_psnr_db": 16.03,
+      "mean_runtime_seconds": 5.549,
+      "mean_seconds_per_megapixel": 4.726
+    }
+  },
+  "all_31_images_gpu_summary": {
+    "num_eval_images": 31,
+    "gpu_single_scale": {
+      "mean_iou": 0.6321,
+      "mean_f_measure": 0.7614,
+      "mean_precision": 0.7727,
+      "mean_recall": 0.7606,
+      "mean_pixel_accuracy": 0.9679,
+      "mean_psnr_db": 16.09,
+      "mean_runtime_seconds": 0.772,
+      "mean_seconds_per_megapixel": 0.723
+    },
+    "gpu_multi_scale": {
+      "mean_iou": 0.6523,
+      "mean_f_measure": 0.7847,
+      "mean_precision": 0.7015,
+      "mean_recall": 0.8973,
+      "mean_pixel_accuracy": 0.966,
+      "mean_psnr_db": 15.54,
+      "mean_runtime_seconds": 5.232,
+      "mean_seconds_per_megapixel": 4.782
+    }
+  },
+  "detailed_per_image_10_way": [
+    {
+      "name": "Bannerughatta 1400CE Sovappa Odeya Damodara Temple Donation Inscription.png",
+      "width": 1027,
+      "height": 1080,
+      "megapixels": 1.109,
+      "cpu_single": {
+        "seconds": 19.945,
+        "seconds_per_mp": 17.982,
+        "iou": 0.7868,
+        "f_measure": 0.8807,
+        "precision": 0.895,
+        "recall": 0.8669,
+        "pixel_accuracy": 0.9852,
+        "psnr_db": 18.28
+      },
+      "gpu_single": {
+        "seconds": 2.593,
+        "seconds_per_mp": 2.338,
+        "iou": 0.7869,
+        "f_measure": 0.8807,
+        "precision": 0.895,
+        "recall": 0.867,
+        "pixel_accuracy": 0.9852,
+        "psnr_db": 18.29
+      },
+      "gpu_multi": {
+        "seconds": 5.049,
+        "seconds_per_mp": 4.553,
+        "iou": 0.7674,
+        "f_measure": 0.8684,
+        "precision": 0.8027,
+        "recall": 0.9459,
+        "pixel_accuracy": 0.9819,
+        "psnr_db": 17.42
+      }
+    },
+    {
+      "name": "Basavanagudi 1600CE Birth of Vrishabhavathi River Peeta Inscription.png",
+      "width": 1920,
+      "height": 418,
+      "megapixels": 0.803,
+      "cpu_single": {
+        "seconds": 11.149,
+        "seconds_per_mp": 13.892,
+        "iou": 0.7533,
+        "f_measure": 0.8593,
+        "precision": 0.8421,
+        "recall": 0.8772,
+        "pixel_accuracy": 0.9641,
+        "psnr_db": 14.45
+      },
+      "gpu_single": {
+        "seconds": 0.844,
+        "seconds_per_mp": 1.052,
+        "iou": 0.7533,
+        "f_measure": 0.8593,
+        "precision": 0.8421,
+        "recall": 0.8772,
+        "pixel_accuracy": 0.9641,
+        "psnr_db": 14.45
+      },
+      "gpu_multi": {
+        "seconds": 3.606,
+        "seconds_per_mp": 4.493,
+        "iou": 0.7113,
+        "f_measure": 0.8313,
+        "precision": 0.7465,
+        "recall": 0.9378,
+        "pixel_accuracy": 0.9524,
+        "psnr_db": 13.23
+      }
+    },
+    {
+      "name": "Begur 900CE Pervvonashetti.png",
+      "width": 633,
+      "height": 1080,
+      "megapixels": 0.684,
+      "cpu_single": {
+        "seconds": 13.687,
+        "seconds_per_mp": 20.021,
+        "iou": 0.817,
+        "f_measure": 0.8993,
+        "precision": 0.9009,
+        "recall": 0.8976,
+        "pixel_accuracy": 0.9839,
+        "psnr_db": 17.94
+      },
+      "gpu_single": {
+        "seconds": 0.906,
+        "seconds_per_mp": 1.326,
+        "iou": 0.817,
+        "f_measure": 0.8993,
+        "precision": 0.9009,
+        "recall": 0.8977,
+        "pixel_accuracy": 0.9839,
+        "psnr_db": 17.94
+      },
+      "gpu_multi": {
+        "seconds": 2.948,
+        "seconds_per_mp": 4.313,
+        "iou": 0.7951,
+        "f_measure": 0.8858,
+        "precision": 0.8253,
+        "recall": 0.956,
+        "pixel_accuracy": 0.9803,
+        "psnr_db": 17.06
+      }
+    },
+    {
+      "name": "Begur 900CE Tondabbe Sanyasana Inscription.png",
+      "width": 455,
+      "height": 1080,
+      "megapixels": 0.491,
+      "cpu_single": {
+        "seconds": 6.997,
+        "seconds_per_mp": 14.239,
+        "iou": 0.8109,
+        "f_measure": 0.8955,
+        "precision": 0.8926,
+        "recall": 0.8985,
+        "pixel_accuracy": 0.9808,
+        "psnr_db": 17.16
+      },
+      "gpu_single": {
+        "seconds": 0.654,
+        "seconds_per_mp": 1.33,
+        "iou": 0.8108,
+        "f_measure": 0.8955,
+        "precision": 0.8926,
+        "recall": 0.8985,
+        "pixel_accuracy": 0.9808,
+        "psnr_db": 17.16
+      },
+      "gpu_multi": {
+        "seconds": 2.126,
+        "seconds_per_mp": 4.326,
+        "iou": 0.7876,
+        "f_measure": 0.8812,
+        "precision": 0.8181,
+        "recall": 0.9549,
+        "pixel_accuracy": 0.9764,
+        "psnr_db": 16.26
+      }
+    },
+    {
+      "name": "Begur 900CE Tondabbe's Husband's Herostone With Inscription.png",
+      "width": 1043,
+      "height": 1080,
+      "megapixels": 1.126,
+      "cpu_single": {
+        "seconds": 20.647,
+        "seconds_per_mp": 18.329,
+        "iou": 0.4154,
+        "f_measure": 0.5869,
+        "precision": 0.7833,
+        "recall": 0.4693,
+        "pixel_accuracy": 0.9896,
+        "psnr_db": 19.83
+      },
+      "gpu_single": {
+        "seconds": 1.158,
+        "seconds_per_mp": 1.028,
+        "iou": 0.4154,
+        "f_measure": 0.587,
+        "precision": 0.7832,
+        "recall": 0.4694,
+        "pixel_accuracy": 0.9896,
+        "psnr_db": 19.83
+      },
+      "gpu_multi": {
+        "seconds": 5.099,
+        "seconds_per_mp": 4.527,
+        "iou": 0.4365,
+        "f_measure": 0.6078,
+        "precision": 0.6147,
+        "recall": 0.601,
+        "pixel_accuracy": 0.9878,
+        "psnr_db": 19.13
+      }
+    },
+    {
+      "name": "Bisanahalli 900CE Saanta's Turugol Herostone With Inscription.png",
+      "width": 1337,
+      "height": 1080,
+      "megapixels": 1.444,
+      "cpu_single": {
+        "seconds": 21.019,
+        "seconds_per_mp": 14.556,
+        "iou": 0.7396,
+        "f_measure": 0.8503,
+        "precision": 0.8187,
+        "recall": 0.8844,
+        "pixel_accuracy": 0.9932,
+        "psnr_db": 21.64
+      },
+      "gpu_single": {
+        "seconds": 1.198,
+        "seconds_per_mp": 0.83,
+        "iou": 0.7395,
+        "f_measure": 0.8503,
+        "precision": 0.8186,
+        "recall": 0.8845,
+        "pixel_accuracy": 0.9931,
+        "psnr_db": 21.64
+      },
+      "gpu_multi": {
+        "seconds": 6.87,
+        "seconds_per_mp": 4.758,
+        "iou": 0.6088,
+        "f_measure": 0.7568,
+        "precision": 0.6337,
+        "recall": 0.9393,
+        "pixel_accuracy": 0.9867,
+        "psnr_db": 18.77
+      }
+    },
+    {
+      "name": "Chikkajala 1382CE Devarasa's Keshavanatha Temple Donation Inscriptiona.png",
+      "width": 1404,
+      "height": 1080,
+      "megapixels": 1.516,
+      "cpu_single": {
+        "seconds": 21.161,
+        "seconds_per_mp": 13.955,
+        "iou": 0.7594,
+        "f_measure": 0.8632,
+        "precision": 0.8474,
+        "recall": 0.8797,
+        "pixel_accuracy": 0.9783,
+        "psnr_db": 16.63
+      },
+      "gpu_single": {
+        "seconds": 1.201,
+        "seconds_per_mp": 0.792,
+        "iou": 0.7594,
+        "f_measure": 0.8632,
+        "precision": 0.8474,
+        "recall": 0.8797,
+        "pixel_accuracy": 0.9783,
+        "psnr_db": 16.63
+      },
+      "gpu_multi": {
+        "seconds": 6.86,
+        "seconds_per_mp": 4.524,
+        "iou": 0.7774,
+        "f_measure": 0.8748,
+        "precision": 0.8072,
+        "recall": 0.9547,
+        "pixel_accuracy": 0.9787,
+        "psnr_db": 16.71
+      }
+    },
+    {
+      "name": "Chikkajala 1589CE Baireyanayaka's Garuda Pillar Inscription.png",
+      "width": 962,
+      "height": 1080,
+      "megapixels": 1.039,
+      "cpu_single": {
+        "seconds": 20.954,
+        "seconds_per_mp": 20.168,
+        "iou": 0.5699,
+        "f_measure": 0.726,
+        "precision": 0.6981,
+        "recall": 0.7563,
+        "pixel_accuracy": 0.945,
+        "psnr_db": 12.6
+      },
+      "gpu_single": {
+        "seconds": 1.068,
+        "seconds_per_mp": 1.028,
+        "iou": 0.5699,
+        "f_measure": 0.726,
+        "precision": 0.6981,
+        "recall": 0.7563,
+        "pixel_accuracy": 0.945,
+        "psnr_db": 12.6
+      },
+      "gpu_multi": {
+        "seconds": 4.726,
+        "seconds_per_mp": 4.548,
+        "iou": 0.4924,
+        "f_measure": 0.6599,
+        "precision": 0.5376,
+        "recall": 0.854,
+        "pixel_accuracy": 0.9152,
+        "psnr_db": 10.72
+      }
+    },
+    {
+      "name": "Devishettihalli 1526CE Vogatta Temple Donation Inscription.png",
+      "width": 1738,
+      "height": 1080,
+      "megapixels": 1.877,
+      "cpu_single": {
+        "seconds": 30.953,
+        "seconds_per_mp": 16.49,
+        "iou": 0.3314,
+        "f_measure": 0.4978,
+        "precision": 0.6118,
+        "recall": 0.4196,
+        "pixel_accuracy": 0.9608,
+        "psnr_db": 14.07
+      },
+      "gpu_single": {
+        "seconds": 1.333,
+        "seconds_per_mp": 0.71,
+        "iou": 0.3313,
+        "f_measure": 0.4977,
+        "precision": 0.6118,
+        "recall": 0.4195,
+        "pixel_accuracy": 0.9608,
+        "psnr_db": 14.07
+      },
+      "gpu_multi": {
+        "seconds": 8.348,
+        "seconds_per_mp": 4.447,
+        "iou": 0.6584,
+        "f_measure": 0.794,
+        "precision": 0.69,
+        "recall": 0.935,
+        "pixel_accuracy": 0.9776,
+        "psnr_db": 16.49
+      }
+    },
+    {
+      "name": "Gangavara 1371CE Three Priests Inscription.png",
+      "width": 1920,
+      "height": 758,
+      "megapixels": 1.455,
+      "cpu_single": {
+        "seconds": 34.27,
+        "seconds_per_mp": 23.547,
+        "iou": 0.6244,
+        "f_measure": 0.7688,
+        "precision": 0.7384,
+        "recall": 0.8017,
+        "pixel_accuracy": 0.9737,
+        "psnr_db": 15.8
+      },
+      "gpu_single": {
+        "seconds": 1.218,
+        "seconds_per_mp": 0.837,
+        "iou": 0.6244,
+        "f_measure": 0.7688,
+        "precision": 0.7384,
+        "recall": 0.8018,
+        "pixel_accuracy": 0.9737,
+        "psnr_db": 15.8
+      },
+      "gpu_multi": {
+        "seconds": 9.857,
+        "seconds_per_mp": 6.773,
+        "iou": 0.5853,
+        "f_measure": 0.7384,
+        "precision": 0.6225,
+        "recall": 0.9073,
+        "pixel_accuracy": 0.9649,
+        "psnr_db": 14.55
+      }
+    }
+  ],
+  "detailed_per_image_31_gpu": [
+    {
+      "name": "Bannerughatta 1400CE Sovappa Odeya Damodara Temple Donation Inscription.png",
+      "megapixels": 1.109,
+      "gpu_single": {
+        "seconds": 1.242,
+        "iou": 0.7869,
+        "f_measure": 0.8807,
+        "precision": 0.895,
+        "recall": 0.867,
+        "pixel_accuracy": 0.9852,
+        "psnr_db": 18.29
+      },
+      "gpu_multi": {
+        "seconds": 5.165,
+        "iou": 0.7674,
+        "f_measure": 0.8684,
+        "precision": 0.8027,
+        "recall": 0.9459,
+        "pixel_accuracy": 0.9819,
+        "psnr_db": 17.42
+      }
+    },
+    {
+      "name": "Basavanagudi 1600CE Birth of Vrishabhavathi River Peeta Inscription.png",
+      "megapixels": 0.803,
+      "gpu_single": {
+        "seconds": 0.474,
+        "iou": 0.7533,
+        "f_measure": 0.8593,
+        "precision": 0.8421,
+        "recall": 0.8772,
+        "pixel_accuracy": 0.9641,
+        "psnr_db": 14.45
+      },
+      "gpu_multi": {
+        "seconds": 3.684,
+        "iou": 0.7113,
+        "f_measure": 0.8313,
+        "precision": 0.7465,
+        "recall": 0.9378,
+        "pixel_accuracy": 0.9524,
+        "psnr_db": 13.23
+      }
+    },
+    {
+      "name": "Begur 900CE Pervvonashetti.png",
+      "megapixels": 0.684,
+      "gpu_single": {
+        "seconds": 0.564,
+        "iou": 0.817,
+        "f_measure": 0.8993,
+        "precision": 0.9009,
+        "recall": 0.8977,
+        "pixel_accuracy": 0.9839,
+        "psnr_db": 17.94
+      },
+      "gpu_multi": {
+        "seconds": 3.034,
+        "iou": 0.7951,
+        "f_measure": 0.8858,
+        "precision": 0.8253,
+        "recall": 0.956,
+        "pixel_accuracy": 0.9803,
+        "psnr_db": 17.06
+      }
+    },
+    {
+      "name": "Begur 900CE Tondabbe Sanyasana Inscription.png",
+      "megapixels": 0.491,
+      "gpu_single": {
+        "seconds": 0.291,
+        "iou": 0.8108,
+        "f_measure": 0.8955,
+        "precision": 0.8926,
+        "recall": 0.8985,
+        "pixel_accuracy": 0.9808,
+        "psnr_db": 17.16
+      },
+      "gpu_multi": {
+        "seconds": 2.187,
+        "iou": 0.7876,
+        "f_measure": 0.8812,
+        "precision": 0.8181,
+        "recall": 0.9549,
+        "pixel_accuracy": 0.9764,
+        "psnr_db": 16.26
+      }
+    },
+    {
+      "name": "Begur 900CE Tondabbe's Husband's Herostone With Inscription.png",
+      "megapixels": 1.126,
+      "gpu_single": {
+        "seconds": 0.856,
+        "iou": 0.4154,
+        "f_measure": 0.587,
+        "precision": 0.7832,
+        "recall": 0.4694,
+        "pixel_accuracy": 0.9896,
+        "psnr_db": 19.83
+      },
+      "gpu_multi": {
+        "seconds": 5.241,
+        "iou": 0.4365,
+        "f_measure": 0.6078,
+        "precision": 0.6147,
+        "recall": 0.601,
+        "pixel_accuracy": 0.9878,
+        "psnr_db": 19.13
+      }
+    },
+    {
+      "name": "Bisanahalli 900CE Saanta's Turugol Herostone With Inscription.png",
+      "megapixels": 1.444,
+      "gpu_single": {
+        "seconds": 0.875,
+        "iou": 0.7395,
+        "f_measure": 0.8503,
+        "precision": 0.8186,
+        "recall": 0.8845,
+        "pixel_accuracy": 0.9931,
+        "psnr_db": 21.64
+      },
+      "gpu_multi": {
+        "seconds": 7.01,
+        "iou": 0.6088,
+        "f_measure": 0.7568,
+        "precision": 0.6337,
+        "recall": 0.9393,
+        "pixel_accuracy": 0.9867,
+        "psnr_db": 18.77
+      }
+    },
+    {
+      "name": "Chikkajala 1382CE Devarasa's Keshavanatha Temple Donation Inscriptiona.png",
+      "megapixels": 1.516,
+      "gpu_single": {
+        "seconds": 0.858,
+        "iou": 0.7594,
+        "f_measure": 0.8632,
+        "precision": 0.8474,
+        "recall": 0.8797,
+        "pixel_accuracy": 0.9783,
+        "psnr_db": 16.63
+      },
+      "gpu_multi": {
+        "seconds": 7.04,
+        "iou": 0.7774,
+        "f_measure": 0.8748,
+        "precision": 0.8072,
+        "recall": 0.9547,
+        "pixel_accuracy": 0.9787,
+        "psnr_db": 16.71
+      }
+    },
+    {
+      "name": "Chikkajala 1589CE Baireyanayaka's Garuda Pillar Inscription.png",
+      "megapixels": 1.039,
+      "gpu_single": {
+        "seconds": 0.859,
+        "iou": 0.5699,
+        "f_measure": 0.726,
+        "precision": 0.6981,
+        "recall": 0.7563,
+        "pixel_accuracy": 0.945,
+        "psnr_db": 12.6
+      },
+      "gpu_multi": {
+        "seconds": 4.852,
+        "iou": 0.4924,
+        "f_measure": 0.6599,
+        "precision": 0.5376,
+        "recall": 0.854,
+        "pixel_accuracy": 0.9152,
+        "psnr_db": 10.72
+      }
+    },
+    {
+      "name": "Devishettihalli 1526CE Vogatta Temple Donation Inscription.png",
+      "megapixels": 1.877,
+      "gpu_single": {
+        "seconds": 1.149,
+        "iou": 0.3313,
+        "f_measure": 0.4977,
+        "precision": 0.6118,
+        "recall": 0.4195,
+        "pixel_accuracy": 0.9608,
+        "psnr_db": 14.07
+      },
+      "gpu_multi": {
+        "seconds": 8.667,
+        "iou": 0.6584,
+        "f_measure": 0.794,
+        "precision": 0.69,
+        "recall": 0.935,
+        "pixel_accuracy": 0.9776,
+        "psnr_db": 16.49
+      }
+    },
+    {
+      "name": "Gangavara 1371CE Three Priests Inscription.png",
+      "megapixels": 1.455,
+      "gpu_single": {
+        "seconds": 0.967,
+        "iou": 0.6244,
+        "f_measure": 0.7688,
+        "precision": 0.7384,
+        "recall": 0.8018,
+        "pixel_accuracy": 0.9737,
+        "psnr_db": 15.8
+      },
+      "gpu_multi": {
+        "seconds": 6.905,
+        "iou": 0.5853,
+        "f_measure": 0.7384,
+        "precision": 0.6225,
+        "recall": 0.9073,
+        "pixel_accuracy": 0.9649,
+        "psnr_db": 14.55
+      }
+    },
+    {
+      "name": "Hale Nijagal 1280CE Temple Donation Inscription.png",
+      "megapixels": 0.691,
+      "gpu_single": {
+        "seconds": 0.573,
+        "iou": 0.6266,
+        "f_measure": 0.7704,
+        "precision": 0.8279,
+        "recall": 0.7204,
+        "pixel_accuracy": 0.9262,
+        "psnr_db": 11.32
+      },
+      "gpu_multi": {
+        "seconds": 3.094,
+        "iou": 0.6649,
+        "f_measure": 0.7987,
+        "precision": 0.7316,
+        "recall": 0.8794,
+        "pixel_accuracy": 0.9238,
+        "psnr_db": 11.18
+      }
+    },
+    {
+      "name": "Jakkur 1432CE God Allalanatha inscription.png",
+      "megapixels": 0.408,
+      "gpu_single": {
+        "seconds": 0.296,
+        "iou": 0.5702,
+        "f_measure": 0.7263,
+        "precision": 0.7425,
+        "recall": 0.7107,
+        "pixel_accuracy": 0.9505,
+        "psnr_db": 13.05
+      },
+      "gpu_multi": {
+        "seconds": 1.84,
+        "iou": 0.598,
+        "f_measure": 0.7484,
+        "precision": 0.6654,
+        "recall": 0.8552,
+        "pixel_accuracy": 0.9468,
+        "psnr_db": 12.74
+      }
+    },
+    {
+      "name": "Jalige 1345CE Pemmeyanayaka's Donation Inscription backside.png",
+      "megapixels": 0.862,
+      "gpu_single": {
+        "seconds": 0.58,
+        "iou": 0.8765,
+        "f_measure": 0.9342,
+        "precision": 0.9371,
+        "recall": 0.9313,
+        "pixel_accuracy": 0.9883,
+        "psnr_db": 19.3
+      },
+      "gpu_multi": {
+        "seconds": 4.107,
+        "iou": 0.7266,
+        "f_measure": 0.8417,
+        "precision": 0.7517,
+        "recall": 0.9561,
+        "pixel_accuracy": 0.9678,
+        "psnr_db": 14.92
+      }
+    },
+    {
+      "name": "Jalige 1345CE Pemmeyanayaka's Donation Inscription.png",
+      "megapixels": 0.804,
+      "gpu_single": {
+        "seconds": 0.567,
+        "iou": 0.6741,
+        "f_measure": 0.8053,
+        "precision": 0.7611,
+        "recall": 0.8549,
+        "pixel_accuracy": 0.9637,
+        "psnr_db": 14.4
+      },
+      "gpu_multi": {
+        "seconds": 4.03,
+        "iou": 0.7049,
+        "f_measure": 0.8269,
+        "precision": 0.7256,
+        "recall": 0.9611,
+        "pixel_accuracy": 0.9646,
+        "psnr_db": 14.51
+      }
+    },
+    {
+      "name": "K R Puram 750CE Posauraralgeya.png",
+      "megapixels": 1.844,
+      "gpu_single": {
+        "seconds": 1.145,
+        "iou": 0.6339,
+        "f_measure": 0.776,
+        "precision": 0.7753,
+        "recall": 0.7767,
+        "pixel_accuracy": 0.9785,
+        "psnr_db": 16.68
+      },
+      "gpu_multi": {
+        "seconds": 8.654,
+        "iou": 0.6021,
+        "f_measure": 0.7517,
+        "precision": 0.6835,
+        "recall": 0.835,
+        "pixel_accuracy": 0.9736,
+        "psnr_db": 15.78
+      }
+    },
+    {
+      "name": "Kambipura 1651CE Donation Inscription.png",
+      "megapixels": 1.988,
+      "gpu_single": {
+        "seconds": 1.16,
+        "iou": 0.6765,
+        "f_measure": 0.807,
+        "precision": 0.8295,
+        "recall": 0.7858,
+        "pixel_accuracy": 0.9913,
+        "psnr_db": 20.59
+      },
+      "gpu_multi": {
+        "seconds": 8.978,
+        "iou": 0.6843,
+        "f_measure": 0.8126,
+        "precision": 0.7223,
+        "recall": 0.9286,
+        "pixel_accuracy": 0.9901,
+        "psnr_db": 20.02
+      }
+    },
+    {
+      "name": "Kudluru 1000 CE Dantala Basadi Donation Inscription.png",
+      "megapixels": 0.611,
+      "gpu_single": {
+        "seconds": 0.576,
+        "iou": 0.4275,
+        "f_measure": 0.599,
+        "precision": 0.5257,
+        "recall": 0.696,
+        "pixel_accuracy": 0.9485,
+        "psnr_db": 12.89
+      },
+      "gpu_multi": {
+        "seconds": 3.097,
+        "iou": 0.4028,
+        "f_measure": 0.5743,
+        "precision": 0.4431,
+        "recall": 0.8158,
+        "pixel_accuracy": 0.9332,
+        "psnr_db": 11.75
+      }
+    },
+    {
+      "name": "Kumbalahalli 900CE Nelmalli Herostone With Inscription.png",
+      "megapixels": 0.892,
+      "gpu_single": {
+        "seconds": 0.574,
+        "iou": 0.691,
+        "f_measure": 0.8173,
+        "precision": 0.7911,
+        "recall": 0.8452,
+        "pixel_accuracy": 0.9765,
+        "psnr_db": 16.3
+      },
+      "gpu_multi": {
+        "seconds": 4.086,
+        "iou": 0.7145,
+        "f_measure": 0.8335,
+        "precision": 0.7488,
+        "recall": 0.9397,
+        "pixel_accuracy": 0.9767,
+        "psnr_db": 16.33
+      }
+    },
+    {
+      "name": "Kurudusonnenahalli 900CE Sambayya Hero Stone with Inscription.png",
+      "megapixels": 1.374,
+      "gpu_single": {
+        "seconds": 0.874,
+        "iou": 0.6685,
+        "f_measure": 0.8013,
+        "precision": 0.7569,
+        "recall": 0.8513,
+        "pixel_accuracy": 0.993,
+        "psnr_db": 21.55
+      },
+      "gpu_multi": {
+        "seconds": 5.925,
+        "iou": 0.6667,
+        "f_measure": 0.8001,
+        "precision": 0.6912,
+        "recall": 0.9495,
+        "pixel_accuracy": 0.9921,
+        "psnr_db": 21.04
+      }
+    },
+    {
+      "name": "Kutaganahalli 1800CE Yelechikkana Lake Construction Inscription.png",
+      "megapixels": 0.684,
+      "gpu_single": {
+        "seconds": 0.572,
+        "iou": 0.7207,
+        "f_measure": 0.8377,
+        "precision": 0.8197,
+        "recall": 0.8565,
+        "pixel_accuracy": 0.9804,
+        "psnr_db": 17.08
+      },
+      "gpu_multi": {
+        "seconds": 3.141,
+        "iou": 0.701,
+        "f_measure": 0.8242,
+        "precision": 0.7372,
+        "recall": 0.9346,
+        "pixel_accuracy": 0.9765,
+        "psnr_db": 16.28
+      }
+    },
+    {
+      "name": "Malurpatna 1000CE Kashayya's Herostone With Inscription.png",
+      "megapixels": 0.973,
+      "gpu_single": {
+        "seconds": 0.615,
+        "iou": 0.7528,
+        "f_measure": 0.859,
+        "precision": 0.8645,
+        "recall": 0.8536,
+        "pixel_accuracy": 0.9937,
+        "psnr_db": 21.98
+      },
+      "gpu_multi": {
+        "seconds": 4.736,
+        "iou": 0.7808,
+        "f_measure": 0.8769,
+        "precision": 0.831,
+        "recall": 0.9282,
+        "pixel_accuracy": 0.9941,
+        "psnr_db": 22.3
+      }
+    },
+    {
+      "name": "Mutkur 1400CE Agrahara Inscription (Not Documented Before).png",
+      "megapixels": 1.778,
+      "gpu_single": {
+        "seconds": 1.179,
+        "iou": 0.5039,
+        "f_measure": 0.6701,
+        "precision": 0.6941,
+        "recall": 0.6477,
+        "pixel_accuracy": 0.9606,
+        "psnr_db": 14.05
+      },
+      "gpu_multi": {
+        "seconds": 8.26,
+        "iou": 0.5035,
+        "f_measure": 0.6698,
+        "precision": 0.6289,
+        "recall": 0.7163,
+        "pixel_accuracy": 0.9564,
+        "psnr_db": 13.6
+      }
+    },
+    {
+      "name": "Muttanallur 1618CE Thimmarakka's Nagastone Inscription.png",
+      "megapixels": 0.822,
+      "gpu_single": {
+        "seconds": 0.587,
+        "iou": 0.6263,
+        "f_measure": 0.7702,
+        "precision": 0.7991,
+        "recall": 0.7434,
+        "pixel_accuracy": 0.9729,
+        "psnr_db": 15.67
+      },
+      "gpu_multi": {
+        "seconds": 4.09,
+        "iou": 0.6511,
+        "f_measure": 0.7887,
+        "precision": 0.7315,
+        "recall": 0.8556,
+        "pixel_accuracy": 0.9719,
+        "psnr_db": 15.52
+      }
+    },
+    {
+      "name": "Nagavara 971CE Herostone With Inscription.png",
+      "megapixels": 0.567,
+      "gpu_single": {
+        "seconds": 0.574,
+        "iou": 0.6031,
+        "f_measure": 0.7524,
+        "precision": 0.7233,
+        "recall": 0.7839,
+        "pixel_accuracy": 0.9581,
+        "psnr_db": 13.78
+      },
+      "gpu_multi": {
+        "seconds": 3.135,
+        "iou": 0.6966,
+        "f_measure": 0.8212,
+        "precision": 0.73,
+        "recall": 0.9384,
+        "pixel_accuracy": 0.9668,
+        "psnr_db": 14.79
+      }
+    },
+    {
+      "name": "Rajapura 1400CE Donation Inscription.png",
+      "megapixels": 0.939,
+      "gpu_single": {
+        "seconds": 0.587,
+        "iou": 0.6794,
+        "f_measure": 0.8091,
+        "precision": 0.8178,
+        "recall": 0.8005,
+        "pixel_accuracy": 0.9581,
+        "psnr_db": 13.78
+      },
+      "gpu_multi": {
+        "seconds": 4.706,
+        "iou": 0.6094,
+        "f_measure": 0.7573,
+        "precision": 0.6622,
+        "recall": 0.8844,
+        "pixel_accuracy": 0.9372,
+        "psnr_db": 12.02
+      }
+    },
+    {
+      "name": "Sadenahalli 1342CE Endedevarasa's Donation Inscription.png",
+      "megapixels": 0.541,
+      "gpu_single": {
+        "seconds": 0.299,
+        "iou": 0.4238,
+        "f_measure": 0.5953,
+        "precision": 0.6145,
+        "recall": 0.5773,
+        "pixel_accuracy": 0.907,
+        "psnr_db": 10.31
+      },
+      "gpu_multi": {
+        "seconds": 2.875,
+        "iou": 0.6302,
+        "f_measure": 0.7732,
+        "precision": 0.6578,
+        "recall": 0.9377,
+        "pixel_accuracy": 0.9348,
+        "psnr_db": 11.86
+      }
+    },
+    {
+      "name": "Sarjapura 1429CE Mayileya Nayaka's Lunar Eclipse Inscription.png",
+      "megapixels": 2.026,
+      "gpu_single": {
+        "seconds": 1.483,
+        "iou": 0.7553,
+        "f_measure": 0.8606,
+        "precision": 0.8531,
+        "recall": 0.8682,
+        "pixel_accuracy": 0.9776,
+        "psnr_db": 16.5
+      },
+      "gpu_multi": {
+        "seconds": 9.288,
+        "iou": 0.7898,
+        "f_measure": 0.8826,
+        "precision": 0.8193,
+        "recall": 0.9564,
+        "pixel_accuracy": 0.9797,
+        "psnr_db": 16.93
+      }
+    },
+    {
+      "name": "Tharalu 1561CE Bingiyappa Gowda.png",
+      "megapixels": 1.233,
+      "gpu_single": {
+        "seconds": 0.914,
+        "iou": 0.8279,
+        "f_measure": 0.9059,
+        "precision": 0.8934,
+        "recall": 0.9187,
+        "pixel_accuracy": 0.9888,
+        "psnr_db": 19.5
+      },
+      "gpu_multi": {
+        "seconds": 6.061,
+        "iou": 0.6437,
+        "f_measure": 0.7833,
+        "precision": 0.6748,
+        "recall": 0.9333,
+        "pixel_accuracy": 0.9697,
+        "psnr_db": 15.18
+      }
+    },
+    {
+      "name": "Tindlu 1368CE Donation Inscription.png",
+      "megapixels": 0.589,
+      "gpu_single": {
+        "seconds": 0.581,
+        "iou": 0.1597,
+        "f_measure": 0.2754,
+        "precision": 0.4961,
+        "recall": 0.1906,
+        "pixel_accuracy": 0.8927,
+        "psnr_db": 9.69
+      },
+      "gpu_multi": {
+        "seconds": 3.211,
+        "iou": 0.5793,
+        "f_measure": 0.7336,
+        "precision": 0.6767,
+        "recall": 0.801,
+        "pixel_accuracy": 0.9377,
+        "psnr_db": 12.06
+      }
+    },
+    {
+      "name": "Totagere 750CE Inscription.png",
+      "megapixels": 1.166,
+      "gpu_single": {
+        "seconds": 0.887,
+        "iou": 0.632,
+        "f_measure": 0.7745,
+        "precision": 0.821,
+        "recall": 0.7329,
+        "pixel_accuracy": 0.9608,
+        "psnr_db": 14.06
+      },
+      "gpu_multi": {
+        "seconds": 6.115,
+        "iou": 0.7202,
+        "f_measure": 0.8373,
+        "precision": 0.7776,
+        "recall": 0.9071,
+        "pixel_accuracy": 0.9676,
+        "psnr_db": 14.9
+      }
+    },
+    {
+      "name": "Vagata 1028CE Sevachari Makara Torana Inscription.png",
+      "megapixels": 1.849,
+      "gpu_single": {
+        "seconds": 1.181,
+        "iou": 0.4578,
+        "f_measure": 0.628,
+        "precision": 0.5822,
+        "recall": 0.6818,
+        "pixel_accuracy": 0.9835,
+        "psnr_db": 17.82
+      },
+      "gpu_multi": {
+        "seconds": 8.979,
+        "iou": 0.53,
+        "f_measure": 0.6928,
+        "precision": 0.5568,
+        "recall": 0.9167,
+        "pixel_accuracy": 0.9834,
+        "psnr_db": 17.79
+      }
+    }
+  ]
+}

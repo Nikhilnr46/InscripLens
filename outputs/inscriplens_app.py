@@ -60,7 +60,7 @@ notice('Research prototype for local epigraphic enhancement and diagnostic chara
 
 # Long disclaimer moved into an expander named "Limitations of this prototype"
 with st.expander('Limitations of this prototype'):
-    st.write('Research prototype: enhancement works; character recognition is experimental. Published/source labels are references, not automatic readings. Modern Kannada conversion and English translation are not available.')
+    st.write('Research prototype: enhancement works; character recognition is experimental. Published/source labels are references, not automatic readings. Translation is not yet available in the Studio interface (the API only offers a rule-based draft for reviewer-verified formulaic hero-stone text). All machine translations are unverified drafts requiring expert epigraphic verification.')
 
 # Branded sidebar header: app name and one-line tagline at top
 st.sidebar.markdown('''

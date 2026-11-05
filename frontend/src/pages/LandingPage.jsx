@@ -516,7 +516,7 @@ export default function LandingPage({ onEnterStudio, onTryDemo }) {
                   <h4>Limitations of this prototype</h4>
                 </div>
                 <p className="limitations-text">
-                  Research prototype: enhancement works; character recognition is experimental. Published/source labels are references, not automatic readings. Modern Kannada conversion and English translation are not available.
+                  Research prototype: enhancement works; character recognition is experimental. Published/source labels are references, not automatic readings. Translation is not yet available in the Studio interface (the API only offers an experimental, rule-based draft for reviewer-verified formulaic hero-stone text). It is not a general Old Kannada translator, and all drafts require expert epigraphic verification.
                 </p>
               </div>
             </Reveal>
@@ -554,8 +554,8 @@ export default function LandingPage({ onEnterStudio, onTryDemo }) {
                     <li>Guarantee correct readings</li>
                     <li>Treat candidate regions as complete characters</li>
                     <li>Provide a verified reading order</li>
-                    <li>Convert to modern Kannada</li>
-                    <li>Translate to English</li>
+                    <li>Translate in the Studio interface (the API only offers a rule-based draft for reviewer-verified formulaic hero-stone text; not wired into the UI)</li>
+                    <li>Guarantee unreviewed machine translation accuracy</li>
                   </ul>
                 </Reveal>
               </div>

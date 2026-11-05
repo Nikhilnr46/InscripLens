@@ -20,12 +20,15 @@ import {
   AlertCircle,
   Maximize2,
   ArrowLeft,
-  ChevronLeft
+  ChevronLeft,
+  ChevronDown,
+  Download
 } from 'lucide-react';
 import LandingPage from './pages/LandingPage.jsx';
 import ThemeToggle from './components/ThemeToggle.tsx';
 import { SITE } from './config/site.ts';
 import { initSiteInteractions } from './utils/interactions.ts';
+import { formatDisplayLabel } from './utils/kannadaConverter';
 
 export default function App() {
   // Routing: '/' for single-page landing site, '/studio' for epigraphic workspace
@@ -43,18 +46,55 @@ export default function App() {
     return '/';
   });
 
-  // Collapsible sidebar state (remembered in localStorage)
+  // Collapsible sidebar state (auto-collapses below 1500px, remembers user manual preference, supports url override)
   const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
-    return localStorage.getItem('inscriplens_sidebar_collapsed') === 'true';
+    try {
+      const sp = new URLSearchParams(window.location.search);
+      if (sp.get('sidebar') === 'open') return false;
+      if (sp.get('sidebar') === 'collapsed') return true;
+      const saved = localStorage.getItem('inscriplens_sidebar_collapsed');
+      if (saved !== null) {
+        return saved === 'true';
+      }
+    } catch {}
+    return typeof window !== 'undefined' ? window.innerWidth < 1500 : true;
   });
+
+  // URL theme override support for testing and direct linking
+  useEffect(() => {
+    try {
+      const sp = new URLSearchParams(window.location.search);
+      const t = sp.get('theme');
+      if (t === 'light' || t === 'dark') {
+        document.documentElement.setAttribute('data-theme', t);
+      }
+    } catch {}
+  }, []);
 
   const toggleSidebar = () => {
     setSidebarCollapsed(prev => {
       const next = !prev;
-      localStorage.setItem('inscriplens_sidebar_collapsed', String(next));
+      try {
+        localStorage.setItem('inscriplens_sidebar_collapsed', String(next));
+        localStorage.setItem('inscriplens_sidebar_manual', 'true');
+      } catch {}
       return next;
     });
   };
+
+  // Auto-collapse sidebar below 1500px unless user manually chose a preference
+  useEffect(() => {
+    const handleResize = () => {
+      try {
+        const hasManual = localStorage.getItem('inscriplens_sidebar_manual') === 'true';
+        if (!hasManual) {
+          setSidebarCollapsed(window.innerWidth < 1500);
+        }
+      } catch {}
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const navigateToStudio = (autoDemo = false) => {
     const target = autoDemo ? '/studio?demo=1' : '/studio';
@@ -133,6 +173,38 @@ export default function App() {
   const [activeTab, setActiveTab] = useState('studio'); // 'studio', 'history', 'credits'
   const [status, setStatus] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [highAccuracy, setHighAccuracy] = useState(false);
+  // Script display mode (Kannada default vs Roman), saved in localStorage with try/catch
+  const [scriptMode, setScriptMode] = useState(() => {
+    try {
+      return localStorage.getItem('inscriplens_script_mode') || 'kannada';
+    } catch {
+      return 'kannada';
+    }
+  });
+
+  const [modernLetters, setModernLetters] = useState(() => {
+    try {
+      return localStorage.getItem('inscriplens_modern_letters') === 'true';
+    } catch {
+      return false;
+    }
+  });
+
+  const [cropError, setCropError] = useState(null);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('inscriplens_script_mode', scriptMode);
+    } catch {}
+  }, [scriptMode]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('inscriplens_modern_letters', String(modernLetters));
+    } catch {}
+  }, [modernLetters]);
+
   const [loadingMessage, setLoadingMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   
@@ -182,8 +254,50 @@ export default function App() {
   const containerRef = useRef(null);
   const viewportRef = useRef(null);
   const galleryStripRef = useRef(null);
+  const inspectorRef = useRef(null);
+  const predictRequestIdRef = useRef(0);
+  const autoPredictedAnalysisIdRef = useRef(null);
   const isDraggingCurtain = useRef(false);
   const panStartRef = useRef(null);
+
+  const canvasPanelRef = useRef(null);
+  const [panelWidth, setPanelWidth] = useState(1200);
+  const [viewDropdownOpen, setViewDropdownOpen] = useState(false);
+  const viewDropdownRef = useRef(null);
+
+  const [cropTimedOut, setCropTimedOut] = useState(false);
+  const cropTimeoutRef = useRef(null);
+  const cropAbortControllerRef = useRef(null);
+
+  // Measure canvas panel container width for responsive toolbar
+  useEffect(() => {
+    if (!canvasPanelRef.current) return;
+    const observer = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        if (entry.contentRect) {
+          setPanelWidth(entry.contentRect.width);
+        }
+      }
+    });
+    observer.observe(canvasPanelRef.current);
+    return () => observer.disconnect();
+  }, [analysis]);
+
+  // Close view dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (viewDropdownRef.current && !viewDropdownRef.current.contains(e.target)) {
+        setViewDropdownOpen(false);
+      }
+    };
+    if (viewDropdownOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => document.removeEventListener('mousedown', handleClickOutside);
+    }
+  }, [viewDropdownOpen]);
+
+  const isCompactView = panelWidth < 1100;
+  const isUltraCompactView = panelWidth < 900;
 
   const showError = (msg) => {
     setErrorMessage(msg);
@@ -256,6 +370,9 @@ export default function App() {
     let label = null;
     let confidence = null;
 
+    let uncertain = false;
+    let modelsAgree = null;
+
     if (review) {
       if (review.suggested_label && review.suggested_label.trim() !== '') {
         status = 'corrected';
@@ -265,24 +382,30 @@ export default function App() {
         label = review.prediction || 'Reviewed';
       }
       confidence = review.confidence ?? null;
+      uncertain = review.uncertain ?? false;
+      modelsAgree = review.models_agree ?? null;
     } else {
       const batchMatch = batchRegions.find(r => r.candidate === idx + 1);
       const cached = predictionCache[idx];
       const activeCrop = (selectedBoxIndex === idx && cropPrediction) ? cropPrediction.prediction : null;
-      const pred = batchMatch ? batchMatch.predicted_source_label : (cached || activeCrop);
+      const pred = batchMatch ? batchMatch.predicted_source_label : (typeof cached === 'object' ? cached?.prediction : (cached || activeCrop));
 
       if (pred) {
         status = 'predicted';
         label = pred;
-        confidence = batchMatch?.confidence ?? (selectedBoxIndex === idx ? cropPrediction?.confidence : null);
+        confidence = batchMatch?.confidence ?? (selectedBoxIndex === idx ? cropPrediction?.confidence : (typeof cached === 'object' ? cached?.confidence : null));
+        uncertain = batchMatch?.uncertain ?? (selectedBoxIndex === idx ? cropPrediction?.uncertain : (typeof cached === 'object' ? cached?.uncertain : false));
+        modelsAgree = batchMatch?.models_agree ?? (selectedBoxIndex === idx ? cropPrediction?.models_agree : (typeof cached === 'object' ? cached?.models_agree : null));
       } else {
         status = 'unpredicted';
         label = null;
         confidence = null;
+        uncertain = false;
+        modelsAgree = null;
       }
     }
 
-    return { idx, bbox, w, h, isTiny, status, label, confidence, review };
+    return { idx, bbox, w, h, isTiny, status, label, confidence, uncertain, modelsAgree, review };
   };
 
   // Derive candidate lists and counts
@@ -490,52 +613,80 @@ export default function App() {
   // Load demonstration stone
   const loadDemoStone = async () => {
     setLoading(true);
-    setLoadingMessage('Loading Nagavara demonstration stone...');
+    setLoadingMessage(highAccuracy ? 'Running high accuracy multi-scale enhancement...' : 'Loading Nagavara demonstration stone...');
     try {
-      const res = await fetch('/api/analyse?use_demo=true', { method: 'POST' });
+      const modeParam = highAccuracy ? 'high_accuracy' : 'standard';
+      const res = await fetch(`/api/analyse?use_demo=true&mode=${modeParam}`, { method: 'POST' });
       if (!res.ok) {
         const errData = await res.json().catch(() => ({}));
         throw new Error(errData.detail || 'Enhancement analysis could not be completed.');
       }
       const data = await res.json();
       setAnalysis(data);
-      setSelectedBoxIndex(data.boxes.length > 0 ? 0 : null);
       setBatchRegions([]);
       setPredictionCache({});
       setClassifyComplete(false);
       setClassifyProgress(0);
       setCropPrediction(null);
+      setCropError(null);
       fetchReviews(data.id);
+      if (data.boxes && data.boxes.length > 0) {
+        setSelectedBoxIndex(0);
+        predictBox(0, data.id, data.boxes[0]);
+      } else {
+        setSelectedBoxIndex(null);
+      }
+      if (data.fallback_note) {
+        showError(data.fallback_note);
+      }
     } catch (err) {
       showError(err.message);
     } finally {
       setLoading(false);
     }
   };
+
+  // Auto-load demo stone on mount if url contains demo=1
+  useEffect(() => {
+    if (window.location.search.includes('demo=1') && !analysis) {
+      loadDemoStone();
+    }
+  }, []);
 
   // Upload user photograph
   const handleFileUpload = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
     setLoading(true);
-    setLoadingMessage('Enhancing inscription photograph...');
+    setLoadingMessage(highAccuracy ? 'Running high accuracy multi-scale enhancement...' : 'Enhancing inscription photograph...');
     try {
+      const modeParam = highAccuracy ? 'high_accuracy' : 'standard';
       const formData = new FormData();
       formData.append('file', file);
-      const res = await fetch('/api/analyse', { method: 'POST', body: formData });
+      formData.append('mode', modeParam);
+      const res = await fetch(`/api/analyse?mode=${modeParam}`, { method: 'POST', body: formData });
       if (!res.ok) {
         const errData = await res.json().catch(() => ({}));
         throw new Error(errData.detail || 'Image enhancement could not be completed.');
       }
       const data = await res.json();
       setAnalysis(data);
-      setSelectedBoxIndex(data.boxes.length > 0 ? 0 : null);
       setBatchRegions([]);
       setPredictionCache({});
       setClassifyComplete(false);
       setClassifyProgress(0);
       setCropPrediction(null);
+      setCropError(null);
       fetchReviews(data.id);
+      if (data.boxes && data.boxes.length > 0) {
+        setSelectedBoxIndex(0);
+        predictBox(0, data.id, data.boxes[0]);
+      } else {
+        setSelectedBoxIndex(null);
+      }
+      if (data.fallback_note) {
+        showError(data.fallback_note);
+      }
     } catch (err) {
       showError(err.message);
     } finally {
@@ -543,29 +694,102 @@ export default function App() {
     }
   };
 
-  // Predict selected crop region
-  const predictBox = async (boxIndex) => {
-    if (!analysis || boxIndex === null || !analysis.boxes[boxIndex]) return;
-    const bbox = analysis.boxes[boxIndex];
+    // Predict selected crop region with tiny check and 8s timeout guard
+  const predictBox = async (boxIndex, overrideAnalysisId, overrideBbox) => {
+    const currentAnalysisId = overrideAnalysisId || analysis?.id;
+    const boxes = analysis?.boxes;
+    const bbox = overrideBbox || (boxes && boxIndex !== null ? boxes[boxIndex] : null);
+    if (!currentAnalysisId || boxIndex === null || !bbox) return;
+
     setSelectedBoxIndex(boxIndex);
+
+    // Clear any previous crop timeout timer and in-flight abort controller
+    if (cropTimeoutRef.current) {
+      clearTimeout(cropTimeoutRef.current);
+      cropTimeoutRef.current = null;
+    }
+    if (cropAbortControllerRef.current) {
+      cropAbortControllerRef.current.abort();
+      cropAbortControllerRef.current = null;
+    }
+
+    const w = bbox[2] - bbox[0];
+    const h = bbox[3] - bbox[1];
+    if (w < 10 || h < 10) {
+      setCropPrediction(null);
+      setPredictingCrop(false);
+      setCropError(null);
+      setCropTimedOut(false);
+      return;
+    }
+
+    setCropPrediction(prev => (prev?.candidateIndex === boxIndex ? prev : null));
     setPredictingCrop(true);
+    setCropError(null);
+    setCropTimedOut(false);
+
+    const requestId = ++predictRequestIdRef.current;
+    const controller = new AbortController();
+    cropAbortControllerRef.current = controller;
+
+    // 8-second timeout guard: cancel skeleton and display retry button
+    cropTimeoutRef.current = setTimeout(() => {
+      if (requestId === predictRequestIdRef.current) {
+        controller.abort();
+        setPredictingCrop(false);
+        setCropTimedOut(true);
+        setCropError('Character preview took longer than 8 seconds to respond.');
+      }
+    }, 8000);
+
     try {
       const res = await fetch('/api/predict-crop', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ run_id: analysis.id, bbox })
+        body: JSON.stringify({ run_id: currentAnalysisId, bbox }),
+        signal: controller.signal
       });
+
+      if (cropTimeoutRef.current) {
+        clearTimeout(cropTimeoutRef.current);
+        cropTimeoutRef.current = null;
+      }
+
+      if (requestId !== predictRequestIdRef.current) return;
+
       if (!res.ok) {
         const errData = await res.json().catch(() => ({}));
         throw new Error(errData.detail || 'Character prediction could not be completed.');
       }
       const data = await res.json();
-      setCropPrediction(data);
-      setPredictionCache(prev => ({ ...prev, [boxIndex]: data.prediction }));
+
+      if (requestId === predictRequestIdRef.current) {
+        setCropTimedOut(false);
+        setCropPrediction({ ...data, candidateIndex: boxIndex });
+        setPredictionCache(prev => ({
+          ...prev,
+          [boxIndex]: {
+            prediction: data.prediction,
+            confidence: data.confidence,
+            uncertain: data.uncertain,
+            models_agree: data.models_agree
+          }
+        }));
+      }
     } catch (err) {
-      showError(err.message);
+      if (requestId === predictRequestIdRef.current) {
+        if (err.name !== 'AbortError') {
+          setCropError(err.message || 'Crop preview could not be loaded.');
+        }
+      }
     } finally {
-      setPredictingCrop(false);
+      if (cropTimeoutRef.current) {
+        clearTimeout(cropTimeoutRef.current);
+        cropTimeoutRef.current = null;
+      }
+      if (requestId === predictRequestIdRef.current) {
+        setPredictingCrop(false);
+      }
     }
   };
 
@@ -651,6 +875,17 @@ export default function App() {
     }
   }, [selectedBoxIndex]);
 
+  // Auto-scroll Glyph Inspector to top on candidate selection change
+  useEffect(() => {
+    if (inspectorRef.current) {
+      if (typeof inspectorRef.current.scrollTo === 'function') {
+        inspectorRef.current.scrollTo({ top: 0, behavior: 'auto' });
+      } else {
+        inspectorRef.current.scrollTop = 0;
+      }
+    }
+  }, [selectedBoxIndex]);
+
   // Synchronize review form with existing review record on candidate selection
   useEffect(() => {
     if (analysis && selectedBoxIndex !== null && analysis.boxes[selectedBoxIndex]) {
@@ -669,7 +904,8 @@ export default function App() {
 
   // Auto-predict first box when analysis completes
   useEffect(() => {
-    if (analysis && selectedBoxIndex !== null && !cropPrediction) {
+    if (analysis && selectedBoxIndex !== null && autoPredictedAnalysisIdRef.current !== analysis.id) {
+      autoPredictedAnalysisIdRef.current = analysis.id;
       predictBox(selectedBoxIndex);
     }
   }, [analysis, selectedBoxIndex]);
@@ -706,6 +942,11 @@ export default function App() {
       setClassifyProgress(total);
       setBatchRegions(data.regions || []);
       setClassifyComplete(true);
+
+      // Refresh inspector alternatives for focused candidate
+      if (selectedBoxIndex !== null) {
+        predictBox(selectedBoxIndex);
+      }
     } catch (err) {
       clearInterval(progressTimer);
       showError(err.message);
@@ -714,20 +955,53 @@ export default function App() {
     }
   };
 
+  // Derived state for Glyph Inspector
+  const selectedBox = (analysis?.boxes && selectedBoxIndex !== null) ? analysis.boxes[selectedBoxIndex] : null;
+  const selectedBoxW = selectedBox ? selectedBox[2] - selectedBox[0] : 0;
+  const selectedBoxH = selectedBox ? selectedBox[3] - selectedBox[1] : 0;
+  const isSelectedTiny = selectedBox ? (selectedBoxW < 10 || selectedBoxH < 10) : false;
+
+  // Active review for current inspector view
+  const currentSelectedReview = selectedBox ? findReviewForBox(selectedBox) : null;
+
+  const knownCandidateLabel = (() => {
+    if (selectedBoxIndex === null) return null;
+    if (currentSelectedReview) {
+      return currentSelectedReview.suggested_label || currentSelectedReview.prediction || 'Reviewed';
+    }
+    const batchMatch = batchRegions.find(r => r.candidate === selectedBoxIndex + 1);
+    if (batchMatch?.predicted_source_label) {
+      return batchMatch.predicted_source_label;
+    }
+    const cachedVal = predictionCache[selectedBoxIndex];
+    return (typeof cachedVal === 'object' ? cachedVal?.prediction : cachedVal) || null;
+  })();
+
+  const isMatchingPrediction = Boolean(
+    cropPrediction &&
+    cropPrediction.candidateIndex === selectedBoxIndex &&
+    selectedBoxIndex !== null
+  );
+
   // Save character review (behaviour unchanged)
   const handleSaveReview = async (e) => {
     e.preventDefault();
-    if (!analysis || !cropPrediction) return;
+    if (!analysis || selectedBoxIndex === null || !analysis.boxes[selectedBoxIndex]) return;
+    const currentBox = analysis.boxes[selectedBoxIndex];
+    const currentPrediction = isMatchingPrediction ? cropPrediction.prediction : knownCandidateLabel;
+    const modelSha = isMatchingPrediction ? cropPrediction.model_sha256 : (status?.model_sha256 || '');
+    if (!currentPrediction) return;
+
     try {
       const res = await fetch('/api/review', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           run_id: analysis.id,
-          bbox: cropPrediction.bbox,
-          prediction: cropPrediction.prediction,
+          bbox: currentBox,
+          prediction: currentPrediction,
           model: 'Experimental recognizer',
-          model_sha256: cropPrediction.model_sha256,
+          model_sha256: modelSha,
           suggestion,
           reviewer,
           note
@@ -745,11 +1019,6 @@ export default function App() {
     }
   };
 
-  // Active review for current inspector view
-  const currentSelectedReview = (analysis && selectedBoxIndex !== null && analysis.boxes[selectedBoxIndex])
-    ? findReviewForBox(analysis.boxes[selectedBoxIndex])
-    : null;
-
   // Render Landing Page if on route '/'
   if (route === '/') {
     return (
@@ -764,7 +1033,7 @@ export default function App() {
     <div className="app-container">
       {/* Studio Header */}
       <header className="studio-header">
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', minWidth: 0, overflow: 'hidden', whiteSpace: 'nowrap' }}>
           <a
             href="/#overview"
             className="btn-secondary"
@@ -772,7 +1041,7 @@ export default function App() {
               e.preventDefault();
               navigateToSection('overview');
             }}
-            style={{ padding: '4px 8px', fontSize: '0.75rem', gap: '5px', textDecoration: 'none', display: 'inline-flex', alignItems: 'center' }}
+            style={{ padding: '4px 8px', fontSize: '0.75rem', gap: '5px', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', flexShrink: 0, whiteSpace: 'nowrap' }}
             title="Return to Landing Page"
           >
             <ArrowLeft size={13} /> Home
@@ -784,42 +1053,82 @@ export default function App() {
               e.preventDefault();
               navigateToSection('about');
             }}
-            style={{ padding: '4px 8px', fontSize: '0.75rem', gap: '5px', textDecoration: 'none', display: 'inline-flex', alignItems: 'center' }}
+            style={{ padding: '4px 8px', fontSize: '0.75rem', gap: '5px', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', flexShrink: 0, whiteSpace: 'nowrap' }}
             title="About & Documentation"
           >
             About
           </a>
           <div
             className="brand-logo-shimmer"
-            style={{ fontWeight: '700', fontSize: '1.15rem', color: 'var(--text-primary)', letterSpacing: '-0.02em', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
+            style={{ fontWeight: '700', fontSize: '1.15rem', color: 'var(--text-primary)', letterSpacing: '-0.02em', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '4px', flexShrink: 0, whiteSpace: 'nowrap' }}
             onClick={navigateToHome}
             title="Return to Landing Page"
           >
             <span className="brand-title">InscripLens</span> <span className="brand-tag" style={{ color: 'var(--accent-sandstone)', fontSize: '0.85rem', fontWeight: '500' }}>Studio</span>
           </div>
-          {/* Merged Single Subtle Status Line */}
+
+          {/* Merged Single Subtle Status Line with Truncated Stone Name */}
           <div className="header-status-line">
             {analysis ? (
               <>
-                <span className="status-dot-active" />
-                <span style={{ fontWeight: '600', color: 'var(--text-primary)' }}>{analysis.display_name}</span>
-                <span className="status-sep">&middot;</span>
-                <span>{analysis.width} &times; {analysis.height} px</span>
-                <span className="status-sep">&middot;</span>
-                <span>Local Workspace</span>
+                <span className="status-dot-active" style={{ flexShrink: 0 }} />
+                <span
+                  className="header-status-name"
+                  style={{ fontWeight: '600', color: 'var(--text-primary)' }}
+                  title={analysis.display_name}
+                >
+                  {analysis.display_name}
+                </span>
+                <span className="status-sep" style={{ flexShrink: 0 }}>&middot;</span>
+                <span style={{ flexShrink: 0 }}>{analysis.width} &times; {analysis.height} px</span>
+                <span className="status-sep" style={{ flexShrink: 0 }}>&middot;</span>
+                <span style={{ flexShrink: 0 }}>Local Workspace</span>
               </>
             ) : (
               <>
-                <span className="status-dot-idle" />
-                <span>Local Research Workspace</span>
-                <span className="status-sep">&middot;</span>
-                <span style={{ color: 'var(--text-subtle)' }}>No stone loaded</span>
+                <span className="status-dot-idle" style={{ flexShrink: 0 }} />
+                <span style={{ flexShrink: 0 }}>Local Research Workspace</span>
+                <span className="status-sep" style={{ flexShrink: 0 }}>&middot;</span>
+                <span style={{ color: 'var(--text-subtle)', flexShrink: 0 }}>No stone loaded</span>
               </>
             )}
           </div>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0, whiteSpace: 'nowrap' }}>
+          {/* High accuracy mode switch with single-row layout and info tooltip */}
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', whiteSpace: 'nowrap' }}>
+            <div
+              className="toggle-wrapper"
+              onClick={() => setHighAccuracy(!highAccuracy)}
+              role="switch"
+              aria-checked={highAccuracy}
+              tabIndex={0}
+              onKeyDown={(e) => {
+                if (e.key === ' ' || e.key === 'Enter') {
+                  e.preventDefault();
+                  setHighAccuracy(!highAccuracy);
+                }
+              }}
+              title="Toggle High accuracy mode"
+              style={{ cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+            >
+              <div className={`toggle-switch ${highAccuracy ? 'active' : ''}`} style={{ width: '28px', height: '16px' }}>
+                <div className="toggle-thumb" style={{ width: '10px', height: '10px' }} />
+              </div>
+              <span style={{ fontSize: '0.76rem', color: highAccuracy ? 'var(--accent-sandstone)' : 'var(--text-muted)', fontWeight: highAccuracy ? '600' : '500', whiteSpace: 'nowrap' }}>
+                High accuracy
+              </span>
+            </div>
+            <span
+              title="Finds more faint strokes. Slower, and may add a few false strokes."
+              aria-label="Finds more faint strokes. Slower, and may add a few false strokes."
+              style={{ display: 'inline-flex', alignItems: 'center', color: 'var(--text-subtle)', cursor: 'help' }}
+            >
+              <Info size={13} />
+            </span>
+          </div>
+
           <ThemeToggle />
           <input
             type="file"
@@ -832,6 +1141,7 @@ export default function App() {
             className="btn-secondary"
             onClick={() => fileInputRef.current?.click()}
             disabled={loading}
+            style={{ whiteSpace: 'nowrap', flexShrink: 0 }}
           >
             <Upload size={14} /> Upload Photograph
           </button>
@@ -839,6 +1149,7 @@ export default function App() {
             className="btn-primary btn-magnetic"
             onClick={loadDemoStone}
             disabled={loading}
+            style={{ whiteSpace: 'nowrap', flexShrink: 0 }}
           >
             <Sparkles size={14} /> Try Demo Stone (Nagavara)
           </button>
@@ -985,20 +1296,20 @@ export default function App() {
             analysis ? (
               <div style={{ display: 'flex', flexDirection: 'column', flex: 1, overflow: 'hidden' }}>
                 <div className="studio-workspace">
-                  {/* Central Canvas Panel */}
-                  <div className="canvas-panel">
-                    {/* Canvas Toolbar with controls */}
+                  {/* Central Canvas Panel with container query ref */}
+                  <div className="canvas-panel" ref={canvasPanelRef}>
+                    {/* Canvas Toolbar with directly visible Kannada script switch */}
                     <div className="canvas-toolbar">
-                      {/* Left: Wipe percentage & Candidate boxes toggle switch */}
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      {/* Left Group: Curtain, Boxes toggle, Mode badge, Mask */}
+                      <div className="toolbar-group-left">
+                        <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', whiteSpace: 'nowrap', minWidth: '95px' }}>
                           <Sliders size={13} color="#C9A66B" />
-                          <span>Curtain: <strong style={{ color: '#EDEDEC' }}>{Math.round(sliderPos)}%</strong></span>
+                          <span>Curtain: <strong style={{ color: 'var(--text-primary)' }}>{Math.round(sliderPos)}%</strong></span>
                         </div>
 
-                        <div style={{ width: '1px', height: '16px', backgroundColor: '#2A2A30' }} />
+                        <div className="toolbar-sep" />
 
-                        {/* Modern Toggle Switch for Candidate Boxes */}
+                        {/* Toggle Switch for Candidate Boxes */}
                         <div
                           className="toggle-wrapper"
                           onClick={() => setShowBoxes(!showBoxes)}
@@ -1011,22 +1322,113 @@ export default function App() {
                               setShowBoxes(!showBoxes);
                             }
                           }}
+                          style={{ minWidth: '95px', whiteSpace: 'nowrap' }}
                         >
                           <div className={`toggle-switch ${showBoxes ? 'active' : ''}`}>
                             <div className="toggle-thumb" />
                           </div>
-                          <span style={{ fontSize: '0.78rem', color: showBoxes ? '#EDEDEC' : '#A8A29A' }}>
+                          <span style={{ fontSize: '0.78rem', color: showBoxes ? 'var(--text-primary)' : 'var(--text-muted)', whiteSpace: 'nowrap' }}>
                             Boxes ({analysis.boxes.length})
                           </span>
                         </div>
+
+                        <div className="toolbar-sep" />
+
+                        {/* Mode badge */}
+                        <span
+                          className={`pill ${analysis.mode === 'high_accuracy' ? 'pill-sandstone' : 'pill-neutral'}`}
+                          style={{ fontSize: '0.68rem', padding: '2px 8px', minWidth: '65px', textAlign: 'center', whiteSpace: 'nowrap' }}
+                          title={analysis.mode === 'high_accuracy' ? 'Enhanced with multi-scale sliding window' : 'Enhanced with standard single-scale GPU'}
+                        >
+                          {analysis.mode_label || (analysis.mode === 'high_accuracy' ? 'High accuracy' : 'Standard')}
+                        </span>
+
+                        {/* Mask download button */}
+                        <a
+                          href={analysis.mask_url}
+                          download={`mask_${analysis.id}.png`}
+                          className="tool-btn"
+                          title="Download enhanced binary mask image"
+                          style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '4px', minWidth: '60px', whiteSpace: 'nowrap' }}
+                        >
+                          <Download size={12} /> Mask
+                        </a>
                       </div>
 
-                      {/* Center: Zoom & Fit Controls */}
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      {/* Middle Group: Kannada Script Toggle & Modern letters (ALWAYS DIRECTLY VISIBLE ON TOOLBAR) */}
+                      <div className="toolbar-group-middle">
+                        <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', fontWeight: '500' }}>Script:</span>
+                        <div style={{ display: 'flex', alignItems: 'center', backgroundColor: 'var(--bg-base)', borderRadius: '5px', padding: '2px', border: '1px solid var(--border-subtle)' }}>
+                          <button
+                            type="button"
+                            onClick={() => setScriptMode('kannada')}
+                            title="Display character labels in Kannada script"
+                            style={{
+                              padding: '2px 8px',
+                              fontSize: '0.74rem',
+                              border: 'none',
+                              borderRadius: '3px',
+                              backgroundColor: scriptMode === 'kannada' ? '#C9A66B' : 'transparent',
+                              color: scriptMode === 'kannada' ? '#121214' : 'var(--text-muted)',
+                              fontWeight: scriptMode === 'kannada' ? '600' : '400',
+                              cursor: 'pointer',
+                              fontFamily: "'Noto Sans Kannada', sans-serif"
+                            }}
+                          >
+                            Kannada
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setScriptMode('roman')}
+                            title="Display character labels in Roman transliteration"
+                            style={{
+                              padding: '2px 8px',
+                              fontSize: '0.74rem',
+                              border: 'none',
+                              borderRadius: '3px',
+                              backgroundColor: scriptMode === 'roman' ? '#C9A66B' : 'transparent',
+                              color: scriptMode === 'roman' ? '#121214' : 'var(--text-muted)',
+                              fontWeight: scriptMode === 'roman' ? '600' : '400',
+                              cursor: 'pointer'
+                            }}
+                          >
+                            Roman
+                          </button>
+                        </div>
+
+                        {scriptMode === 'kannada' && (
+                          <div
+                            className="toggle-wrapper"
+                            onClick={() => setModernLetters(!modernLetters)}
+                            role="switch"
+                            aria-checked={modernLetters}
+                            tabIndex={0}
+                            title="Replace archaic ಱ and ೞ with modern letters ರ and ಳ (marked with lossy tag)"
+                            style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', minWidth: '105px', whiteSpace: 'nowrap' }}
+                            onKeyDown={(e) => {
+                              if (e.key === ' ' || e.key === 'Enter') {
+                                e.preventDefault();
+                                setModernLetters(!modernLetters);
+                              }
+                            }}
+                          >
+                            <div className={`toggle-switch ${modernLetters ? 'active' : ''}`} style={{ width: '28px', height: '16px' }}>
+                              <div className="toggle-thumb" style={{ width: '10px', height: '10px' }} />
+                            </div>
+                            <span style={{ fontSize: '0.72rem', color: modernLetters ? 'var(--text-primary)' : 'var(--text-muted)', whiteSpace: 'nowrap' }}>
+                              Modern letters
+                            </span>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Right Group: Fit & Zoom Controls (Always visible) */}
+                      <div className="toolbar-group-right">
                         <button
                           className="tool-btn"
                           onClick={() => fitToViewport(true)}
                           title="Fit stone to available panel height"
+                          style={{ minWidth: '45px', whiteSpace: 'nowrap' }}
                         >
                           <Maximize2 size={12} /> Fit
                         </button>
@@ -1034,6 +1436,7 @@ export default function App() {
                           className="tool-btn"
                           onClick={zoomTo100}
                           title="View at 100% original scale"
+                          style={{ minWidth: '45px', whiteSpace: 'nowrap' }}
                         >
                           100%
                         </button>
@@ -1041,60 +1444,21 @@ export default function App() {
                           className="tool-btn"
                           onClick={zoomOut}
                           title="Zoom Out (-)"
+                          style={{ minWidth: '28px' }}
                         >
                           <ZoomOut size={13} />
                         </button>
-                        <span style={{ fontSize: '0.75rem', minWidth: '42px', textAlign: 'center', color: '#EDEDEC', fontFamily: 'monospace' }}>
+                        <span style={{ fontSize: '0.75rem', minWidth: '42px', textAlign: 'center', color: 'var(--text-primary)', fontFamily: 'monospace', whiteSpace: 'nowrap' }}>
                           {Math.round(scale * 100)}%
                         </span>
                         <button
                           className="tool-btn"
                           onClick={zoomIn}
                           title="Zoom In (+)"
+                          style={{ minWidth: '28px' }}
                         >
                           <ZoomIn size={13} />
                         </button>
-                      </div>
-
-                      {/* Right: Primary Classify All Action & Progress */}
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                        {isClassifying ? (
-                          <div className="progress-container">
-                            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.72rem', color: '#C9A66B' }}>
-                              <span>Classifying candidate regions...</span>
-                              <span style={{ fontWeight: '600' }}>{classifyProgress} of {analysis.boxes.length}</span>
-                            </div>
-                            <div className="progress-track">
-                              <div
-                                className="progress-fill"
-                                style={{ width: `${(classifyProgress / analysis.boxes.length) * 100}%` }}
-                              />
-                            </div>
-                          </div>
-                        ) : classifyComplete && batchRegions.length > 0 ? (
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                            <span className="pill pill-success">
-                              <CheckCircle size={12} /> {batchRegions.length} Regions Classified
-                            </span>
-                            <button
-                              className="btn-secondary"
-                              style={{ padding: '4px 8px', fontSize: '0.72rem' }}
-                              onClick={runBatchRecognize}
-                              title="Re-run batch recognition"
-                            >
-                              <RotateCcw size={11} /> Re-run
-                            </button>
-                          </div>
-                        ) : (
-                          <button
-                            className="btn-primary"
-                            style={{ padding: '5px 12px', fontSize: '0.78rem' }}
-                            onClick={runBatchRecognize}
-                            disabled={loading}
-                          >
-                            <Sparkles size={13} /> Classify All ({analysis.boxes.length} Regions)
-                          </button>
-                        )}
                       </div>
                     </div>
 
@@ -1243,7 +1607,7 @@ export default function App() {
                   </div>
 
                   {/* Right Inspector Panel */}
-                  <aside className="inspector-panel card-spotlight">
+                  <aside className="inspector-panel card-spotlight" ref={inspectorRef}>
                     <div className="inspector-header">
                       <div style={{ fontSize: '0.75rem', fontWeight: '700', textTransform: 'uppercase', color: '#A8A29A', letterSpacing: '0.05em' }}>
                         GLYPH INSPECTOR
@@ -1253,24 +1617,77 @@ export default function App() {
                       </div>
                     </div>
 
-                    {cropPrediction ? (
+                    {selectedBoxIndex !== null ? (
                       <div>
                         {/* Larger Glyph Crop Box (>= 160px with padding) */}
                         <div className="inspector-section" style={{ paddingBottom: '12px' }}>
                           <div className="inspector-crop-box">
-                            <img
-                              src={cropPrediction.crop_url}
-                              alt={`Magnified candidate region #${selectedBoxIndex + 1} predicted as transliteration ${cropPrediction.prediction}`}
-                              style={{
-                                maxHeight: '160px',
-                                maxWidth: '160px',
-                                width: 'auto',
-                                height: 'auto',
-                                objectFit: 'contain',
-                                imageRendering: 'pixelated',
-                                filter: 'drop-shadow(0 4px 12px rgba(0, 0, 0, 0.7))'
-                              }}
-                            />
+                            {isSelectedTiny ? (
+                              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '24px', color: '#A8A29A', textAlign: 'center' }}>
+                                <span className="tiny-tag" style={{ fontSize: '0.72rem', padding: '2px 8px', marginBottom: '6px' }}>
+                                  Too small to read
+                                </span>
+                                <span style={{ fontSize: '0.7rem', color: '#7E7A75' }}>
+                                  Region is {selectedBoxW} &times; {selectedBoxH} px (&lt; 10&times;10 px limit)
+                                </span>
+                              </div>
+                            ) : cropTimedOut ? (
+                              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '20px', color: '#D97706', textAlign: 'center' }}>
+                                <span style={{ fontSize: '0.75rem', fontWeight: '600', marginBottom: '4px' }}>
+                                  Crop preview timed out
+                                </span>
+                                <span style={{ fontSize: '0.68rem', color: '#7E7A75', marginBottom: '8px' }}>
+                                  Request took longer than 8 seconds.
+                                </span>
+                                <button
+                                  className="btn-secondary"
+                                  onClick={() => predictBox(selectedBoxIndex)}
+                                  style={{ padding: '3px 10px', fontSize: '0.72rem', gap: '4px', height: '24px' }}
+                                >
+                                  <RotateCcw size={11} /> Retry
+                                </button>
+                              </div>
+                            ) : cropError ? (
+                              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '20px', color: '#D97706', textAlign: 'center' }}>
+                                <span style={{ fontSize: '0.75rem', fontWeight: '600', marginBottom: '4px' }}>
+                                  Crop preview unavailable
+                                </span>
+                                <span style={{ fontSize: '0.68rem', color: '#7E7A75', marginBottom: '8px' }}>
+                                  {cropError}
+                                </span>
+                                <button
+                                  className="btn-secondary"
+                                  onClick={() => predictBox(selectedBoxIndex)}
+                                  style={{ padding: '3px 10px', fontSize: '0.72rem', gap: '4px', height: '24px' }}
+                                >
+                                  <RotateCcw size={11} /> Retry
+                                </button>
+                              </div>
+                            ) : isMatchingPrediction && cropPrediction.crop_url ? (
+                              <img
+                                src={cropPrediction.crop_url}
+                                alt={`Magnified candidate region #${selectedBoxIndex + 1} predicted as transliteration ${cropPrediction.prediction}`}
+                                style={{
+                                  maxHeight: '160px',
+                                  maxWidth: '160px',
+                                  width: 'auto',
+                                  height: 'auto',
+                                  objectFit: 'contain',
+                                  imageRendering: 'pixelated',
+                                  filter: 'drop-shadow(0 4px 12px rgba(0, 0, 0, 0.7))'
+                                }}
+                              />
+                            ) : predictingCrop ? (
+                              <div className="skeleton-pulse" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '8px', color: '#7E7A75' }}>
+                                <div style={{ width: '56px', height: '56px', borderRadius: '6px', backgroundColor: 'var(--bg-elevated)', border: '1px dashed var(--border-subtle)' }} />
+                                <span style={{ fontSize: '0.7rem' }}>Loading crop...</span>
+                              </div>
+                            ) : (
+                              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '8px', color: '#7E7A75' }}>
+                                <div style={{ width: '56px', height: '56px', borderRadius: '6px', backgroundColor: 'var(--bg-elevated)', border: '1px dashed var(--border-subtle)' }} />
+                                <span style={{ fontSize: '0.7rem' }}>Select region to inspect</span>
+                              </div>
+                            )}
                             <span style={{
                               position: 'absolute',
                               bottom: '8px',
@@ -1282,21 +1699,95 @@ export default function App() {
                               borderRadius: '4px',
                               border: '1px solid #28282F'
                             }}>
-                              {analysis.boxes[selectedBoxIndex][2] - analysis.boxes[selectedBoxIndex][0]} x {analysis.boxes[selectedBoxIndex][3] - analysis.boxes[selectedBoxIndex][1]} px
+                              {selectedBoxW} x {selectedBoxH} px
                             </span>
                           </div>
 
-                          <div style={{ marginTop: '8px' }}>
-                            <div style={{ fontSize: '0.72rem', color: '#A8A29A', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-                              Predicted Source Transliteration
-                            </div>
-                            <div style={{ fontSize: '1.8rem', fontWeight: '700', color: '#C9A66B', letterSpacing: '-0.01em', lineHeight: 1.2 }}>
-                              {cropPrediction.prediction}
-                            </div>
-                            <div style={{ fontSize: '0.75rem', color: '#7E7A75', marginTop: '2px' }}>
-                              Model: Experimental recognizer
-                            </div>
-                          </div>
+                          {(() => {
+                            const rawPred = isMatchingPrediction ? cropPrediction.prediction : knownCandidateLabel;
+                            const predDisp = formatDisplayLabel(rawPred, scriptMode, modernLetters);
+
+                            return (
+                              <div style={{ marginTop: '8px' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '2px' }}>
+                                  <div style={{ fontSize: '0.72rem', color: '#A8A29A', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                                    Predicted Character
+                                  </div>
+                                  {cropPrediction?.uncertain && !isSelectedTiny && (
+                                    <span className="uncertain-tag">
+                                      Uncertain
+                                    </span>
+                                  )}
+                                  {isSelectedTiny && (
+                                    <span className="tiny-tag">
+                                      Too small to read
+                                    </span>
+                                  )}
+                                </div>
+
+                                <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', minHeight: '2.4rem', marginTop: '4px' }}>
+                                  {isSelectedTiny ? (
+                                    <span style={{ fontSize: '1rem', color: '#7E7A75', fontStyle: 'italic' }}>
+                                      Too small to read (&lt; 10&times;10 px)
+                                    </span>
+                                  ) : rawPred ? (
+                                    <>
+                                      <span
+                                        style={{
+                                          fontFamily: (scriptMode === 'kannada' && !predDisp.isUnmapped) ? "'Noto Sans Kannada', sans-serif" : 'inherit',
+                                          fontSize: (scriptMode === 'kannada' && !predDisp.isUnmapped) ? '2.4rem' : '1.8rem',
+                                          fontWeight: '700',
+                                          color: cropPrediction?.uncertain ? '#D97706' : '#C9A66B',
+                                          lineHeight: 1
+                                        }}
+                                      >
+                                        {predDisp.primary}
+                                      </span>
+                                      {predDisp.isLossy && <span className="lossy-tag">lossy</span>}
+                                      {predDisp.isUnmapped && <span className="roman-marker-tag">Roman</span>}
+                                      {scriptMode === 'kannada' && predDisp.secondary && (
+                                        <span style={{ fontSize: '1.05rem', color: '#A8A29A', fontWeight: '500' }}>
+                                          ({predDisp.secondary})
+                                        </span>
+                                      )}
+                                    </>
+                                  ) : (
+                                    <span className="skeleton-pulse" style={{ display: 'inline-block', width: '80px', height: '1.8rem', backgroundColor: 'var(--bg-elevated)', borderRadius: '4px', verticalAlign: 'middle' }} />
+                                  )}
+                                </div>
+
+                                {/* Subtle Calibrated Confidence Bar in Inspector - ONLY when NOT tiny */}
+                                {!isSelectedTiny && cropPrediction?.confidence != null && (
+                                  <div style={{ marginTop: '6px', marginBottom: '6px' }}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.68rem', color: '#7E7A75', marginBottom: '2px' }}>
+                                      <span>Confidence</span>
+                                      <span style={{ color: cropPrediction.uncertain ? '#D97706' : '#C9A66B', fontWeight: '600' }}>
+                                        {Math.round(cropPrediction.confidence * 100)}%
+                                      </span>
+                                    </div>
+                                    <div className="confidence-bar-subtle" style={{ height: '4px' }}>
+                                      <div
+                                        className="confidence-bar-subtle-fill"
+                                        style={{
+                                          width: `${Math.round(cropPrediction.confidence * 100)}%`,
+                                          backgroundColor: cropPrediction.uncertain ? '#D97706' : '#C9A66B'
+                                        }}
+                                      />
+                                    </div>
+                                  </div>
+                                )}
+
+                                <div style={{ fontSize: '0.75rem', color: '#7E7A75', marginTop: '2px', display: 'flex', justifyContent: 'space-between' }}>
+                                  <span>Model: Calibrated recognizer</span>
+                                  {cropPrediction?.models_agree != null && !isSelectedTiny && (
+                                    <span style={{ color: cropPrediction.models_agree ? '#76D876' : '#A8A29A', fontSize: '0.7rem' }}>
+                                      {cropPrediction.models_agree ? 'Models agree' : 'Models disagree'}
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+                            );
+                          })()}
                         </div>
 
                         {/* Selectable Alternative Chips with Confidence Bars if Available */}
@@ -1311,32 +1802,58 @@ export default function App() {
                           </div>
 
                           <div className="alt-chips-container">
-                            {cropPrediction.alternatives.map((alt, idx) => {
-                              const labelStr = typeof alt === 'object' ? alt.label : alt;
-                              const isChosen = suggestion === labelStr;
-                              const confVal = typeof alt === 'object' && alt.confidence != null
-                                ? alt.confidence
-                                : (cropPrediction.confidence_scores?.[idx] ?? null);
+                            {isMatchingPrediction && Array.isArray(cropPrediction.alternatives) ? (
+                              cropPrediction.alternatives.map((alt, idx) => {
+                                const labelStr = typeof alt === 'object' ? alt.label : alt;
+                                const isChosen = suggestion === labelStr;
+                                const confVal = typeof alt === 'object' && alt.confidence != null
+                                  ? alt.confidence
+                                  : (cropPrediction.confidence_scores?.[idx] ?? null);
+                                const altDisp = formatDisplayLabel(labelStr, scriptMode, modernLetters);
 
-                              return (
-                                <div
-                                  key={idx}
-                                  className={`alt-chip ${isChosen ? 'selected' : ''}`}
-                                  onClick={() => setSuggestion(labelStr)}
-                                  title={`Click to select '${labelStr}' as suggestion`}
-                                >
-                                  <span>{labelStr}</span>
-                                  {confVal != null && (
-                                    <div className="alt-confidence-track">
-                                      <div
-                                        className="alt-confidence-fill"
-                                        style={{ width: `${Math.round(confVal * 100)}%` }}
-                                      />
-                                    </div>
-                                  )}
+                                return (
+                                  <div
+                                    key={idx}
+                                    className={`alt-chip ${isChosen ? 'selected' : ''}`}
+                                    onClick={() => setSuggestion(labelStr)}
+                                    title={scriptMode === 'kannada' ? `${labelStr} (Click to adopt '${labelStr}' as suggestion)` : `Click to select '${labelStr}' as suggestion`}
+                                  >
+                                    <span style={{
+                                      fontFamily: (scriptMode === 'kannada' && !altDisp.isUnmapped) ? "'Noto Sans Kannada', sans-serif" : 'inherit',
+                                      fontSize: (scriptMode === 'kannada' && !altDisp.isUnmapped) ? '1.15rem' : '0.9rem'
+                                    }}>
+                                      {altDisp.primary}
+                                    </span>
+                                    {altDisp.isLossy && <span className="lossy-tag">lossy</span>}
+                                    {altDisp.isUnmapped && <span className="roman-marker-tag">Roman</span>}
+                                    {confVal != null && (
+                                      <div className="alt-confidence-track">
+                                        <div
+                                          className="alt-confidence-fill"
+                                          style={{ width: `${Math.round(confVal * 100)}%` }}
+                                        />
+                                      </div>
+                                    )}
+                                  </div>
+                                );
+                              })
+                            ) : predictingCrop ? (
+                              <div className="skeleton-pulse" style={{ display: 'flex', gap: '8px', width: '100%' }}>
+                                <div className="alt-chip" style={{ width: '64px', height: '34px', backgroundColor: 'var(--bg-elevated)', opacity: 0.6, cursor: 'default' }}>
+                                  <span style={{ visibility: 'hidden' }}>---</span>
                                 </div>
-                              );
-                            })}
+                                <div className="alt-chip" style={{ width: '64px', height: '34px', backgroundColor: 'var(--bg-elevated)', opacity: 0.6, cursor: 'default' }}>
+                                  <span style={{ visibility: 'hidden' }}>---</span>
+                                </div>
+                                <div className="alt-chip" style={{ width: '64px', height: '34px', backgroundColor: 'var(--bg-elevated)', opacity: 0.6, cursor: 'default' }}>
+                                  <span style={{ visibility: 'hidden' }}>---</span>
+                                </div>
+                              </div>
+                            ) : (
+                              <div style={{ padding: '8px 12px', backgroundColor: 'var(--bg-surface)', borderRadius: '6px', border: '1px dashed var(--border-subtle)', color: 'var(--text-subtle)', fontSize: '0.75rem', width: '100%' }}>
+                                Alternatives unavailable
+                              </div>
+                            )}
                           </div>
                         </div>
 
@@ -1361,12 +1878,22 @@ export default function App() {
                                 </span>
                               </div>
 
-                              {currentSelectedReview.suggested_label && (
-                                <div style={{ fontSize: '0.82rem', color: '#EDEDEC', marginBottom: '4px' }}>
-                                  <span style={{ color: '#A8A29A' }}>Corrected Label: </span>
-                                  <strong style={{ color: '#64B4F0', fontSize: '1rem' }}>{currentSelectedReview.suggested_label}</strong>
-                                </div>
-                              )}
+                              {currentSelectedReview.suggested_label && (() => {
+                                const revDisp = formatDisplayLabel(currentSelectedReview.suggested_label, scriptMode, modernLetters);
+                                return (
+                                  <div style={{ fontSize: '0.82rem', color: '#EDEDEC', marginBottom: '4px' }}>
+                                    <span style={{ color: '#A8A29A' }}>Corrected Label: </span>
+                                    <strong style={{ color: '#64B4F0', fontSize: '1.1rem', fontFamily: (scriptMode === 'kannada' && !revDisp.isUnmapped) ? "'Noto Sans Kannada', sans-serif" : 'inherit' }}>
+                                      {revDisp.primary}
+                                    </strong>
+                                    {scriptMode === 'kannada' && revDisp.secondary && (
+                                      <span style={{ color: '#A8A29A', fontSize: '0.82rem', marginLeft: '6px' }}>
+                                        ({revDisp.secondary})
+                                      </span>
+                                    )}
+                                  </div>
+                                );
+                              })()}
 
                               {currentSelectedReview.reviewer && (
                                 <div style={{ fontSize: '0.75rem', color: '#A8A29A' }}>
@@ -1385,14 +1912,36 @@ export default function App() {
                           {/* Review Form (Behaviour unchanged) */}
                           <form onSubmit={handleSaveReview}>
                             <div style={{ marginBottom: '10px' }}>
-                              <label style={{ fontSize: '0.75rem', color: '#A8A29A', display: 'block', marginBottom: '4px' }}>
-                                Suggested Correction (optional)
-                              </label>
+                              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                                <label style={{ fontSize: '0.75rem', color: '#A8A29A' }}>
+                                  Suggested Correction (Roman transliteration)
+                                </label>
+                                {suggestion && suggestion.trim() && (
+                                  <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                    <span style={{ fontSize: '0.68rem', color: '#A8A29A' }}>Kannada preview:</span>
+                                    <span
+                                      style={{
+                                        fontFamily: "'Noto Sans Kannada', sans-serif",
+                                        fontSize: '1.05rem',
+                                        fontWeight: '600',
+                                        color: '#C9A66B',
+                                        backgroundColor: '#1E1E23',
+                                        padding: '1px 6px',
+                                        borderRadius: '4px',
+                                        border: '1px solid #2A2A30',
+                                        lineHeight: 1.2
+                                      }}
+                                    >
+                                      {formatDisplayLabel(suggestion.trim(), 'kannada', modernLetters).primary}
+                                    </span>
+                                  </div>
+                                )}
+                              </div>
                               <input
                                 type="text"
                                 value={suggestion}
                                 onChange={(e) => setSuggestion(e.target.value)}
-                                placeholder="e.g. ko"
+                                placeholder="e.g. ko, ya, sva, śrī"
                                 style={{
                                   width: '100%',
                                   padding: '8px 10px',
@@ -1478,8 +2027,50 @@ export default function App() {
                       </button>
                     </div>
 
-                    {/* Right: Hide tiny regions toggle and keyboard navigation guide */}
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+                    {/* Right: Classification status, Re-run, Hide tiny, and arrow navigation */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', whiteSpace: 'nowrap' }}>
+                      {/* Classification Status / Classify All / Re-run moved from toolbar */}
+                      {isClassifying ? (
+                        <div className="progress-container" style={{ minWidth: '160px' }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.7rem', color: '#C9A66B' }}>
+                            <span>Classifying...</span>
+                            <span style={{ fontWeight: '600' }}>{classifyProgress} of {analysis.boxes.length}</span>
+                          </div>
+                          <div className="progress-track" style={{ height: '3px' }}>
+                            <div
+                              className="progress-fill"
+                              style={{ width: `${(classifyProgress / analysis.boxes.length) * 100}%` }}
+                            />
+                          </div>
+                        </div>
+                      ) : classifyComplete && batchRegions.length > 0 ? (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                          <span className="pill pill-success" style={{ fontSize: '0.7rem', padding: '2px 8px' }}>
+                            <CheckCircle size={11} /> {batchRegions.length} regions classified
+                          </span>
+                          <button
+                            className="btn-secondary"
+                            style={{ padding: '2px 8px', fontSize: '0.7rem', height: '22px', gap: '4px' }}
+                            onClick={runBatchRecognize}
+                            title="Re-run batch recognition"
+                          >
+                            <RotateCcw size={10} /> Re-run
+                          </button>
+                        </div>
+                      ) : (
+                        <button
+                          className="btn-primary"
+                          style={{ padding: '3px 10px', fontSize: '0.74rem', height: '24px', whiteSpace: 'nowrap', gap: '5px' }}
+                          onClick={runBatchRecognize}
+                          disabled={loading}
+                        >
+                          <Sparkles size={12} /> Classify All ({analysis.boxes.length})
+                        </button>
+                      )}
+
+                      <div style={{ width: '1px', height: '14px', backgroundColor: 'var(--border-subtle)' }} />
+
+                      {/* Hide tiny regions toggle */}
                       <div
                         className="toggle-wrapper"
                         onClick={() => setHideTiny(!hideTiny)}
@@ -1493,17 +2084,17 @@ export default function App() {
                           }
                         }}
                       >
-                        <div className={`toggle-switch ${hideTiny ? 'active' : ''}`} style={{ width: '32px', height: '18px' }}>
-                          <div className="toggle-thumb" style={{ width: '12px', height: '12px' }} />
+                        <div className={`toggle-switch ${hideTiny ? 'active' : ''}`} style={{ width: '28px', height: '16px' }}>
+                          <div className="toggle-thumb" style={{ width: '10px', height: '10px' }} />
                         </div>
-                        <span style={{ fontSize: '0.74rem', color: hideTiny ? '#EDEDEC' : '#7E7A75' }}>
+                        <span style={{ fontSize: '0.74rem', color: hideTiny ? 'var(--text-primary)' : 'var(--text-subtle)', whiteSpace: 'nowrap' }}>
                           Hide tiny &lt;10px ({counts.tiny})
                         </span>
                       </div>
 
-                      <div style={{ width: '1px', height: '14px', backgroundColor: '#28282F' }} />
+                      <div style={{ width: '1px', height: '14px', backgroundColor: 'var(--border-subtle)' }} />
 
-                      <span style={{ fontSize: '0.7rem', color: '#7E7A75' }}>
+                      <span style={{ fontSize: '0.7rem', color: 'var(--text-subtle)', whiteSpace: 'nowrap' }}>
                         Arrow keys to navigate
                       </span>
                     </div>
@@ -1518,41 +2109,91 @@ export default function App() {
                         <div
                           key={cand.idx}
                           data-chip-idx={cand.idx}
-                          className={`glyph-chip status-${cand.status} ${isSelected ? 'selected' : ''} ${cand.isTiny ? 'is-tiny' : ''}`}
+                          className={`glyph-chip status-${cand.status} ${isSelected ? 'selected' : ''} ${cand.isTiny ? 'is-tiny' : ''} ${cand.uncertain ? 'is-uncertain' : ''}`}
                           onClick={() => handleSelectAndFocusBox(cand.idx)}
-                          title={`Candidate #${cand.idx + 1} (${cand.w}x${cand.h}px) - ${cand.status}`}
+                          title={`Candidate #${cand.idx + 1} (${cand.w}x${cand.h}px) - ${cand.status}${cand.uncertain ? ' (Uncertain)' : ''}`}
                         >
                           <div className="glyph-chip-tooltip">
                             #{cand.idx + 1} &middot; {cand.w}&times;{cand.h}px &middot; {cand.status}
+                            {cand.uncertain && ' (Uncertain)'}
+                            {cand.confidence != null && ` (${Math.round(cand.confidence * 100)}% conf)`}
                           </div>
                           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
                             <span style={{ fontSize: '0.65rem', color: '#A8A29A', fontWeight: '600' }}>
                               #{cand.idx + 1}
                             </span>
-                            <span className={`status-dot dot-${cand.status}`} />
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                              {cand.uncertain && (
+                                <span className="uncertain-tag">
+                                  Uncertain
+                                </span>
+                              )}
+                              <span className={`status-dot dot-${cand.status}`} />
+                            </div>
                           </div>
 
-                          <div
-                            className="glyph-chip-label"
-                            style={{
-                              color: isSelected
-                                ? '#C9A66B'
-                                : cand.status === 'corrected'
-                                ? '#64B4F0'
-                                : cand.status === 'reviewed'
-                                ? '#76D876'
-                                : cand.status === 'predicted'
-                                ? '#EDEDEC'
-                                : '#6A6A72'
-                            }}
-                          >
-                            {cand.label || '—'}
-                          </div>
+                          {(() => {
+                            const chipDisp = formatDisplayLabel(cand.label, scriptMode, modernLetters);
+
+                            if (cand.isTiny) {
+                              return (
+                                <div style={{ margin: '6px 0', minHeight: '30px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                  <span className="tiny-tag">Too small to read</span>
+                                </div>
+                              );
+                            }
+
+                            return (
+                              <>
+                                <div style={{ margin: '2px 0', minHeight: '34px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                                  <div
+                                    className="glyph-chip-label"
+                                    style={{
+                                      fontFamily: (scriptMode === 'kannada' && !chipDisp.isUnmapped) ? "'Noto Sans Kannada', sans-serif" : 'inherit',
+                                      fontSize: (scriptMode === 'kannada' && !chipDisp.isUnmapped) ? '1.25rem' : '0.95rem',
+                                      lineHeight: 1.1,
+                                      color: isSelected
+                                        ? '#C9A66B'
+                                        : cand.status === 'corrected'
+                                        ? '#64B4F0'
+                                        : cand.status === 'reviewed'
+                                        ? '#76D876'
+                                        : cand.status === 'predicted'
+                                        ? (cand.uncertain ? '#A8A29A' : '#EDEDEC')
+                                        : '#6A6A72'
+                                    }}
+                                  >
+                                    {chipDisp.primary || '·'}
+                                    {chipDisp.isLossy && <span className="lossy-tag">lossy</span>}
+                                    {chipDisp.isUnmapped && <span className="roman-marker-tag">Roman</span>}
+                                  </div>
+                                  {scriptMode === 'kannada' && chipDisp.secondary && (
+                                    <div style={{ fontSize: '0.62rem', color: '#A8A29A', lineHeight: 1 }}>
+                                      {chipDisp.secondary}
+                                    </div>
+                                  )}
+                                </div>
+
+                                {/* Subtle Confidence Bar on Chip - only shown for non-tiny */}
+                                {cand.confidence != null && (
+                                  <div className="confidence-bar-subtle">
+                                    <div
+                                      className="confidence-bar-subtle-fill"
+                                      style={{
+                                        width: `${Math.round(cand.confidence * 100)}%`,
+                                        backgroundColor: cand.uncertain ? '#D97706' : '#C9A66B'
+                                      }}
+                                    />
+                                  </div>
+                                )}
+                              </>
+                            );
+                          })()}
 
                           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', fontSize: '0.62rem', color: '#7E7A75' }}>
                             <span>{cand.w}x{cand.h}</span>
                             {cand.confidence != null && (
-                              <span style={{ color: '#C9A66B', fontWeight: '600' }}>
+                              <span style={{ color: cand.uncertain ? '#D97706' : '#C9A66B', fontWeight: '600' }}>
                                 {Math.round(cand.confidence * 100)}%
                               </span>
                             )}
@@ -1596,6 +2237,32 @@ export default function App() {
                   <p style={{ fontSize: '0.88rem', color: '#A8A29A', lineHeight: 1.5, marginBottom: '24px' }}>
                     Begin by loading the public Nagavara demonstration stone (8th-century hero stone with 133 candidate regions) or uploading an inscription photograph.
                   </p>
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px', marginBottom: '20px' }}>
+                    <div
+                      className="toggle-wrapper"
+                      onClick={() => setHighAccuracy(!highAccuracy)}
+                      role="switch"
+                      aria-checked={highAccuracy}
+                      tabIndex={0}
+                      onKeyDown={(e) => {
+                        if (e.key === ' ' || e.key === 'Enter') {
+                          e.preventDefault();
+                          setHighAccuracy(!highAccuracy);
+                        }
+                      }}
+                      style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}
+                    >
+                      <div className={`toggle-switch ${highAccuracy ? 'active' : ''}`} style={{ width: '32px', height: '18px' }}>
+                        <div className="toggle-thumb" style={{ width: '12px', height: '12px' }} />
+                      </div>
+                      <span style={{ fontSize: '0.82rem', color: highAccuracy ? '#C9A66B' : 'var(--text-primary)', fontWeight: '600' }}>
+                        High accuracy mode
+                      </span>
+                    </div>
+                    <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', maxWidth: '360px', lineHeight: 1.3 }}>
+                      Finds more faint strokes. Slower, and may add a few false strokes.
+                    </span>
+                  </div>
                   <div style={{ display: 'flex', justifyContent: 'center', gap: '12px' }}>
                     <button className="btn-primary" onClick={loadDemoStone} disabled={loading}>
                       <Sparkles size={14} /> Try Demo Stone (Nagavara)
@@ -1636,9 +2303,62 @@ export default function App() {
                       </div>
                       <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginTop: '4px' }}>
                         Analysis Record · {item.created ? new Date(item.created).toLocaleDateString() : 'Recorded'}
+                        {item.mode_label && ` · Mode: ${item.mode_label}`}
                       </div>
+                      {item.fallback_note && (
+                        <div style={{ fontSize: '0.72rem', color: '#D97706', marginTop: '2px' }}>
+                          {item.fallback_note}
+                        </div>
+                      )}
+                      {item.reviews && item.reviews.length > 0 && (
+                        <div style={{ marginTop: '8px', display: 'flex', flexWrap: 'wrap', gap: '6px', alignItems: 'center' }}>
+                          <span style={{ fontSize: '0.72rem', color: '#A8A29A', fontWeight: '500' }}>
+                            Reviews ({item.reviews.length}):
+                          </span>
+                          {item.reviews.slice(0, 5).map((rev, rIdx) => {
+                            const pDisp = formatDisplayLabel(rev.prediction, scriptMode, modernLetters);
+                            const sDisp = rev.suggested_label ? formatDisplayLabel(rev.suggested_label, scriptMode, modernLetters) : null;
+                            return (
+                              <span
+                                key={rIdx}
+                                className="pill pill-neutral"
+                                style={{ fontSize: '0.7rem', padding: '2px 6px' }}
+                              >
+                                {sDisp ? (
+                                  <>
+                                    <span style={{ fontFamily: "'Noto Sans Kannada', sans-serif" }}>{sDisp.primary}</span> ({rev.suggested_label})
+                                  </>
+                                ) : (
+                                  <>
+                                    <span style={{ fontFamily: "'Noto Sans Kannada', sans-serif" }}>{pDisp.primary}</span> ({rev.prediction})
+                                  </>
+                                )}
+                              </span>
+                            );
+                          })}
+                          {item.reviews.length > 5 && (
+                            <span style={{ fontSize: '0.68rem', color: '#7E7A75' }}>
+                              +{item.reviews.length - 5} more
+                            </span>
+                          )}
+                        </div>
+                      )}
                     </div>
-                    <span className="pill pill-sandstone">Analyzed Locally</span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <span className={`pill ${item.mode === 'high_accuracy' ? 'pill-sandstone' : 'pill-neutral'}`}>
+                        {item.mode_label || (item.mode === 'high_accuracy' ? 'High accuracy' : 'Standard')}
+                      </span>
+                      <span className="pill pill-sandstone">Analyzed Locally</span>
+                      <a
+                        href={`/api/export/${item.id}`}
+                        download={`inscriplens_export_${item.id}.json`}
+                        className="tool-btn"
+                        title="Export analysis metadata and reviews as JSON"
+                        style={{ textDecoration: 'none', fontSize: '0.75rem', padding: '3px 8px' }}
+                      >
+                        Export
+                      </a>
+                    </div>
                   </div>
                 ))}
               </div>

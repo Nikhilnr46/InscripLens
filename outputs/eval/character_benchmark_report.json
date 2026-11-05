@@ -1,0 +1,1163 @@
+{
+  "shared_intersection_eval": {
+    "evaluation_subset": "Shared Intersection Subset",
+    "total_crops": 271,
+    "classes_evaluated": 281,
+    "svm_bundle": {
+      "model_name": "SVM Bundle (Mask)",
+      "samples_evaluated": 271,
+      "top1_correct": 74,
+      "top1_accuracy": 0.2731,
+      "top3_correct": 122,
+      "top3_accuracy": 0.4502,
+      "top5_correct": 147,
+      "top5_accuracy": 0.5424,
+      "expected_calibration_error": 0.3729,
+      "frequency_buckets": {
+        "Rare (1-5 samples)": {
+          "correct": 9,
+          "total": 98,
+          "accuracy": 0.0918
+        },
+        "Common (>20 samples)": {
+          "correct": 43,
+          "total": 80,
+          "accuracy": 0.5375
+        },
+        "Medium (6-20 samples)": {
+          "correct": 22,
+          "total": 93,
+          "accuracy": 0.2366
+        }
+      },
+      "top_20_confused_pairs": [
+        {
+          "true_label": "ka",
+          "predicted_label": "ra",
+          "count": 3
+        },
+        {
+          "true_label": "l\u0324a",
+          "predicted_label": "da",
+          "count": 3
+        },
+        {
+          "true_label": "ga",
+          "predicted_label": "da",
+          "count": 2
+        },
+        {
+          "true_label": "da\u1e43",
+          "predicted_label": "da",
+          "count": 2
+        },
+        {
+          "true_label": "jya\u1e43",
+          "predicted_label": "pa",
+          "count": 2
+        },
+        {
+          "true_label": "vu",
+          "predicted_label": "ka",
+          "count": 2
+        },
+        {
+          "true_label": "ba",
+          "predicted_label": "la",
+          "count": 2
+        },
+        {
+          "true_label": "y\u0101",
+          "predicted_label": "ya",
+          "count": 2
+        },
+        {
+          "true_label": "m\u0101",
+          "predicted_label": "ma",
+          "count": 2
+        },
+        {
+          "true_label": "va",
+          "predicted_label": "ra",
+          "count": 2
+        },
+        {
+          "true_label": "ma",
+          "predicted_label": "ya",
+          "count": 2
+        },
+        {
+          "true_label": "ba",
+          "predicted_label": "ya",
+          "count": 1
+        },
+        {
+          "true_label": "tta",
+          "predicted_label": "\u015br\u012b",
+          "count": 1
+        },
+        {
+          "true_label": "l\u0324\u0115",
+          "predicted_label": "l\u0324a",
+          "count": 1
+        },
+        {
+          "true_label": "g\u014f",
+          "predicted_label": "k\u014f",
+          "count": 1
+        },
+        {
+          "true_label": "\u1e47\u1e0du",
+          "predicted_label": "lli",
+          "count": 1
+        },
+        {
+          "true_label": "tta\u1e43",
+          "predicted_label": "ra",
+          "count": 1
+        },
+        {
+          "true_label": "mma",
+          "predicted_label": "sva",
+          "count": 1
+        },
+        {
+          "true_label": "ya",
+          "predicted_label": "sa",
+          "count": 1
+        },
+        {
+          "true_label": "na",
+          "predicted_label": "da",
+          "count": 1
+        }
+      ],
+      "calibration_bins": [
+        {
+          "bin": "[0.0, 0.1]",
+          "count": 0,
+          "acc": 0.0,
+          "conf": 0.0
+        },
+        {
+          "bin": "[0.1, 0.2]",
+          "count": 0,
+          "acc": 0.0,
+          "conf": 0.0
+        },
+        {
+          "bin": "[0.2, 0.3]",
+          "count": 1,
+          "acc": 0.0,
+          "conf": 0.2915
+        },
+        {
+          "bin": "[0.3, 0.4]",
+          "count": 25,
+          "acc": 0.16,
+          "conf": 0.359
+        },
+        {
+          "bin": "[0.4, 0.5]",
+          "count": 13,
+          "acc": 0.0769,
+          "conf": 0.4445
+        },
+        {
+          "bin": "[0.5, 0.6]",
+          "count": 9,
+          "acc": 0.1111,
+          "conf": 0.5476
+        },
+        {
+          "bin": "[0.6, 0.7]",
+          "count": 157,
+          "acc": 0.3248,
+          "conf": 0.6526
+        },
+        {
+          "bin": "[0.7, 0.8]",
+          "count": 36,
+          "acc": 0.3056,
+          "conf": 0.7462
+        },
+        {
+          "bin": "[0.8, 0.9]",
+          "count": 23,
+          "acc": 0.2609,
+          "conf": 0.8334
+        },
+        {
+          "bin": "[0.9, 1.0]",
+          "count": 7,
+          "acc": 0.0,
+          "conf": 0.9395
+        }
+      ]
+    },
+    "hero_cnn": {
+      "model_name": "Hero CNN (GPU)",
+      "samples_evaluated": 271,
+      "top1_correct": 38,
+      "top1_accuracy": 0.1402,
+      "top3_correct": 68,
+      "top3_accuracy": 0.2509,
+      "top5_correct": 89,
+      "top5_accuracy": 0.3284,
+      "expected_calibration_error": 0.3579,
+      "frequency_buckets": {
+        "Rare (1-5 samples)": {
+          "correct": 1,
+          "total": 98,
+          "accuracy": 0.0102
+        },
+        "Common (>20 samples)": {
+          "correct": 33,
+          "total": 80,
+          "accuracy": 0.4125
+        },
+        "Medium (6-20 samples)": {
+          "correct": 4,
+          "total": 93,
+          "accuracy": 0.043
+        }
+      },
+      "top_20_confused_pairs": [
+        {
+          "true_label": "ma",
+          "predicted_label": "va",
+          "count": 3
+        },
+        {
+          "true_label": "t\u014f",
+          "predicted_label": "p\u014f",
+          "count": 2
+        },
+        {
+          "true_label": "y\u0115",
+          "predicted_label": "ya",
+          "count": 2
+        },
+        {
+          "true_label": "k\u014f",
+          "predicted_label": "r\u0101",
+          "count": 2
+        },
+        {
+          "true_label": "ri",
+          "predicted_label": "ra",
+          "count": 2
+        },
+        {
+          "true_label": "ba",
+          "predicted_label": "pa",
+          "count": 2
+        },
+        {
+          "true_label": "ka",
+          "predicted_label": "ra",
+          "count": 2
+        },
+        {
+          "true_label": "da",
+          "predicted_label": "ra",
+          "count": 2
+        },
+        {
+          "true_label": "ga",
+          "predicted_label": "na",
+          "count": 2
+        },
+        {
+          "true_label": "g\u0115",
+          "predicted_label": "n\u0101",
+          "count": 2
+        },
+        {
+          "true_label": "ga",
+          "predicted_label": "ra",
+          "count": 2
+        },
+        {
+          "true_label": "ba",
+          "predicted_label": "ka",
+          "count": 1
+        },
+        {
+          "true_label": "ya",
+          "predicted_label": "ma",
+          "count": 1
+        },
+        {
+          "true_label": "ka",
+          "predicted_label": "na",
+          "count": 1
+        },
+        {
+          "true_label": "tta",
+          "predicted_label": "m\u0101",
+          "count": 1
+        },
+        {
+          "true_label": "l\u0324\u0115",
+          "predicted_label": "da",
+          "count": 1
+        },
+        {
+          "true_label": "g\u014f",
+          "predicted_label": "n\u0101",
+          "count": 1
+        },
+        {
+          "true_label": "\u1e47\u1e0du",
+          "predicted_label": "l\u0324i",
+          "count": 1
+        },
+        {
+          "true_label": "sa",
+          "predicted_label": "ga",
+          "count": 1
+        },
+        {
+          "true_label": "tta\u1e43",
+          "predicted_label": "mma",
+          "count": 1
+        }
+      ],
+      "calibration_bins": [
+        {
+          "bin": "[0.0, 0.1]",
+          "count": 5,
+          "acc": 0.0,
+          "conf": 0.0727
+        },
+        {
+          "bin": "[0.1, 0.2]",
+          "count": 31,
+          "acc": 0.0,
+          "conf": 0.1453
+        },
+        {
+          "bin": "[0.2, 0.3]",
+          "count": 38,
+          "acc": 0.0263,
+          "conf": 0.2497
+        },
+        {
+          "bin": "[0.3, 0.4]",
+          "count": 44,
+          "acc": 0.0227,
+          "conf": 0.354
+        },
+        {
+          "bin": "[0.4, 0.5]",
+          "count": 42,
+          "acc": 0.1429,
+          "conf": 0.4412
+        },
+        {
+          "bin": "[0.5, 0.6]",
+          "count": 19,
+          "acc": 0.2632,
+          "conf": 0.5415
+        },
+        {
+          "bin": "[0.6, 0.7]",
+          "count": 17,
+          "acc": 0.1765,
+          "conf": 0.6517
+        },
+        {
+          "bin": "[0.7, 0.8]",
+          "count": 20,
+          "acc": 0.1,
+          "conf": 0.7507
+        },
+        {
+          "bin": "[0.8, 0.9]",
+          "count": 22,
+          "acc": 0.2273,
+          "conf": 0.8464
+        },
+        {
+          "bin": "[0.9, 1.0]",
+          "count": 33,
+          "acc": 0.4545,
+          "conf": 0.9554
+        }
+      ]
+    },
+    "broad_cnn": {
+      "model_name": "Broad EpiSAM CNN (GPU)",
+      "samples_evaluated": 271,
+      "top1_correct": 77,
+      "top1_accuracy": 0.2841,
+      "top3_correct": 121,
+      "top3_accuracy": 0.4465,
+      "top5_correct": 143,
+      "top5_accuracy": 0.5277,
+      "expected_calibration_error": 0.0704,
+      "frequency_buckets": {
+        "Rare (1-5 samples)": {
+          "correct": 9,
+          "total": 98,
+          "accuracy": 0.0918
+        },
+        "Common (>20 samples)": {
+          "correct": 45,
+          "total": 80,
+          "accuracy": 0.5625
+        },
+        "Medium (6-20 samples)": {
+          "correct": 23,
+          "total": 93,
+          "accuracy": 0.2473
+        }
+      },
+      "top_20_confused_pairs": [
+        {
+          "true_label": "ka",
+          "predicted_label": "ra",
+          "count": 5
+        },
+        {
+          "true_label": "da\u1e43",
+          "predicted_label": "da",
+          "count": 3
+        },
+        {
+          "true_label": "vu",
+          "predicted_label": "ka",
+          "count": 3
+        },
+        {
+          "true_label": "a",
+          "predicted_label": "\u015br\u012b",
+          "count": 3
+        },
+        {
+          "true_label": "y\u0101",
+          "predicted_label": "ya",
+          "count": 3
+        },
+        {
+          "true_label": "g\u014f",
+          "predicted_label": "g\u0115",
+          "count": 2
+        },
+        {
+          "true_label": "ggi",
+          "predicted_label": "g\u0115",
+          "count": 2
+        },
+        {
+          "true_label": "ya",
+          "predicted_label": "ma",
+          "count": 2
+        },
+        {
+          "true_label": "y\u0115",
+          "predicted_label": "ya",
+          "count": 2
+        },
+        {
+          "true_label": "lli",
+          "predicted_label": "tti",
+          "count": 2
+        },
+        {
+          "true_label": "ta",
+          "predicted_label": "ra",
+          "count": 2
+        },
+        {
+          "true_label": "\u1e5fi",
+          "predicted_label": "\u015br\u012b",
+          "count": 2
+        },
+        {
+          "true_label": "ma",
+          "predicted_label": "va",
+          "count": 2
+        },
+        {
+          "true_label": "ma",
+          "predicted_label": "ya",
+          "count": 2
+        },
+        {
+          "true_label": "ri",
+          "predicted_label": "na",
+          "count": 2
+        },
+        {
+          "true_label": "l\u0324a",
+          "predicted_label": "da",
+          "count": 2
+        },
+        {
+          "true_label": "ba",
+          "predicted_label": "va",
+          "count": 1
+        },
+        {
+          "true_label": "tta",
+          "predicted_label": "tti",
+          "count": 1
+        },
+        {
+          "true_label": "\u1e47\u1e0du",
+          "predicted_label": "sti",
+          "count": 1
+        },
+        {
+          "true_label": "tta\u1e43",
+          "predicted_label": "\u015br\u012b",
+          "count": 1
+        }
+      ],
+      "calibration_bins": [
+        {
+          "bin": "[0.0, 0.1]",
+          "count": 47,
+          "acc": 0.0851,
+          "conf": 0.0681
+        },
+        {
+          "bin": "[0.1, 0.2]",
+          "count": 68,
+          "acc": 0.2647,
+          "conf": 0.1499
+        },
+        {
+          "bin": "[0.2, 0.3]",
+          "count": 56,
+          "acc": 0.1786,
+          "conf": 0.2358
+        },
+        {
+          "bin": "[0.3, 0.4]",
+          "count": 42,
+          "acc": 0.3333,
+          "conf": 0.3428
+        },
+        {
+          "bin": "[0.4, 0.5]",
+          "count": 22,
+          "acc": 0.3636,
+          "conf": 0.4515
+        },
+        {
+          "bin": "[0.5, 0.6]",
+          "count": 14,
+          "acc": 0.6429,
+          "conf": 0.5389
+        },
+        {
+          "bin": "[0.6, 0.7]",
+          "count": 4,
+          "acc": 0.25,
+          "conf": 0.6345
+        },
+        {
+          "bin": "[0.7, 0.8]",
+          "count": 7,
+          "acc": 0.5714,
+          "conf": 0.7373
+        },
+        {
+          "bin": "[0.8, 0.9]",
+          "count": 6,
+          "acc": 0.8333,
+          "conf": 0.8453
+        },
+        {
+          "bin": "[0.9, 1.0]",
+          "count": 5,
+          "acc": 0.8,
+          "conf": 0.9419
+        }
+      ]
+    }
+  },
+  "full_validation_eval": {
+    "evaluation_subset": "Full Validation Set (Unconstrained)",
+    "total_crops": 300,
+    "svm_bundle": {
+      "model_name": "SVM Bundle (Broad Mask)",
+      "samples_evaluated": 300,
+      "top1_correct": 74,
+      "top1_accuracy": 0.2467,
+      "top3_correct": 122,
+      "top3_accuracy": 0.4067,
+      "top5_correct": 148,
+      "top5_accuracy": 0.4933,
+      "expected_calibration_error": 0.3858,
+      "frequency_buckets": {
+        "Rare (1-5 samples)": {
+          "correct": 10,
+          "total": 127,
+          "accuracy": 0.0787
+        },
+        "Common (>20 samples)": {
+          "correct": 42,
+          "total": 80,
+          "accuracy": 0.525
+        },
+        "Medium (6-20 samples)": {
+          "correct": 22,
+          "total": 93,
+          "accuracy": 0.2366
+        }
+      },
+      "top_20_confused_pairs": [
+        {
+          "true_label": "ka",
+          "predicted_label": "ra",
+          "count": 3
+        },
+        {
+          "true_label": "l\u0324a",
+          "predicted_label": "da",
+          "count": 3
+        },
+        {
+          "true_label": "tta",
+          "predicted_label": "tra",
+          "count": 2
+        },
+        {
+          "true_label": "ga",
+          "predicted_label": "da",
+          "count": 2
+        },
+        {
+          "true_label": "da\u1e43",
+          "predicted_label": "da",
+          "count": 2
+        },
+        {
+          "true_label": "jya\u1e43",
+          "predicted_label": "pa",
+          "count": 2
+        },
+        {
+          "true_label": "ba",
+          "predicted_label": "la",
+          "count": 2
+        },
+        {
+          "true_label": "y\u0101",
+          "predicted_label": "ya",
+          "count": 2
+        },
+        {
+          "true_label": "m\u0101",
+          "predicted_label": "ma",
+          "count": 2
+        },
+        {
+          "true_label": "bhu",
+          "predicted_label": "pa",
+          "count": 2
+        },
+        {
+          "true_label": "va",
+          "predicted_label": "ra",
+          "count": 2
+        },
+        {
+          "true_label": "ma",
+          "predicted_label": "ya",
+          "count": 2
+        },
+        {
+          "true_label": "ba",
+          "predicted_label": "ya",
+          "count": 1
+        },
+        {
+          "true_label": "vya",
+          "predicted_label": "la",
+          "count": 1
+        },
+        {
+          "true_label": "ve",
+          "predicted_label": "va",
+          "count": 1
+        },
+        {
+          "true_label": "l\u0324\u0115",
+          "predicted_label": "l\u0324a",
+          "count": 1
+        },
+        {
+          "true_label": "g\u014f",
+          "predicted_label": "k\u014f",
+          "count": 1
+        },
+        {
+          "true_label": "\u1e47\u1e0du",
+          "predicted_label": "lli",
+          "count": 1
+        },
+        {
+          "true_label": "tta\u1e43",
+          "predicted_label": "ra",
+          "count": 1
+        },
+        {
+          "true_label": "h\u0115",
+          "predicted_label": "\u0101",
+          "count": 1
+        }
+      ],
+      "calibration_bins": [
+        {
+          "bin": "[0.0, 0.1]",
+          "count": 0,
+          "acc": 0.0,
+          "conf": 0.0
+        },
+        {
+          "bin": "[0.1, 0.2]",
+          "count": 0,
+          "acc": 0.0,
+          "conf": 0.0
+        },
+        {
+          "bin": "[0.2, 0.3]",
+          "count": 2,
+          "acc": 0.0,
+          "conf": 0.287
+        },
+        {
+          "bin": "[0.3, 0.4]",
+          "count": 25,
+          "acc": 0.16,
+          "conf": 0.352
+        },
+        {
+          "bin": "[0.4, 0.5]",
+          "count": 14,
+          "acc": 0.0714,
+          "conf": 0.4382
+        },
+        {
+          "bin": "[0.5, 0.6]",
+          "count": 12,
+          "acc": 0.1667,
+          "conf": 0.5394
+        },
+        {
+          "bin": "[0.6, 0.7]",
+          "count": 191,
+          "acc": 0.2723,
+          "conf": 0.651
+        },
+        {
+          "bin": "[0.7, 0.8]",
+          "count": 40,
+          "acc": 0.3,
+          "conf": 0.7465
+        },
+        {
+          "bin": "[0.8, 0.9]",
+          "count": 15,
+          "acc": 0.2,
+          "conf": 0.844
+        },
+        {
+          "bin": "[0.9, 1.0]",
+          "count": 1,
+          "acc": 0.0,
+          "conf": 0.9024
+        }
+      ]
+    },
+    "hero_cnn": {
+      "model_name": "Hero CNN",
+      "samples_evaluated": 300,
+      "top1_correct": 38,
+      "top1_accuracy": 0.1267,
+      "top3_correct": 68,
+      "top3_accuracy": 0.2267,
+      "top5_correct": 89,
+      "top5_accuracy": 0.2967,
+      "expected_calibration_error": 0.3654,
+      "frequency_buckets": {
+        "Rare (1-5 samples)": {
+          "correct": 1,
+          "total": 127,
+          "accuracy": 0.0079
+        },
+        "Common (>20 samples)": {
+          "correct": 33,
+          "total": 80,
+          "accuracy": 0.4125
+        },
+        "Medium (6-20 samples)": {
+          "correct": 4,
+          "total": 93,
+          "accuracy": 0.043
+        }
+      },
+      "top_20_confused_pairs": [
+        {
+          "true_label": "ma",
+          "predicted_label": "va",
+          "count": 3
+        },
+        {
+          "true_label": "t\u014f",
+          "predicted_label": "p\u014f",
+          "count": 2
+        },
+        {
+          "true_label": "y\u0115",
+          "predicted_label": "ya",
+          "count": 2
+        },
+        {
+          "true_label": "k\u014f",
+          "predicted_label": "r\u0101",
+          "count": 2
+        },
+        {
+          "true_label": "ri",
+          "predicted_label": "ra",
+          "count": 2
+        },
+        {
+          "true_label": "ba",
+          "predicted_label": "pa",
+          "count": 2
+        },
+        {
+          "true_label": "ka",
+          "predicted_label": "ra",
+          "count": 2
+        },
+        {
+          "true_label": "da",
+          "predicted_label": "ra",
+          "count": 2
+        },
+        {
+          "true_label": "\u1e47a",
+          "predicted_label": "n\u0101",
+          "count": 2
+        },
+        {
+          "true_label": "ga",
+          "predicted_label": "na",
+          "count": 2
+        },
+        {
+          "true_label": "g\u0115",
+          "predicted_label": "n\u0101",
+          "count": 2
+        },
+        {
+          "true_label": "ga",
+          "predicted_label": "ra",
+          "count": 2
+        },
+        {
+          "true_label": "ba",
+          "predicted_label": "ka",
+          "count": 1
+        },
+        {
+          "true_label": "ya",
+          "predicted_label": "ma",
+          "count": 1
+        },
+        {
+          "true_label": "ka",
+          "predicted_label": "na",
+          "count": 1
+        },
+        {
+          "true_label": "tta",
+          "predicted_label": "m\u0101",
+          "count": 1
+        },
+        {
+          "true_label": "vya",
+          "predicted_label": "ru",
+          "count": 1
+        },
+        {
+          "true_label": "ve",
+          "predicted_label": "m\u0101",
+          "count": 1
+        },
+        {
+          "true_label": "l\u0324\u0115",
+          "predicted_label": "da",
+          "count": 1
+        },
+        {
+          "true_label": "g\u014f",
+          "predicted_label": "n\u0101",
+          "count": 1
+        }
+      ],
+      "calibration_bins": [
+        {
+          "bin": "[0.0, 0.1]",
+          "count": 7,
+          "acc": 0.0,
+          "conf": 0.0719
+        },
+        {
+          "bin": "[0.1, 0.2]",
+          "count": 36,
+          "acc": 0.0,
+          "conf": 0.1492
+        },
+        {
+          "bin": "[0.2, 0.3]",
+          "count": 40,
+          "acc": 0.025,
+          "conf": 0.2491
+        },
+        {
+          "bin": "[0.3, 0.4]",
+          "count": 51,
+          "acc": 0.0196,
+          "conf": 0.3552
+        },
+        {
+          "bin": "[0.4, 0.5]",
+          "count": 46,
+          "acc": 0.1304,
+          "conf": 0.4426
+        },
+        {
+          "bin": "[0.5, 0.6]",
+          "count": 21,
+          "acc": 0.2381,
+          "conf": 0.5426
+        },
+        {
+          "bin": "[0.6, 0.7]",
+          "count": 19,
+          "acc": 0.1579,
+          "conf": 0.6562
+        },
+        {
+          "bin": "[0.7, 0.8]",
+          "count": 22,
+          "acc": 0.0909,
+          "conf": 0.7518
+        },
+        {
+          "bin": "[0.8, 0.9]",
+          "count": 23,
+          "acc": 0.2174,
+          "conf": 0.8463
+        },
+        {
+          "bin": "[0.9, 1.0]",
+          "count": 35,
+          "acc": 0.4286,
+          "conf": 0.9557
+        }
+      ]
+    },
+    "broad_cnn": {
+      "model_name": "Broad EpiSAM CNN",
+      "samples_evaluated": 300,
+      "top1_correct": 79,
+      "top1_accuracy": 0.2633,
+      "top3_correct": 122,
+      "top3_accuracy": 0.4067,
+      "top5_correct": 144,
+      "top5_accuracy": 0.48,
+      "expected_calibration_error": 0.0722,
+      "frequency_buckets": {
+        "Rare (1-5 samples)": {
+          "correct": 11,
+          "total": 127,
+          "accuracy": 0.0866
+        },
+        "Common (>20 samples)": {
+          "correct": 45,
+          "total": 80,
+          "accuracy": 0.5625
+        },
+        "Medium (6-20 samples)": {
+          "correct": 23,
+          "total": 93,
+          "accuracy": 0.2473
+        }
+      },
+      "top_20_confused_pairs": [
+        {
+          "true_label": "ka",
+          "predicted_label": "ra",
+          "count": 5
+        },
+        {
+          "true_label": "da\u1e43",
+          "predicted_label": "da",
+          "count": 3
+        },
+        {
+          "true_label": "vu",
+          "predicted_label": "ka",
+          "count": 3
+        },
+        {
+          "true_label": "a",
+          "predicted_label": "\u015br\u012b",
+          "count": 3
+        },
+        {
+          "true_label": "g\u014f",
+          "predicted_label": "g\u0115",
+          "count": 2
+        },
+        {
+          "true_label": "ggi",
+          "predicted_label": "g\u0115",
+          "count": 2
+        },
+        {
+          "true_label": "ya",
+          "predicted_label": "ma",
+          "count": 2
+        },
+        {
+          "true_label": "y\u0115",
+          "predicted_label": "ya",
+          "count": 2
+        },
+        {
+          "true_label": "lli",
+          "predicted_label": "tti",
+          "count": 2
+        },
+        {
+          "true_label": "ta",
+          "predicted_label": "ra",
+          "count": 2
+        },
+        {
+          "true_label": "y\u0101",
+          "predicted_label": "ya",
+          "count": 2
+        },
+        {
+          "true_label": "\u1e5fi",
+          "predicted_label": "\u015br\u012b",
+          "count": 2
+        },
+        {
+          "true_label": "ma",
+          "predicted_label": "va",
+          "count": 2
+        },
+        {
+          "true_label": "ma",
+          "predicted_label": "ya",
+          "count": 2
+        },
+        {
+          "true_label": "ri",
+          "predicted_label": "na",
+          "count": 2
+        },
+        {
+          "true_label": "l\u0324a",
+          "predicted_label": "da",
+          "count": 2
+        },
+        {
+          "true_label": "bhu",
+          "predicted_label": "pa",
+          "count": 2
+        },
+        {
+          "true_label": "ba",
+          "predicted_label": "va",
+          "count": 1
+        },
+        {
+          "true_label": "tta",
+          "predicted_label": "tti",
+          "count": 1
+        },
+        {
+          "true_label": "vya",
+          "predicted_label": "r\u0101",
+          "count": 1
+        }
+      ],
+      "calibration_bins": [
+        {
+          "bin": "[0.0, 0.1]",
+          "count": 64,
+          "acc": 0.0625,
+          "conf": 0.0585
+        },
+        {
+          "bin": "[0.1, 0.2]",
+          "count": 89,
+          "acc": 0.2697,
+          "conf": 0.1498
+        },
+        {
+          "bin": "[0.2, 0.3]",
+          "count": 58,
+          "acc": 0.1552,
+          "conf": 0.243
+        },
+        {
+          "bin": "[0.3, 0.4]",
+          "count": 31,
+          "acc": 0.3548,
+          "conf": 0.3472
+        },
+        {
+          "bin": "[0.4, 0.5]",
+          "count": 24,
+          "acc": 0.375,
+          "conf": 0.4438
+        },
+        {
+          "bin": "[0.5, 0.6]",
+          "count": 13,
+          "acc": 0.6154,
+          "conf": 0.5408
+        },
+        {
+          "bin": "[0.6, 0.7]",
+          "count": 3,
+          "acc": 0.3333,
+          "conf": 0.6395
+        },
+        {
+          "bin": "[0.7, 0.8]",
+          "count": 7,
+          "acc": 0.5714,
+          "conf": 0.7322
+        },
+        {
+          "bin": "[0.8, 0.9]",
+          "count": 6,
+          "acc": 0.8333,
+          "conf": 0.8401
+        },
+        {
+          "bin": "[0.9, 1.0]",
+          "count": 5,
+          "acc": 0.8,
+          "conf": 0.9403
+        }
+      ]
+    }
+  }
+}

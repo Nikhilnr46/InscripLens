@@ -1,0 +1,66 @@
+{
+  "metadata": {
+    "version": "2.0",
+    "description": "Gold benchmark dataset for historical Kannada epigraphical translation engine evaluation.",
+    "instructions": "Supply published formulaic passages that were not used to write any rule. Test evaluation is strictly performed on entries marked split: test.",
+    "policy": "No invented ground truth. Unverified references are marked unverified."
+  },
+  "entries": [
+    {
+      "id": "EC9_HT110_Kumbalahalli_opening",
+      "split": "dev",
+      "stone_id": "HS024",
+      "source_publication": "Epigraphia Carnatica Vol. IX, Hoskote Taluk, Inscription No. 110 (1905)",
+      "provenance_status": "confirmed from a repo file",
+      "repo_confirmation_file": "outputs/context_reading/HS024_reference.json",
+      "printed_pages": {
+        "roman_transcription": 125,
+        "english_translation": 102,
+        "kannada_reading": 224
+      },
+      "date_ce_approx": 900,
+      "genre": "Cattle Raid Defense Hero Stone (Turugōḷ Vīragallu)",
+      "dataset_normalized_passage": "svasti śrī śrī nŏḻambaṃ pṛthuvī rājyaṃ gĕyĕ",
+      "published_roman_transcription": "svasti śrī Nolambādhirāja pṛthivī-rājyaṃ geye",
+      "published_kannada_reading": "ಸ್ವಸ್ತಿ ಶ್ರೀ ನೊಳಂಬಾಧಿರಾಜ ಪೃಥಿವೀರಾಜ್ಯಂಗೆಯೆ",
+      "published_english_translation": "Hail! While the glorious Nolamba king was ruling the kingdom of the earth:",
+      "formula_type": "regnal_opening"
+    },
+    {
+      "id": "EC9_NL027_Nagavara_opening",
+      "split": "test",
+      "stone_id": "HS027",
+      "source_publication": "Epigraphia Carnatica Vol. IX, Nelamangala Taluk (citation unverified - pending confirmation)",
+      "provenance_status": "unverified",
+      "repo_confirmation_file": null,
+      "printed_pages": {
+        "roman_transcription": null,
+        "english_translation": null,
+        "kannada_reading": null
+      },
+      "date_ce_approx": 971,
+      "genre": "Hero Stone / Land Grant (Vīragallu / Bāḷgaccu)",
+      "dataset_normalized_passage": "svasti śrī",
+      "published_roman_transcription": "svasti śrī",
+      "published_kannada_reading": "ಸ್ವಸ್ತಿ ಶ್ರೀ",
+      "published_english_translation": "Hail! Auspicious fortune.",
+      "formula_type": "invocation"
+    },
+    {
+      "id": "TEMPLATE_CATTLE_RAID_MARTYRDOM",
+      "split": "test",
+      "stone_id": null,
+      "source_publication": "Standard Viragallu Inscription Formula (citation unverified - pending confirmation)",
+      "provenance_status": "unverified",
+      "repo_confirmation_file": null,
+      "printed_pages": {},
+      "date_ce_approx": null,
+      "genre": "Cattle Raid Defense Hero Stone (Turugōḷ Vīragallu)",
+      "dataset_normalized_passage": "kāḷagadoḷ turuvam koḷal sarggamēṟidār kalla niṟisidār",
+      "published_roman_transcription": "kāḷagadoḷ turuvam koḷal sarggamēṟidār kalla niṟisidār",
+      "published_kannada_reading": "ಕಾಳಗದೊಳ್ ತುರುವಂ ಕೊಳಲ್ ಸರ್ಗ್ಗಮೇಱಿದಾರ್ ಕಲ್ಲ ನಿಱಿಸಿದಾರ್",
+      "published_english_translation": "in the battle, while rescuing the cattle, he ascended to heaven. erected this memorial stone.",
+      "formula_type": "martyrdom_and_commemoration"
+    }
+  ]
+}

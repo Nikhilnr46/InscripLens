@@ -55,3 +55,14 @@ Desktop.ini
 
 # Local scratch and test scripts
 scratch/
+
+# Literature and large document archives (>1GB files)
+*.pdf
+
+# Raw datasets and local test imagery
+episam/
+veergallu images/
+
+# Browser audit dumps
+dom*.txt
+dom.txt

@@ -1,0 +1,104 @@
+{
+  "hero_pilot": {
+    "train_stone_ids": [
+      "HS001",
+      "HS002",
+      "HS003",
+      "HS004",
+      "HS005",
+      "HS006",
+      "HS007",
+      "HS008",
+      "HS009",
+      "HS010",
+      "HS011",
+      "HS012",
+      "HS013",
+      "HS014",
+      "HS015",
+      "HS016",
+      "HS017",
+      "HS018",
+      "HS019",
+      "HS020",
+      "HS021"
+    ],
+    "val_stone_ids": [
+      "HS022",
+      "HS023",
+      "HS024",
+      "HS025",
+      "HS026",
+      "HS027"
+    ],
+    "train_count": 21,
+    "val_count": 6,
+    "stone_id_leakage": [],
+    "name_leakage": [],
+    "site_leakage": [
+      "malurpatna"
+    ],
+    "leakage_detected": true
+  },
+  "episam_dataset_raw_splits": {
+    "train_stones_count": 117,
+    "val_stones_count": 31,
+    "exact_name_overlap": [],
+    "site_overlap": [
+      "bannerughatta",
+      "basavanagudi",
+      "begur",
+      "chikkajala",
+      "devishettihalli",
+      "gangavara",
+      "jakkur",
+      "jalige",
+      "kudluru",
+      "kurudusonnenahalli",
+      "malurpatna",
+      "mutkur",
+      "tindlu",
+      "totagere",
+      "vagata"
+    ],
+    "upstream_split_anomaly": {
+      "mutkur_train": [
+        "Mutkur 1417CE Donation Inscription (Not Documented Before)",
+        "Mutkur 1500CE Donation Inscription (Not Documented Before)"
+      ],
+      "mutkur_val": [
+        "Mutkur 1400CE Agrahara Inscription (Not Documented Before)"
+      ],
+      "note": "Raw EpiSAM release contains identical image under different names: 'Mutkur 1500CE Donation Inscription' (train) and 'Mutkur 1400CE Agrahara Inscription' (val)."
+    }
+  },
+  "training_protocol_enforcement": {
+    "excluded_validation_sites": [
+      "begur",
+      "bisanahalli",
+      "kumbalahalli",
+      "kurudusonnenahalli",
+      "malurpatna",
+      "nagavara"
+    ],
+    "hero_training_leakage_into_excluded": [
+      "Malurpatna 1000CE Herostone Inscription (Not Documented Before)",
+      "Malurpatna 1000CE Herostone Inscription backside",
+      "Malurpatna 900CE Permaluru Herostone With Inscription",
+      "Malurpatna 996CE Kala, Kakkayya, Aiyayya & Tatrapala Herostone With Inscription"
+    ]
+  },
+  "nagavara_demo_stone_audit": {
+    "demo_stone_id": "HS027",
+    "demo_stone_full_name": "Nagavara 971CE Herostone With Inscription",
+    "in_hero_pilot_train": false,
+    "in_hero_pilot_val": true,
+    "in_episam_dataset_train": false,
+    "in_episam_dataset_val": true,
+    "in_broad_svm_training": false,
+    "in_broad_cnn_training": false,
+    "in_line_unet_training": false,
+    "is_unseen_held_out_validation_stone": true,
+    "verdict": "The Nagavara demonstration stone (HS027) was NEVER in any training split. It is strictly in the validation split across all experiments."
+  }
+}

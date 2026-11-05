@@ -1,0 +1,232 @@
+{
+  "benchmark": "KittelLM Re-ranking Evaluation Audit",
+  "gold_data_audit": {
+    "candidate_file": "outputs\\context_reading\\HS024_reference.json",
+    "verified_gold_reading_exists": false,
+    "status_in_metadata": "candidate_reference_alignment_not_expert_verified",
+    "allowed_use": "reference-assisted review only; not independent OCR ground truth",
+    "source_annotation_status": "unreviewed"
+  },
+  "kittel_lm_vocabulary_audit": {
+    "checkpoint": "outputs\\dictionary_study\\kittel_lm_gpu.pth",
+    "vocab_size": 120,
+    "kannada_unicode_chars": 0,
+    "iast_diacritics_present": [],
+    "iast_diacritics_missing": [
+      "\u015b",
+      "\u1e63",
+      "\u1e0d",
+      "\u1e47",
+      "\u1e5b",
+      "\u1e3b",
+      "\u012b",
+      "\u016b",
+      "\u0101",
+      "\u1e43",
+      "\u0115",
+      "\u014f"
+    ]
+  },
+  "hs024_line1_optical_eval": [
+    {
+      "crop": "crops/val/HS024_0001.png",
+      "candidate_reference_label": "sva",
+      "top3_predictions": [
+        [
+          "sti",
+          0.014441374689340591
+        ],
+        [
+          "g\u0115",
+          0.013656885363161564
+        ],
+        [
+          "sva",
+          0.013074380345642567
+        ]
+      ],
+      "cnn_top1": "sti",
+      "top1_is_match": false,
+      "in_top3": true
+    },
+    {
+      "crop": "crops/val/HS024_0002.png",
+      "candidate_reference_label": "sti",
+      "top3_predictions": [
+        [
+          "ra",
+          0.06197234243154526
+        ],
+        [
+          "0",
+          0.0553172267973423
+        ],
+        [
+          "da",
+          0.04994290694594383
+        ]
+      ],
+      "cnn_top1": "ra",
+      "top1_is_match": false,
+      "in_top3": false
+    },
+    {
+      "crop": "crops/val/HS024_0003.png",
+      "candidate_reference_label": "\u015br\u012b",
+      "top3_predictions": [
+        [
+          "\u015br\u012b",
+          0.3704014718532562
+        ],
+        [
+          "pra",
+          0.05488131195306778
+        ],
+        [
+          "\u1e5fi",
+          0.052520815283060074
+        ]
+      ],
+      "cnn_top1": "\u015br\u012b",
+      "top1_is_match": true,
+      "in_top3": true
+    },
+    {
+      "crop": "crops/val/HS024_0004.png",
+      "candidate_reference_label": "\u015br\u012b",
+      "top3_predictions": [
+        [
+          "\u015br\u012b",
+          0.11650251597166061
+        ],
+        [
+          "dr\u0101",
+          0.07536119967699051
+        ],
+        [
+          "r\u0101",
+          0.06521788239479065
+        ]
+      ],
+      "cnn_top1": "\u015br\u012b",
+      "top1_is_match": true,
+      "in_top3": true
+    },
+    {
+      "crop": "crops/val/HS024_0005.png",
+      "candidate_reference_label": "n\u014f",
+      "top3_predictions": [
+        [
+          "ya",
+          0.07109447568655014
+        ],
+        [
+          "ma",
+          0.0614430196583271
+        ],
+        [
+          "va",
+          0.050610847771167755
+        ]
+      ],
+      "cnn_top1": "ya",
+      "top1_is_match": false,
+      "in_top3": false
+    },
+    {
+      "crop": "crops/val/HS024_0006.png",
+      "candidate_reference_label": "\u1e3ba",
+      "top3_predictions": [
+        [
+          "lu",
+          0.10241030156612396
+        ],
+        [
+          "\u1e5f\u0115",
+          0.09990640729665756
+        ],
+        [
+          "ya",
+          0.08944521844387054
+        ]
+      ],
+      "cnn_top1": "lu",
+      "top1_is_match": false,
+      "in_top3": false
+    },
+    {
+      "crop": "crops/val/HS024_0007.png",
+      "candidate_reference_label": "mba\u1e43",
+      "top3_predictions": [
+        [
+          "\u015br\u012b",
+          0.03690206632018089
+        ],
+        [
+          "\u1e5fi",
+          0.022184420377016068
+        ],
+        [
+          "r\u0101",
+          0.01952582225203514
+        ]
+      ],
+      "cnn_top1": "\u015br\u012b",
+      "top1_is_match": false,
+      "in_top3": false
+    },
+    {
+      "crop": "crops/val/HS024_0008.png",
+      "candidate_reference_label": "p\u1e5b",
+      "top3_predictions": [
+        [
+          "pa",
+          0.0361553430557251
+        ],
+        [
+          "\u1e6d\u1e6da",
+          0.031842462718486786
+        ],
+        [
+          "ma",
+          0.02844090946018696
+        ]
+      ],
+      "cnn_top1": "pa",
+      "top1_is_match": false,
+      "in_top3": false
+    }
+  ],
+  "verdict": {
+    "testable_as_gold_benchmark": false,
+    "reason_no_gold": "No verified independent epigraphist gold reading exists. The HS024 record is explicitly marked 'candidate_reference_alignment_not_expert_verified' and 'reference-assisted review only; not independent OCR ground truth'.",
+    "reason_lm_incompatibility": "KittelLM is unusable for epigraphical Kannada re-ranking: its 120-token vocabulary contains 0 Kannada Unicode characters and 0 IAST epigraphical diacritics (\u015b, \u012b, \u014f, \u1e3b, \u1e43, \u1e5b are all OOV). It was trained on uncleaned English front-matter OCR noise ('scratch/kittel_corpus_sample.txt') rather than epigraphic inscriptions.",
+    "candidate_line_optical_baseline": {
+      "line_name": "HS024 Line 1 (8 crops)",
+      "candidate_reference_labels": [
+        "sva",
+        "sti",
+        "\u015br\u012b",
+        "\u015br\u012b",
+        "n\u014f",
+        "\u1e3ba",
+        "mba\u1e43",
+        "p\u1e5b"
+      ],
+      "cnn_top1_labels": [
+        "sti",
+        "ra",
+        "\u015br\u012b",
+        "\u015br\u012b",
+        "ya",
+        "lu",
+        "\u015br\u012b",
+        "pa"
+      ],
+      "top1_syllable_accuracy": 0.25,
+      "top1_levenshtein_cer": 0.6364,
+      "top3_coverage": 0.375
+    },
+    "re_ranked_cer": "not testable (OOV character representation and missing gold ground truth)"
+  }
+}

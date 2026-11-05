@@ -1,0 +1,16 @@
+{
+  "svm_temperature": 2.698573579192023,
+  "cnn_temperature": 0.7107412833654193,
+  "calibration_stones": [
+    "Aradeshanahalli 900CE Mumennayaga's Turugol Herostone With Inscription",
+    "Aradeshanahalli 900CE Seemarasa Bhattaraka's Hero Stone Inscription",
+    "Aradeshanahalli 900CE Tax Collectors Inscription",
+    "Sadahalli 1328CE Veeraballala Inscription (Not Documented Before)",
+    "Sadahalli 800CE Uldanapitta Kammara's Herostone With Insciption",
+    "Srinivagilu 800CE Palchatereyamma's Turugol Herostone With Inscription",
+    "T Dasarahalli 800CE Kosigaramalta Guramareya's Turugol Herostone Inscription",
+    "T Dasarahalli 800CE Turugol Herostone With Inscription"
+  ],
+  "calibration_samples": 359,
+  "union_classes_count": 781
+}
