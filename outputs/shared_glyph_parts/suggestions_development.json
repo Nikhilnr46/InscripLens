@@ -1,0 +1,219 @@
+{
+  "totals": {
+    "automatic": {
+      "n": 359,
+      "matches": 254,
+      "first": 49,
+      "baseline": 89,
+      "candidate": 89,
+      "fixed": 1,
+      "lost": 1,
+      "changed": 38
+    },
+    "reference": {
+      "n": 359,
+      "matches": 254,
+      "first": 78,
+      "baseline": 127,
+      "candidate": 126,
+      "fixed": 2,
+      "lost": 3,
+      "changed": 50
+    }
+  },
+  "rows": [
+    {
+      "source": "Aradeshanahalli 900CE Mumennayaga's Turugol Herostone With Inscription",
+      "kind": "reference",
+      "n": 124,
+      "matches": 97,
+      "first": 25,
+      "baseline": 42,
+      "candidate": 41,
+      "fixed": 0,
+      "lost": 1,
+      "changed": 17
+    },
+    {
+      "source": "Aradeshanahalli 900CE Mumennayaga's Turugol Herostone With Inscription",
+      "kind": "automatic",
+      "n": 124,
+      "matches": 97,
+      "first": 24,
+      "baseline": 36,
+      "candidate": 36,
+      "fixed": 0,
+      "lost": 0,
+      "changed": 12
+    },
+    {
+      "source": "Aradeshanahalli 900CE Seemarasa Bhattaraka's Hero Stone Inscription",
+      "kind": "reference",
+      "n": 23,
+      "matches": 18,
+      "first": 5,
+      "baseline": 10,
+      "candidate": 10,
+      "fixed": 0,
+      "lost": 0,
+      "changed": 1
+    },
+    {
+      "source": "Aradeshanahalli 900CE Seemarasa Bhattaraka's Hero Stone Inscription",
+      "kind": "automatic",
+      "n": 23,
+      "matches": 18,
+      "first": 3,
+      "baseline": 8,
+      "candidate": 8,
+      "fixed": 0,
+      "lost": 0,
+      "changed": 1
+    },
+    {
+      "source": "Aradeshanahalli 900CE Tax Collectors Inscription",
+      "kind": "reference",
+      "n": 21,
+      "matches": 15,
+      "first": 7,
+      "baseline": 8,
+      "candidate": 8,
+      "fixed": 0,
+      "lost": 0,
+      "changed": 2
+    },
+    {
+      "source": "Aradeshanahalli 900CE Tax Collectors Inscription",
+      "kind": "automatic",
+      "n": 21,
+      "matches": 15,
+      "first": 2,
+      "baseline": 5,
+      "candidate": 5,
+      "fixed": 0,
+      "lost": 0,
+      "changed": 3
+    },
+    {
+      "source": "Sadahalli 1328CE Veeraballala Inscription (Not Documented Before)",
+      "kind": "reference",
+      "n": 30,
+      "matches": 6,
+      "first": 8,
+      "baseline": 11,
+      "candidate": 11,
+      "fixed": 0,
+      "lost": 0,
+      "changed": 4
+    },
+    {
+      "source": "Sadahalli 1328CE Veeraballala Inscription (Not Documented Before)",
+      "kind": "automatic",
+      "n": 30,
+      "matches": 6,
+      "first": 2,
+      "baseline": 2,
+      "candidate": 2,
+      "fixed": 0,
+      "lost": 0,
+      "changed": 1
+    },
+    {
+      "source": "Sadahalli 800CE Uldanapitta Kammara's Herostone With Insciption",
+      "kind": "reference",
+      "n": 58,
+      "matches": 34,
+      "first": 10,
+      "baseline": 16,
+      "candidate": 16,
+      "fixed": 0,
+      "lost": 0,
+      "changed": 6
+    },
+    {
+      "source": "Sadahalli 800CE Uldanapitta Kammara's Herostone With Insciption",
+      "kind": "automatic",
+      "n": 58,
+      "matches": 34,
+      "first": 5,
+      "baseline": 9,
+      "candidate": 10,
+      "fixed": 1,
+      "lost": 0,
+      "changed": 8
+    },
+    {
+      "source": "Srinivagilu 800CE Palchatereyamma's Turugol Herostone With Inscription",
+      "kind": "reference",
+      "n": 27,
+      "matches": 21,
+      "first": 6,
+      "baseline": 11,
+      "candidate": 10,
+      "fixed": 0,
+      "lost": 1,
+      "changed": 6
+    },
+    {
+      "source": "Srinivagilu 800CE Palchatereyamma's Turugol Herostone With Inscription",
+      "kind": "automatic",
+      "n": 27,
+      "matches": 21,
+      "first": 2,
+      "baseline": 7,
+      "candidate": 7,
+      "fixed": 0,
+      "lost": 0,
+      "changed": 6
+    },
+    {
+      "source": "T Dasarahalli 800CE Kosigaramalta Guramareya's Turugol Herostone Inscription",
+      "kind": "reference",
+      "n": 28,
+      "matches": 19,
+      "first": 3,
+      "baseline": 10,
+      "candidate": 10,
+      "fixed": 0,
+      "lost": 0,
+      "changed": 4
+    },
+    {
+      "source": "T Dasarahalli 800CE Kosigaramalta Guramareya's Turugol Herostone Inscription",
+      "kind": "automatic",
+      "n": 28,
+      "matches": 19,
+      "first": 3,
+      "baseline": 6,
+      "candidate": 5,
+      "fixed": 0,
+      "lost": 1,
+      "changed": 2
+    },
+    {
+      "source": "T Dasarahalli 800CE Turugol Herostone With Inscription",
+      "kind": "reference",
+      "n": 48,
+      "matches": 44,
+      "first": 14,
+      "baseline": 19,
+      "candidate": 20,
+      "fixed": 2,
+      "lost": 1,
+      "changed": 10
+    },
+    {
+      "source": "T Dasarahalli 800CE Turugol Herostone With Inscription",
+      "kind": "automatic",
+      "n": 48,
+      "matches": 44,
+      "first": 8,
+      "baseline": 16,
+      "candidate": 16,
+      "fixed": 0,
+      "lost": 0,
+      "changed": 5
+    }
+  ],
+  "rule": "Preserve first two; use best top-ten label matching both part heads as third unless already in first two; otherwise retain third."
+}
