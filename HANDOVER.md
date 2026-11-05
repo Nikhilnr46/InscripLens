@@ -1,5 +1,17 @@
 # InscripLens Studio Handover and Technical Guide
 
+## 5 November: Studio UI batch 2 layout of controls
+
+Reorganized Studio viewer toolbar and bottom gallery strip:
+- Top Toolbar:
+  - Left group: Boxes toggle (compact switch with count pill) and Curtain control (slider position percentage label).
+  - Right group (desktop >= 1100 px panel width): Script segmented control (sliding indicator, Kannada/Roman, keyboard accessible via Arrow keys), Display options popover (gear icon, visible only in Kannada mode, contains Modern letters switch and lossy warning note), Zoom controls (Fit, minus, zoom percentage, plus), and Export menu dropdown ("Download mask").
+  - Responsive collapse (< 1100 px container width): Script control, Display options, and Export are moved into a unified "View" dropdown button; Zoom controls remain directly accessible.
+- Bottom Gallery Bar:
+  - Left group: Single primary "Classify All (N)" button; after batch classification completes, transitions to a secondary "Re-run" button alongside a green "133 classified" status pill. Next to this, candidate filter segmented control with count pills: All (N), Predicted (N), Reviewed (N).
+  - Right group: Compact "Hide tiny" switch chip with count pill, plus keyboard navigation hint with arrow keycaps (left and right arrow keycaps with Navigate label) that smoothly fades out after initial arrow key navigation, remembered in localStorage, and permanently accessible via title tooltip.
+- Quality & Regression: Zero text wrapping or control collisions across 1280, 1366, 1440, 1536, and 1920 px viewports in both light and dark themes. Full regression passed for stone upload, demo loading, high accuracy enhancement, candidate inspection, batch recognition, reviewer note saving, and mask download.
+
 ## 5 November: first larger sequence diagnostic
 
 Fixed10-epoch CNN-BiLSTM-CTC run on124 screened fit lines,7 separate development lines. Alphabet fit-only, source-disjoint splits, image-only resizing height48/minimum width256/max1024. Initial minimum64 failed CTC capacity on a training line, so fixed minimum256 before training. No validation-stone access or model promotion.
@@ -275,7 +287,7 @@ The client application is built as a single-page application (SPA) with two prim
   2. `#workflow`: Three-stage methodology cards ("Capture & Select", "Enhance & Localize", "Inspect & Verify") with 3D tilt and cursor spotlights, plus the demo stone trigger button.
   3. `#about`: Centered single-column documentation including "What is InscripLens", "Why it exists", the 5-stage pipeline, "Privacy", interactive FAQ accordion, and "Credits and licences".
   4. `#limitations`: Research scope boundaries, "Limitations of this prototype" card, two-column capability summary ("Can" vs "Cannot yet"), and epigraphist verification notice.
-- Route `/studio`: The interactive Epigraphy Studio workspace containing dual-canvas curtain slider, bounding box overlays, candidate gallery strip with filter tabs, character inspector, alternative ranking cards, reviewer submission forms, a "High accuracy mode" enhancement toggle switch with live progress feedback, a direct mask download button, session mode indicators, and a "Script: Kannada / Roman" display switch with an optional "Modern letters" archaic substitution tier.
+- Route `/studio`: The interactive Epigraphy Studio workspace featuring a top toolbar with Boxes and Curtain controls, Script segmented control (Kannada / Roman), Display options popover (Modern letters), Zoom group, and Export menu (mask download), alongside a container-responsive View dropdown below 1100 px. The bottom gallery strip provides Classify All / Re-run with status pill, candidate filter segmented control (All, Predicted, Reviewed), compact Hide tiny switch chip, and keyboard navigation hints.
 
 ### Theme System
 - Controlled by `data-theme="dark"` and `data-theme="light"` attributes on `:root`.

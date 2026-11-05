@@ -19,10 +19,12 @@ import {
   Tag,
   AlertCircle,
   Maximize2,
+  Home,
   ArrowLeft,
   ChevronLeft,
   ChevronDown,
-  Download
+  Download,
+  Settings
 } from 'lucide-react';
 import LandingPage from './pages/LandingPage.jsx';
 import ThemeToggle from './components/ThemeToggle.tsx';
@@ -258,16 +260,47 @@ export default function App() {
   const predictRequestIdRef = useRef(0);
   const autoPredictedAnalysisIdRef = useRef(null);
   const isDraggingCurtain = useRef(false);
+  const [isCurtainDragging, setIsCurtainDragging] = useState(false);
   const panStartRef = useRef(null);
 
   const canvasPanelRef = useRef(null);
   const [panelWidth, setPanelWidth] = useState(1200);
-  const [viewDropdownOpen, setViewDropdownOpen] = useState(false);
+  const [viewDropdownOpen, setViewDropdownOpen] = useState(() => {
+    try { return new URLSearchParams(window.location.search).get('popover') === 'view'; } catch { return false; }
+  });
   const viewDropdownRef = useRef(null);
+  const [displayOptionsOpen, setDisplayOptionsOpen] = useState(() => {
+    try { return new URLSearchParams(window.location.search).get('popover') === 'display'; } catch { return false; }
+  });
+  const displayOptionsRef = useRef(null);
+  const [exportMenuOpen, setExportMenuOpen] = useState(() => {
+    try { return new URLSearchParams(window.location.search).get('popover') === 'export'; } catch { return false; }
+  });
+  const exportMenuRef = useRef(null);
+
+  // Keyboard navigation hint state (fades out after first arrow key navigation)
+  const [hasUsedArrowKeys, setHasUsedArrowKeys] = useState(() => {
+    try {
+      return localStorage.getItem('inscriplens_used_arrow_keys') === 'true';
+    } catch {
+      return false;
+    }
+  });
 
   const [cropTimedOut, setCropTimedOut] = useState(false);
   const cropTimeoutRef = useRef(null);
   const cropAbortControllerRef = useRef(null);
+
+  // Sync test popovers from URL when analysis loads
+  useEffect(() => {
+    if (!analysis) return;
+    try {
+      const p = new URLSearchParams(window.location.search).get('popover');
+      if (p === 'view') setViewDropdownOpen(true);
+      if (p === 'display') setDisplayOptionsOpen(true);
+      if (p === 'export') setExportMenuOpen(true);
+    } catch {}
+  }, [analysis]);
 
   // Measure canvas panel container width for responsive toolbar
   useEffect(() => {
@@ -283,18 +316,35 @@ export default function App() {
     return () => observer.disconnect();
   }, [analysis]);
 
-  // Close view dropdown when clicking outside
+  // Close view, display options, and export popovers when clicking outside or pressing Escape
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (viewDropdownRef.current && !viewDropdownRef.current.contains(e.target)) {
         setViewDropdownOpen(false);
       }
+      if (displayOptionsRef.current && !displayOptionsRef.current.contains(e.target)) {
+        setDisplayOptionsOpen(false);
+      }
+      if (exportMenuRef.current && !exportMenuRef.current.contains(e.target)) {
+        setExportMenuOpen(false);
+      }
     };
-    if (viewDropdownOpen) {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        setViewDropdownOpen(false);
+        setDisplayOptionsOpen(false);
+        setExportMenuOpen(false);
+      }
+    };
+    if (viewDropdownOpen || displayOptionsOpen || exportMenuOpen) {
       document.addEventListener('mousedown', handleClickOutside);
-      return () => document.removeEventListener('mousedown', handleClickOutside);
+      document.addEventListener('keydown', handleKeyDown);
+      return () => {
+        document.removeEventListener('mousedown', handleClickOutside);
+        document.removeEventListener('keydown', handleKeyDown);
+      };
     }
-  }, [viewDropdownOpen]);
+  }, [viewDropdownOpen, displayOptionsOpen, exportMenuOpen]);
 
   const isCompactView = panelWidth < 1100;
   const isUltraCompactView = panelWidth < 900;
@@ -569,11 +619,12 @@ export default function App() {
     window.addEventListener('mouseup', handleGlobalMouseUp);
   };
 
-  // Curtain slider drag handling
+  // Curtain slider drag handling with mouse and touch
   const handleCurtainHandleMouseDown = (e) => {
     e.stopPropagation();
     e.preventDefault();
     isDraggingCurtain.current = true;
+    setIsCurtainDragging(true);
 
     const handleGlobalMouseMove = (moveEvent) => {
       if (!isDraggingCurtain.current || !containerRef.current) return;
@@ -585,12 +636,38 @@ export default function App() {
 
     const handleGlobalMouseUp = () => {
       isDraggingCurtain.current = false;
+      setIsCurtainDragging(false);
       window.removeEventListener('mousemove', handleGlobalMouseMove);
       window.removeEventListener('mouseup', handleGlobalMouseUp);
     };
 
     window.addEventListener('mousemove', handleGlobalMouseMove);
     window.addEventListener('mouseup', handleGlobalMouseUp);
+  };
+
+  const handleCurtainTouchStart = (e) => {
+    e.stopPropagation();
+    isDraggingCurtain.current = true;
+    setIsCurtainDragging(true);
+
+    const handleGlobalTouchMove = (moveEvent) => {
+      if (!isDraggingCurtain.current || !containerRef.current) return;
+      const touch = moveEvent.touches[0];
+      if (!touch) return;
+      const rect = containerRef.current.getBoundingClientRect();
+      const pct = Math.max(0, Math.min(100, ((touch.clientX - rect.left) / rect.width) * 100));
+      setSliderPos(pct);
+    };
+
+    const handleGlobalTouchEnd = () => {
+      isDraggingCurtain.current = false;
+      setIsCurtainDragging(false);
+      window.removeEventListener('touchmove', handleGlobalTouchMove);
+      window.removeEventListener('touchend', handleGlobalTouchEnd);
+    };
+
+    window.addEventListener('touchmove', handleGlobalTouchMove, { passive: true });
+    window.addEventListener('touchend', handleGlobalTouchEnd);
   };
 
   // Keyboard navigation for curtain wipe slider
@@ -836,6 +913,12 @@ export default function App() {
       }
 
       if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+        if (!hasUsedArrowKeys) {
+          setHasUsedArrowKeys(true);
+          try {
+            localStorage.setItem('inscriplens_used_arrow_keys', 'true');
+          } catch {}
+        }
         if (!visibleCandidates.length) return;
         e.preventDefault();
 
@@ -1036,27 +1119,15 @@ export default function App() {
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px', minWidth: 0, overflow: 'hidden', whiteSpace: 'nowrap' }}>
           <a
             href="/#overview"
-            className="btn-secondary"
+            className="btn-home-pill"
             onClick={(e) => {
               e.preventDefault();
               navigateToSection('overview');
             }}
-            style={{ padding: '4px 8px', fontSize: '0.75rem', gap: '5px', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', flexShrink: 0, whiteSpace: 'nowrap' }}
-            title="Return to Landing Page"
+            title="Back to home page"
+            aria-label="Back to home page"
           >
-            <ArrowLeft size={13} /> Home
-          </a>
-          <a
-            href="/#about"
-            className="btn-secondary"
-            onClick={(e) => {
-              e.preventDefault();
-              navigateToSection('about');
-            }}
-            style={{ padding: '4px 8px', fontSize: '0.75rem', gap: '5px', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', flexShrink: 0, whiteSpace: 'nowrap' }}
-            title="About & Documentation"
-          >
-            About
+            <Home size={14} /> Home
           </a>
           <div
             className="brand-logo-shimmer"
@@ -1143,16 +1214,19 @@ export default function App() {
             disabled={loading}
             style={{ whiteSpace: 'nowrap', flexShrink: 0 }}
           >
-            <Upload size={14} /> Upload Photograph
+            <Upload size={14} /> Try another
           </button>
-          <button
-            className="btn-primary btn-magnetic"
-            onClick={loadDemoStone}
-            disabled={loading}
-            style={{ whiteSpace: 'nowrap', flexShrink: 0 }}
-          >
-            <Sparkles size={14} /> Try Demo Stone (Nagavara)
-          </button>
+          {(!analysis || !analysis.is_demo) && (
+            <button
+              className={analysis ? "btn-secondary" : "btn-primary btn-magnetic"}
+              onClick={loadDemoStone}
+              disabled={loading}
+              style={{ whiteSpace: 'nowrap', flexShrink: 0 }}
+              title="Load the Nagavara demonstration hero stone"
+            >
+              <Sparkles size={14} /> Try Demo Stone (Nagavara)
+            </button>
+          )}
         </div>
       </header>
 
@@ -1298,18 +1372,11 @@ export default function App() {
                 <div className="studio-workspace">
                   {/* Central Canvas Panel with container query ref */}
                   <div className="canvas-panel" ref={canvasPanelRef}>
-                    {/* Canvas Toolbar with directly visible Kannada script switch */}
+                    {/* Canvas Toolbar with new layout */}
                     <div className="canvas-toolbar">
-                      {/* Left Group: Curtain, Boxes toggle, Mode badge, Mask */}
+                      {/* Left Group: Boxes switch (with count in pill) and Curtain control */}
                       <div className="toolbar-group-left">
-                        <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', whiteSpace: 'nowrap', minWidth: '95px' }}>
-                          <Sliders size={13} color="#C9A66B" />
-                          <span>Curtain: <strong style={{ color: 'var(--text-primary)' }}>{Math.round(sliderPos)}%</strong></span>
-                        </div>
-
-                        <div className="toolbar-sep" />
-
-                        {/* Toggle Switch for Candidate Boxes */}
+                        {/* Boxes switch */}
                         <div
                           className="toggle-wrapper"
                           onClick={() => setShowBoxes(!showBoxes)}
@@ -1322,143 +1389,317 @@ export default function App() {
                               setShowBoxes(!showBoxes);
                             }
                           }}
-                          style={{ minWidth: '95px', whiteSpace: 'nowrap' }}
+                          title="Toggle bounding box outlines on stone"
+                          style={{ minWidth: '98px', whiteSpace: 'nowrap', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
                         >
                           <div className={`toggle-switch ${showBoxes ? 'active' : ''}`}>
                             <div className="toggle-thumb" />
                           </div>
                           <span style={{ fontSize: '0.78rem', color: showBoxes ? 'var(--text-primary)' : 'var(--text-muted)', whiteSpace: 'nowrap' }}>
-                            Boxes ({analysis.boxes.length})
+                            Boxes
+                          </span>
+                          <span className="pill-count">
+                            {analysis.boxes.length}
                           </span>
                         </div>
 
                         <div className="toolbar-sep" />
 
-                        {/* Mode badge */}
-                        <span
-                          className={`pill ${analysis.mode === 'high_accuracy' ? 'pill-sandstone' : 'pill-neutral'}`}
-                          style={{ fontSize: '0.68rem', padding: '2px 8px', minWidth: '65px', textAlign: 'center', whiteSpace: 'nowrap' }}
-                          title={analysis.mode === 'high_accuracy' ? 'Enhanced with multi-scale sliding window' : 'Enhanced with standard single-scale GPU'}
+                        {/* Curtain control (label plus value) */}
+                        <div
+                          style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', whiteSpace: 'nowrap', minWidth: '95px' }}
+                          title="Curtain divider wipe position between binary mask and original photograph"
                         >
-                          {analysis.mode_label || (analysis.mode === 'high_accuracy' ? 'High accuracy' : 'Standard')}
-                        </span>
-
-                        {/* Mask download button */}
-                        <a
-                          href={analysis.mask_url}
-                          download={`mask_${analysis.id}.png`}
-                          className="tool-btn"
-                          title="Download enhanced binary mask image"
-                          style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '4px', minWidth: '60px', whiteSpace: 'nowrap' }}
-                        >
-                          <Download size={12} /> Mask
-                        </a>
-                      </div>
-
-                      {/* Middle Group: Kannada Script Toggle & Modern letters (ALWAYS DIRECTLY VISIBLE ON TOOLBAR) */}
-                      <div className="toolbar-group-middle">
-                        <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', fontWeight: '500' }}>Script:</span>
-                        <div style={{ display: 'flex', alignItems: 'center', backgroundColor: 'var(--bg-base)', borderRadius: '5px', padding: '2px', border: '1px solid var(--border-subtle)' }}>
-                          <button
-                            type="button"
-                            onClick={() => setScriptMode('kannada')}
-                            title="Display character labels in Kannada script"
-                            style={{
-                              padding: '2px 8px',
-                              fontSize: '0.74rem',
-                              border: 'none',
-                              borderRadius: '3px',
-                              backgroundColor: scriptMode === 'kannada' ? '#C9A66B' : 'transparent',
-                              color: scriptMode === 'kannada' ? '#121214' : 'var(--text-muted)',
-                              fontWeight: scriptMode === 'kannada' ? '600' : '400',
-                              cursor: 'pointer',
-                              fontFamily: "'Noto Sans Kannada', sans-serif"
-                            }}
-                          >
-                            Kannada
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => setScriptMode('roman')}
-                            title="Display character labels in Roman transliteration"
-                            style={{
-                              padding: '2px 8px',
-                              fontSize: '0.74rem',
-                              border: 'none',
-                              borderRadius: '3px',
-                              backgroundColor: scriptMode === 'roman' ? '#C9A66B' : 'transparent',
-                              color: scriptMode === 'roman' ? '#121214' : 'var(--text-muted)',
-                              fontWeight: scriptMode === 'roman' ? '600' : '400',
-                              cursor: 'pointer'
-                            }}
-                          >
-                            Roman
-                          </button>
+                          <Sliders size={13} color="var(--accent-sandstone)" />
+                          <span>Curtain: <strong style={{ color: 'var(--text-primary)' }}>{Math.round(sliderPos)}%</strong></span>
                         </div>
 
-                        {scriptMode === 'kannada' && (
-                          <div
-                            className="toggle-wrapper"
-                            onClick={() => setModernLetters(!modernLetters)}
-                            role="switch"
-                            aria-checked={modernLetters}
-                            tabIndex={0}
-                            title="Replace archaic ಱ and ೞ with modern letters ರ and ಳ (marked with lossy tag)"
-                            style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', minWidth: '105px', whiteSpace: 'nowrap' }}
-                            onKeyDown={(e) => {
-                              if (e.key === ' ' || e.key === 'Enter') {
-                                e.preventDefault();
-                                setModernLetters(!modernLetters);
-                              }
-                            }}
-                          >
-                            <div className={`toggle-switch ${modernLetters ? 'active' : ''}`} style={{ width: '28px', height: '16px' }}>
-                              <div className="toggle-thumb" style={{ width: '10px', height: '10px' }} />
-                            </div>
-                            <span style={{ fontSize: '0.72rem', color: modernLetters ? 'var(--text-primary)' : 'var(--text-muted)', whiteSpace: 'nowrap' }}>
-                              Modern letters
+                        {/* High accuracy tag (only when current run used high accuracy mode) */}
+                        {analysis.mode === 'high_accuracy' && (
+                          <>
+                            <div className="toolbar-sep" />
+                            <span
+                              className="pill pill-sandstone"
+                              style={{ fontSize: '0.68rem', padding: '2px 8px', minWidth: '65px', textAlign: 'center', whiteSpace: 'nowrap' }}
+                              title="Enhanced with multi-scale sliding window"
+                            >
+                              High accuracy
                             </span>
-                          </div>
+                          </>
                         )}
                       </div>
 
-                      {/* Right Group: Fit & Zoom Controls (Always visible) */}
+                      {/* Right Group: Script, Display options, Zoom, and Export menu */}
                       <div className="toolbar-group-right">
-                        <button
-                          className="tool-btn"
-                          onClick={() => fitToViewport(true)}
-                          title="Fit stone to available panel height"
-                          style={{ minWidth: '45px', whiteSpace: 'nowrap' }}
-                        >
-                          <Maximize2 size={12} /> Fit
-                        </button>
-                        <button
-                          className="tool-btn"
-                          onClick={zoomTo100}
-                          title="View at 100% original scale"
-                          style={{ minWidth: '45px', whiteSpace: 'nowrap' }}
-                        >
-                          100%
-                        </button>
-                        <button
-                          className="tool-btn"
-                          onClick={zoomOut}
-                          title="Zoom Out (-)"
-                          style={{ minWidth: '28px' }}
-                        >
-                          <ZoomOut size={13} />
-                        </button>
-                        <span style={{ fontSize: '0.75rem', minWidth: '42px', textAlign: 'center', color: 'var(--text-primary)', fontFamily: 'monospace', whiteSpace: 'nowrap' }}>
-                          {Math.round(scale * 100)}%
-                        </span>
-                        <button
-                          className="tool-btn"
-                          onClick={zoomIn}
-                          title="Zoom In (+)"
-                          style={{ minWidth: '28px' }}
-                        >
-                          <ZoomIn size={13} />
-                        </button>
+                        {/* Below 1100 px: Move Script, Display options and Export into single View menu */}
+                        {isCompactView ? (
+                          <div className="view-menu-wrapper" ref={viewDropdownRef} style={{ position: 'relative', display: 'inline-flex' }}>
+                            <button
+                              type="button"
+                              className={`tool-btn ${viewDropdownOpen ? 'active' : ''}`}
+                              onClick={() => setViewDropdownOpen(!viewDropdownOpen)}
+                              title="View and export options"
+                              aria-expanded={viewDropdownOpen}
+                              style={{ minWidth: '68px', whiteSpace: 'nowrap', gap: '4px' }}
+                            >
+                              <Eye size={13} /> View <ChevronDown size={11} />
+                            </button>
+                            {viewDropdownOpen && (
+                              <div className="toolbar-popover-menu right-aligned" style={{ minWidth: '240px', padding: '12px' }}>
+                                <div style={{ fontSize: '0.68rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '6px' }}>
+                                  Script
+                                </div>
+                                <div
+                                  className="script-segmented-control"
+                                  role="radiogroup"
+                                  aria-label="Script selection"
+                                  tabIndex={0}
+                                  onKeyDown={(e) => {
+                                    if (e.key === 'ArrowLeft') {
+                                      e.preventDefault();
+                                      setScriptMode('kannada');
+                                    } else if (e.key === 'ArrowRight') {
+                                      e.preventDefault();
+                                      setScriptMode('roman');
+                                    }
+                                  }}
+                                  style={{ width: '100%', marginBottom: scriptMode === 'kannada' ? '8px' : '0' }}
+                                >
+                                  <div
+                                    className="script-segment-highlight"
+                                    style={{
+                                      transform: scriptMode === 'kannada' ? 'translateX(0)' : 'translateX(100%)'
+                                    }}
+                                  />
+                                  <button
+                                    type="button"
+                                    role="radio"
+                                    aria-checked={scriptMode === 'kannada'}
+                                    className={`script-segment-btn ${scriptMode === 'kannada' ? 'active' : ''}`}
+                                    onClick={() => setScriptMode('kannada')}
+                                    title="Display character labels in Kannada script (ಕನ್ನಡ)"
+                                  >
+                                    ಕನ್ನಡ
+                                  </button>
+                                  <button
+                                    type="button"
+                                    role="radio"
+                                    aria-checked={scriptMode === 'roman'}
+                                    className={`script-segment-btn ${scriptMode === 'roman' ? 'active' : ''}`}
+                                    onClick={() => setScriptMode('roman')}
+                                    title="Display character labels in Roman transliteration"
+                                  >
+                                    Roman
+                                  </button>
+                                </div>
+
+                                {scriptMode === 'kannada' && (
+                                  <div style={{ padding: '8px', backgroundColor: 'var(--bg-base)', borderRadius: '6px', border: '1px solid var(--border-subtle)', marginBottom: '4px' }}>
+                                    <div
+                                      className="toggle-wrapper"
+                                      onClick={() => setModernLetters(!modernLetters)}
+                                      role="switch"
+                                      aria-checked={modernLetters}
+                                      tabIndex={0}
+                                      onKeyDown={(e) => {
+                                        if (e.key === ' ' || e.key === 'Enter') {
+                                          e.preventDefault();
+                                          setModernLetters(!modernLetters);
+                                        }
+                                      }}
+                                      style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}
+                                    >
+                                      <div className={`toggle-switch ${modernLetters ? 'active' : ''}`}>
+                                        <div className="toggle-thumb" />
+                                      </div>
+                                      <span style={{ fontSize: '0.76rem', color: modernLetters ? 'var(--text-primary)' : 'var(--text-muted)', fontWeight: 500 }}>
+                                        Modern letters
+                                      </span>
+                                    </div>
+                                    <p style={{ fontSize: '0.68rem', color: 'var(--text-muted)', lineHeight: 1.35, margin: '6px 0 0 0' }}>
+                                      Modern letters replace archaic ಱ and ೞ with modern ರ and ಳ and are marked as lossy.
+                                    </p>
+                                  </div>
+                                )}
+
+                                <div style={{ height: '1px', backgroundColor: 'var(--border-subtle)', margin: '8px 0' }} />
+
+                                <div style={{ fontSize: '0.68rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '6px' }}>
+                                  Export
+                                </div>
+                                <a
+                                  href={analysis.mask_url}
+                                  download={`mask_${analysis.id}.png`}
+                                  className="popover-action-item"
+                                  onClick={() => setViewDropdownOpen(false)}
+                                  title="Download enhanced binary mask PNG"
+                                >
+                                  <Download size={13} /> Download mask
+                                </a>
+                              </div>
+                            )}
+                          </div>
+                        ) : (
+                          <>
+                            {/* Script control: segmented control with sliding highlight */}
+                            <div
+                              className="script-segmented-control"
+                              role="radiogroup"
+                              aria-label="Script selection"
+                              tabIndex={0}
+                              onKeyDown={(e) => {
+                                if (e.key === 'ArrowLeft') {
+                                  e.preventDefault();
+                                  setScriptMode('kannada');
+                                } else if (e.key === 'ArrowRight') {
+                                  e.preventDefault();
+                                  setScriptMode('roman');
+                                }
+                              }}
+                            >
+                              <div
+                                className="script-segment-highlight"
+                                style={{
+                                  transform: scriptMode === 'kannada' ? 'translateX(0)' : 'translateX(100%)'
+                                }}
+                              />
+                              <button
+                                type="button"
+                                role="radio"
+                                aria-checked={scriptMode === 'kannada'}
+                                className={`script-segment-btn ${scriptMode === 'kannada' ? 'active' : ''}`}
+                                onClick={() => setScriptMode('kannada')}
+                                title="Display character labels in Kannada script (ಕನ್ನಡ)"
+                              >
+                                ಕನ್ನಡ
+                              </button>
+                              <button
+                                type="button"
+                                role="radio"
+                                aria-checked={scriptMode === 'roman'}
+                                className={`script-segment-btn ${scriptMode === 'roman' ? 'active' : ''}`}
+                                onClick={() => setScriptMode('roman')}
+                                title="Display character labels in Roman transliteration"
+                              >
+                                Roman
+                              </button>
+                            </div>
+
+                            {/* Display options popover (gear icon), visible only when Kannada is selected */}
+                            {scriptMode === 'kannada' && (
+                              <div className="display-options-wrapper" ref={displayOptionsRef} style={{ position: 'relative', display: 'inline-flex' }}>
+                                <button
+                                  type="button"
+                                  className={`tool-btn tool-btn-icon ${displayOptionsOpen ? 'active' : ''}`}
+                                  onClick={() => setDisplayOptionsOpen(!displayOptionsOpen)}
+                                  title="Display options"
+                                  aria-label="Display options"
+                                  aria-expanded={displayOptionsOpen}
+                                  style={{ minWidth: '30px', height: '30px', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                                >
+                                  <Settings size={13} />
+                                </button>
+                                {displayOptionsOpen && (
+                                  <div className="toolbar-popover-menu" style={{ minWidth: '240px', padding: '12px' }}>
+                                    <div style={{ fontWeight: 600, fontSize: '0.78rem', color: 'var(--text-primary)', marginBottom: '8px' }}>
+                                      Display options
+                                    </div>
+                                    <div
+                                      className="toggle-wrapper"
+                                      onClick={() => setModernLetters(!modernLetters)}
+                                      role="switch"
+                                      aria-checked={modernLetters}
+                                      tabIndex={0}
+                                      onKeyDown={(e) => {
+                                        if (e.key === ' ' || e.key === 'Enter') {
+                                          e.preventDefault();
+                                          setModernLetters(!modernLetters);
+                                        }
+                                      }}
+                                      style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}
+                                    >
+                                      <div className={`toggle-switch ${modernLetters ? 'active' : ''}`}>
+                                        <div className="toggle-thumb" />
+                                      </div>
+                                      <span style={{ fontSize: '0.78rem', color: modernLetters ? 'var(--text-primary)' : 'var(--text-muted)', fontWeight: 500 }}>
+                                        Modern letters
+                                      </span>
+                                    </div>
+                                    <p style={{ fontSize: '0.71rem', color: 'var(--text-muted)', lineHeight: 1.4, margin: '8px 0 0 0' }}>
+                                      Modern letters replace archaic ಱ and ೞ with modern ರ and ಳ and are marked as lossy.
+                                    </p>
+                                  </div>
+                                )}
+                              </div>
+                            )}
+
+                            <div className="toolbar-sep" />
+                          </>
+                        )}
+
+                        {/* Zoom Group (Fit, minus, zoom percent, plus) - Always visible */}
+                        <div style={{ display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
+                          <button
+                            className="tool-btn"
+                            onClick={() => fitToViewport(true)}
+                            title="Fit stone to available panel height"
+                            style={{ minWidth: '45px', whiteSpace: 'nowrap' }}
+                          >
+                            <Maximize2 size={12} /> Fit
+                          </button>
+                          <button
+                            className="tool-btn"
+                            onClick={zoomOut}
+                            title="Zoom Out (-)"
+                            style={{ minWidth: '28px', padding: '0 6px' }}
+                          >
+                            <ZoomOut size={13} />
+                          </button>
+                          <span style={{ fontSize: '0.75rem', minWidth: '42px', textAlign: 'center', color: 'var(--text-primary)', fontFamily: 'monospace', whiteSpace: 'nowrap' }}>
+                            {Math.round(scale * 100)}%
+                          </span>
+                          <button
+                            className="tool-btn"
+                            onClick={zoomIn}
+                            title="Zoom In (+)"
+                            style={{ minWidth: '28px', padding: '0 6px' }}
+                          >
+                            <ZoomIn size={13} />
+                          </button>
+                        </div>
+
+                        {/* Export Menu: Far right when panelWidth >= 1100 px */}
+                        {!isCompactView && (
+                          <>
+                            <div className="toolbar-sep" />
+                            <div className="export-menu-wrapper" ref={exportMenuRef} style={{ position: 'relative', display: 'inline-flex' }}>
+                              <button
+                                type="button"
+                                className={`tool-btn ${exportMenuOpen ? 'active' : ''}`}
+                                onClick={() => setExportMenuOpen(!exportMenuOpen)}
+                                title="Export options"
+                                aria-label="Export options"
+                                aria-expanded={exportMenuOpen}
+                                style={{ minWidth: '76px', height: '30px', whiteSpace: 'nowrap', gap: '5px' }}
+                              >
+                                <Download size={13} /> Export <ChevronDown size={11} />
+                              </button>
+                              {exportMenuOpen && (
+                                <div className="toolbar-popover-menu right-aligned" style={{ minWidth: '160px', padding: '6px' }}>
+                                  <a
+                                    href={analysis.mask_url}
+                                    download={`mask_${analysis.id}.png`}
+                                    className="popover-action-item"
+                                    onClick={() => setExportMenuOpen(false)}
+                                    title="Download enhanced binary mask PNG"
+                                  >
+                                    <Download size={13} /> Download mask
+                                  </a>
+                                </div>
+                              )}
+                            </div>
+                          </>
+                        )}
                       </div>
                     </div>
 
@@ -1515,9 +1756,9 @@ export default function App() {
                           <div className="curtain-label curtain-label-mask">Mask</div>
                           <div className="curtain-label curtain-label-original">Original</div>
 
-                          {/* Slider Handle (Keyboard Accessible & Draggable) */}
+                          {/* Slider Handle (Keyboard Accessible, Touch & Draggable) */}
                           <div
-                            className="curtain-handle"
+                            className={`curtain-handle ${isCurtainDragging ? 'dragging' : ''}`}
                             style={{ left: `${sliderPos}%` }}
                             tabIndex={0}
                             role="slider"
@@ -1526,6 +1767,7 @@ export default function App() {
                             aria-valuemin={0}
                             aria-valuemax={100}
                             onMouseDown={handleCurtainHandleMouseDown}
+                            onTouchStart={handleCurtainTouchStart}
                             onKeyDown={handleCurtainKeyDown}
                           >
                             <div className="curtain-handle-knob">
@@ -2001,37 +2243,12 @@ export default function App() {
 
                 {/* Bottom Glyph Gallery Strip with Filters, Tiny Region Toggle & Status Chips */}
                 <div className="gallery-strip">
-                  <div className="gallery-strip-header">
-                    {/* Left: Filter Buttons */}
-                    <div className="filter-group">
-                      <span style={{ fontSize: '0.72rem', fontWeight: '700', color: '#7E7A75', textTransform: 'uppercase', marginRight: '4px' }}>
-                        Filter:
-                      </span>
-                      <button
-                        className={`filter-chip ${filterTab === 'all' ? 'active' : ''}`}
-                        onClick={() => setFilterTab('all')}
-                      >
-                        All ({counts.all})
-                      </button>
-                      <button
-                        className={`filter-chip ${filterTab === 'predicted' ? 'active' : ''}`}
-                        onClick={() => setFilterTab('predicted')}
-                      >
-                        Predicted ({counts.predicted})
-                      </button>
-                      <button
-                        className={`filter-chip ${filterTab === 'reviewed' ? 'active' : ''}`}
-                        onClick={() => setFilterTab('reviewed')}
-                      >
-                        Reviewed ({counts.reviewed})
-                      </button>
-                    </div>
-
-                    {/* Right: Classification status, Re-run, Hide tiny, and arrow navigation */}
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', whiteSpace: 'nowrap' }}>
-                      {/* Classification Status / Classify All / Re-run moved from toolbar */}
+                  <div className="gallery-strip-header" title="Use Left and Right arrow keys to navigate candidates">
+                    {/* Left: Classification button / status AND Filter segmented control */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', minWidth: 0, whiteSpace: 'nowrap' }}>
+                      {/* Classification Status / Classify All / Re-run */}
                       {isClassifying ? (
-                        <div className="progress-container" style={{ minWidth: '160px' }}>
+                        <div className="progress-container" style={{ minWidth: '150px' }}>
                           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.7rem', color: '#C9A66B' }}>
                             <span>Classifying...</span>
                             <span style={{ fontWeight: '600' }}>{classifyProgress} of {analysis.boxes.length}</span>
@@ -2044,23 +2261,23 @@ export default function App() {
                           </div>
                         </div>
                       ) : classifyComplete && batchRegions.length > 0 ? (
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                          <span className="pill pill-success" style={{ fontSize: '0.7rem', padding: '2px 8px' }}>
-                            <CheckCircle size={11} /> {batchRegions.length} regions classified
-                          </span>
+                        <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
                           <button
                             className="btn-secondary"
-                            style={{ padding: '2px 8px', fontSize: '0.7rem', height: '22px', gap: '4px' }}
+                            style={{ padding: '0 8px', fontSize: '0.72rem', height: '26px', gap: '4px', whiteSpace: 'nowrap' }}
                             onClick={runBatchRecognize}
                             title="Re-run batch recognition"
                           >
-                            <RotateCcw size={10} /> Re-run
+                            <RotateCcw size={11} /> Re-run
                           </button>
+                          <span className="pill pill-success" style={{ fontSize: '0.7rem', padding: '2px 8px', whiteSpace: 'nowrap' }}>
+                            <CheckCircle size={11} /> {batchRegions.length} classified
+                          </span>
                         </div>
                       ) : (
                         <button
-                          className="btn-primary"
-                          style={{ padding: '3px 10px', fontSize: '0.74rem', height: '24px', whiteSpace: 'nowrap', gap: '5px' }}
+                          className="btn-primary btn-magnetic"
+                          style={{ padding: '0 10px', fontSize: '0.74rem', height: '26px', whiteSpace: 'nowrap', gap: '5px' }}
                           onClick={runBatchRecognize}
                           disabled={loading}
                         >
@@ -2068,15 +2285,50 @@ export default function App() {
                         </button>
                       )}
 
-                      <div style={{ width: '1px', height: '14px', backgroundColor: 'var(--border-subtle)' }} />
+                      <div className="toolbar-sep" style={{ height: '16px' }} />
 
-                      {/* Hide tiny regions toggle */}
+                      {/* Filter segmented control with counts: All, Predicted, Reviewed */}
+                      <div className="filter-segmented-control" role="tablist" aria-label="Candidate filters">
+                        <button
+                          type="button"
+                          role="tab"
+                          aria-selected={filterTab === 'all'}
+                          className={`filter-segment-btn ${filterTab === 'all' ? 'active' : ''}`}
+                          onClick={() => setFilterTab('all')}
+                        >
+                          All ({counts.all})
+                        </button>
+                        <button
+                          type="button"
+                          role="tab"
+                          aria-selected={filterTab === 'predicted'}
+                          className={`filter-segment-btn ${filterTab === 'predicted' ? 'active' : ''}`}
+                          onClick={() => setFilterTab('predicted')}
+                        >
+                          Predicted ({counts.predicted})
+                        </button>
+                        <button
+                          type="button"
+                          role="tab"
+                          aria-selected={filterTab === 'reviewed'}
+                          className={`filter-segment-btn ${filterTab === 'reviewed' ? 'active' : ''}`}
+                          onClick={() => setFilterTab('reviewed')}
+                        >
+                          Reviewed ({counts.reviewed})
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Right: Hide tiny compact switch chip and Keyboard navigation hint */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', whiteSpace: 'nowrap' }} title="Use Left and Right arrow keys to navigate candidates">
+                      {/* Hide tiny regions compact switch chip */}
                       <div
-                        className="toggle-wrapper"
+                        className={`chip-switch ${hideTiny ? 'active' : ''}`}
                         onClick={() => setHideTiny(!hideTiny)}
                         role="switch"
                         aria-checked={hideTiny}
                         tabIndex={0}
+                        title={`Toggle visibility of tiny candidate boxes under 10x10 px (${counts.tiny} regions)`}
                         onKeyDown={(e) => {
                           if (e.key === ' ' || e.key === 'Enter') {
                             e.preventDefault();
@@ -2084,19 +2336,24 @@ export default function App() {
                           }
                         }}
                       >
-                        <div className={`toggle-switch ${hideTiny ? 'active' : ''}`} style={{ width: '28px', height: '16px' }}>
-                          <div className="toggle-thumb" style={{ width: '10px', height: '10px' }} />
+                        <div className={`toggle-switch mini ${hideTiny ? 'active' : ''}`}>
+                          <div className="toggle-thumb" />
                         </div>
-                        <span style={{ fontSize: '0.74rem', color: hideTiny ? 'var(--text-primary)' : 'var(--text-subtle)', whiteSpace: 'nowrap' }}>
-                          Hide tiny &lt;10px ({counts.tiny})
-                        </span>
+                        <span>Hide tiny</span>
+                        <span className="pill-count">{counts.tiny}</span>
                       </div>
 
-                      <div style={{ width: '1px', height: '14px', backgroundColor: 'var(--border-subtle)' }} />
+                      <div className="toolbar-sep" style={{ height: '16px' }} />
 
-                      <span style={{ fontSize: '0.7rem', color: 'var(--text-subtle)', whiteSpace: 'nowrap' }}>
-                        Arrow keys to navigate
-                      </span>
+                      {/* Keyboard hint showing small left and right arrow keycaps */}
+                      <div
+                        className={`keyboard-hint-pill ${hasUsedArrowKeys ? 'faded' : ''}`}
+                        title="Use Left and Right arrow keys to navigate candidates"
+                      >
+                        <kbd className="keycap">←</kbd>
+                        <kbd className="keycap">→</kbd>
+                        <span className="keycap-label" style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>Navigate</span>
+                      </div>
                     </div>
                   </div>
 
