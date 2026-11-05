@@ -13,7 +13,10 @@ ROOT=Path(__file__).resolve().parent.parent
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--omit-separators', action='store_true')
+    parser.add_argument('--glyph-pretrained', action='store_true')
     args = parser.parse_args()
+    if args.glyph_pretrained and not args.omit_separators:
+        parser.error('The transfer comparison requires --omit-separators')
     random.seed(42);np.random.seed(42);torch.manual_seed(42);torch.set_num_threads(4)
     folder=ROOT/'outputs/paired_line_data';out=ROOT/'outputs/screened_sequence_study';out.mkdir(exist_ok=True)
     rows=[r for r in json.loads((folder/'records.json').read_text(encoding='utf-8')) if r['eligible']]
@@ -41,6 +44,9 @@ def main():
         for i,r in enumerate(rs):x[i,:,:,:r['tensor'].shape[-1]]=r['tensor']
         return x,torch.tensor([r['steps'] for r in rs])
     model=SequenceRecognizer(len(alphabet)+1,True);opt=torch.optim.Adam(model.parameters(),lr=.003)
+    if args.glyph_pretrained:
+        out = ROOT/'outputs/glyph_encoder_study'
+        model.cnn.load_state_dict(torch.load(out/'encoder.pth', weights_only=True))
     loss_fn=torch.nn.CTCLoss(blank=0,zero_infinity=False);logs=[];start=time.perf_counter()
     for epoch in range(1,11):
         model.train();order=list(fit);random.shuffle(order);loss_sum=0
@@ -82,6 +88,11 @@ def main():
         summary['letter_only']={k:sum(distance(r['target'],r[k]) for r in letter_results)/denominator for k in ['baseline','candidate','blank']}
         summary['letter_codepoints']=denominator
         summary['development_examples']=letter_results
+        if args.glyph_pretrained:
+            scratch = json.loads((ROOT/'outputs/sequence_separator_comparison/summary.json').read_text(encoding='utf-8'))
+            assert [(r['source'],r['line'],r['target']) for r in scratch['development_examples']]==[(r['source'],r['line'],r['target']) for r in letter_results]
+            summary['scratch_letter_cer']=scratch['letter_only']['candidate']
+            summary['pretraining']='Six glyph classification epochs on 9566 fit-location crops; CNN weights transferred. All line-model layers fine-tuned.'
         summary['target_policy']='Omit inserted separators in supervision. Same alphabet, seed, images and training settings as baseline. Score both after stripping separators. Blank control preserves dimensions.'
         summary['limitations'][2]='Roman codepoint error on annotation-assisted crops.'
     (out/'summary.json').write_text(json.dumps(summary,indent=2)+'\n')

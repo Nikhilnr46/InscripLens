@@ -1,0 +1,152 @@
+{
+  "reports": {
+    "fit": {
+      "lines": 124,
+      "reference_codepoints": 2674,
+      "greedy_exact": 0,
+      "greedy_edits": 2674,
+      "greedy_cer": 1.0
+    },
+    "development": {
+      "lines": 7,
+      "reference_codepoints": 125,
+      "greedy_exact": 0,
+      "greedy_edits": 125,
+      "greedy_cer": 1.0,
+      "beam_exact": 0,
+      "beam_edits": 106,
+      "beam_cer": 0.848
+    }
+  },
+  "history": [
+    {
+      "epoch": 1,
+      "training_loss": 10.716697077597342,
+      "elapsed_seconds": 23.94689410000865
+    },
+    {
+      "epoch": 2,
+      "training_loss": 3.688122364782518,
+      "elapsed_seconds": 47.50012500000594
+    },
+    {
+      "epoch": 3,
+      "training_loss": 3.5791969683862503,
+      "elapsed_seconds": 68.61865800000669
+    },
+    {
+      "epoch": 4,
+      "training_loss": 3.441396628656695,
+      "elapsed_seconds": 86.97374919999857
+    },
+    {
+      "epoch": 5,
+      "training_loss": 3.3582778361535843,
+      "elapsed_seconds": 95.3219439000095
+    },
+    {
+      "epoch": 6,
+      "training_loss": 3.3245038370932303,
+      "elapsed_seconds": 102.14512240000477
+    },
+    {
+      "epoch": 7,
+      "training_loss": 3.3012652089518886,
+      "elapsed_seconds": 116.63231000000087
+    },
+    {
+      "epoch": 8,
+      "training_loss": 3.2662859809014106,
+      "elapsed_seconds": 126.8288567999989
+    },
+    {
+      "epoch": 9,
+      "training_loss": 3.239354964225523,
+      "elapsed_seconds": 135.85107750000316
+    },
+    {
+      "epoch": 10,
+      "training_loss": 3.2171806673849783,
+      "elapsed_seconds": 144.43658960000903
+    }
+  ],
+  "epochs": 10,
+  "seed": 42,
+  "seconds": 151.6896093999967,
+  "validation_used": false,
+  "production_model_changed": false,
+  "protocol": "Fixed initial ten epochs, batch4, Adam .003, packed vertical CNN-BiLSTM-CTC; alphabet from fit only; image-only height48 width256..1024. Final checkpoint evaluated once, no development checkpoint selection.",
+  "limitations": [
+    "Supplied annotation-assisted line crops and unverified source labels.",
+    "Only seven development lines.",
+    "Roman codepoint error on annotation-assisted crops.",
+    "Ten epochs is a diagnostic budget, not convergence or impossibility evidence."
+  ],
+  "letter_only": {
+    "baseline": 1.0,
+    "candidate": 0.848,
+    "blank": 1.0
+  },
+  "letter_codepoints": 125,
+  "development_examples": [
+    {
+      "source": "Aradeshanahalli 900CE Mumennayaga's Turugol Herostone With Inscription",
+      "line": 10,
+      "target": "ndiyasth\u0101namum\u0115",
+      "baseline": "",
+      "candidate": "aa",
+      "blank": "000"
+    },
+    {
+      "source": "Aradeshanahalli 900CE Mumennayaga's Turugol Herostone With Inscription",
+      "line": 6,
+      "target": "suttir\u0115nandigundadapa",
+      "baseline": "",
+      "candidate": "aaaa",
+      "blank": "000"
+    },
+    {
+      "source": "Aradeshanahalli 900CE Seemarasa Bhattaraka's Hero Stone Inscription",
+      "line": 3,
+      "target": "rsarabha\u1e6d\u0101rarkiy\u0101sd\u0101varak\u0115ysid\u0101",
+      "baseline": "",
+      "candidate": "aaaaa",
+      "blank": "000"
+    },
+    {
+      "source": "Sadahalli 800CE Uldanapitta Kammara's Herostone With Insciption",
+      "line": 1,
+      "target": "\u015br\u012b\u0115gitt\u014f\u1e5f\u0115",
+      "baseline": "",
+      "candidate": "aa",
+      "blank": "000"
+    },
+    {
+      "source": "Sadahalli 800CE Uldanapitta Kammara's Herostone With Insciption",
+      "line": 2,
+      "target": "yamah\u0101janadapa",
+      "baseline": "",
+      "candidate": "aaa",
+      "blank": "000"
+    },
+    {
+      "source": "Srinivagilu 800CE Palchatereyamma's Turugol Herostone With Inscription",
+      "line": 1,
+      "target": "svasti\u015br\u012bpal\u0324cat\u0115\u1e5f\u0115",
+      "baseline": "",
+      "candidate": "aaa",
+      "blank": "000"
+    },
+    {
+      "source": "T Dasarahalli 800CE Turugol Herostone With Inscription",
+      "line": 5,
+      "target": "i\u016bra\u0101l\u0324v\u014fsata\u1e43",
+      "baseline": "",
+      "candidate": "aa",
+      "blank": "000"
+    }
+  ],
+  "scratch_letter_cer": 0.928,
+  "pretraining": "Six glyph classification epochs on 9566 fit-location crops; CNN weights transferred. All line-model layers fine-tuned.",
+  "target_policy": "Omit inserted separators in supervision. Same alphabet, seed, images and training settings as baseline. Score both after stripping separators. Blank control preserves dimensions."
+}

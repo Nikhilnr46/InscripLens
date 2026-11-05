@@ -1,0 +1,8 @@
+{
+  "fit": 9566,
+  "development": 359,
+  "epochs": 6,
+  "classes": 737,
+  "correct": 49,
+  "frequency_control_correct": 17
+}
