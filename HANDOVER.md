@@ -1,5 +1,12 @@
 # InscripLens Studio Handover and Technical Guide
 
+## 6 November: Import Screen (Step S1 of 3)
+
+Added dedicated `/import` workspace route allowing users to choose between uploading a field photograph and loading the curated Nagavara demonstration stone before entering Studio:
+- Route Navigation: Added `/import` to `frontend/src/App.jsx`. SlideToEnter control and keyboard shortcuts on `/` route to `/import`. Studio header "Try another" and demo button route back to `/import`.
+- Import Component (`frontend/src/pages/ImportPage.jsx`): Two side-by-side cards with drag-and-drop upload (PNG/JPG, 20 MP limit check) and demo stone thumbnail selection (/api/demo/image) with full responsive stacking.
+- In-Memory File Store (`frontend/src/utils/fileStore.ts`): File objects are held strictly in memory during transition to `/studio`, invoking the unmodified enhancement upload handler on arrival without localStorage persistence.
+
 ## 5 November: Studio UI batch 2 layout of controls
 
 Reorganized Studio viewer toolbar and bottom gallery strip:
@@ -283,6 +290,7 @@ All binary checkpoints, large model bundles, datasets, and runtime images are ex
 ### Pages and Single-Page Landing Sections
 The client application is built as a single-page application (SPA) with two primary view states managed in `frontend/src/App.jsx`:
 - Route `/`: Single-page landing site containing four sequential sections:
+- Route `/import`: Dedicated stone image selection workspace (Step S1) featuring drag-and-drop/browse upload and demonstration stone loading cards.
   1. `#overview`: Hero banner, epigraphy badge, offline privacy guarantee, interactive stone tablet illustration with proximity glow, and "Slide to enter Studio" control.
   2. `#workflow`: Three-stage methodology cards ("Capture & Select", "Enhance & Localize", "Inspect & Verify") with 3D tilt and cursor spotlights, plus the demo stone trigger button.
   3. `#about`: Centered single-column documentation including "What is InscripLens", "Why it exists", the 5-stage pipeline, "Privacy", interactive FAQ accordion, and "Credits and licences".

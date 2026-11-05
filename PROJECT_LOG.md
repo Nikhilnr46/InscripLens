@@ -1,5 +1,23 @@
 # InscripLens Studio Project Log
 
+## 6 November: Import Screen Implementation (Step S1 of 3)
+
+Implemented the dedicated Image Import workspace route (`/import`) providing a streamlined entry point before Studio analysis:
+- Route Architecture & Navigation:
+  - Added dedicated route `/import` with full design system, header, and theme integration (obsidian dark and parchment light).
+  - Landing page's "Slide to enter Studio" interactive slider (including keyboard navigation via Enter, Space, and ArrowRight) now navigates directly to `/import`.
+  - Added navigation back link on `/import` routing back to the landing page (`/`).
+  - Studio top header "Try another" button and demo button now route back to `/import` rather than directly opening the system file dialog, preserving direct `/studio` visits.
+- Import Selection Cards:
+  - Centered workspace card with heading "Choose a stone image" and two large options side by side (stacked gracefully on viewports < 768px).
+  - Option A: "Upload a photograph": Drag-and-drop zone with active hover states plus "Browse image" button; validates accepted formats (PNG, JPG) and enforces the 20 megapixel limit with user-friendly error banners.
+  - Option B: "Use the demo stone": Showcases the Nagavara hero stone (971 CE) benchmark with thumbnail preview, historical epoch pill, and 1-click loading.
+- Temporary In-Memory File Handoff (completed in S2):
+  - Created `frontend/src/utils/fileStore.ts` to hold chosen `File` objects strictly in memory (zero `localStorage` / `sessionStorage` usage).
+  - Studio route consumes pending files on entry and dispatches the existing neural enhancement upload pipeline, maintaining full backward compatibility.
+- Regression & Verification:
+  - Landing page reveals, slide-to-enter transition, demo stone loading, photograph upload pipeline, multi-scale enhancement, connected-component candidate detection, batch classification, and SQLite review persistence all operate identically to baseline.
+
 ## 5 November: Studio UI batch 2 layout of controls
 
 Reorganized Studio viewer toolbar and bottom gallery strip:

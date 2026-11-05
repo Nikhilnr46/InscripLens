@@ -27,6 +27,8 @@ import {
   Settings
 } from 'lucide-react';
 import LandingPage from './pages/LandingPage.jsx';
+import ImportPage from './pages/ImportPage.jsx';
+import { setPendingFile, getPendingFile, clearPendingFile } from './utils/fileStore';
 import ThemeToggle from './components/ThemeToggle.tsx';
 import { SITE } from './config/site.ts';
 import { initSiteInteractions } from './utils/interactions.ts';
@@ -41,6 +43,9 @@ export default function App() {
       const section = p.replace(/^\//, '');
       window.history.replaceState(null, '', `/#${section}`);
       return '/';
+    }
+    if (p === '/import') {
+      return '/import';
     }
     if (p === '/studio' || window.location.search.includes('studio=1') || window.location.search.includes('demo=1')) {
       return '/studio';
@@ -98,6 +103,11 @@ export default function App() {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  const navigateToImport = () => {
+    window.history.pushState(null, '', '/import');
+    setRoute('/import');
+  };
+
   const navigateToStudio = (autoDemo = false) => {
     const target = autoDemo ? '/studio?demo=1' : '/studio';
     window.history.pushState(null, '', target);
@@ -141,6 +151,10 @@ export default function App() {
         setRoute('/');
         return;
       }
+      if (p === '/import') {
+        setRoute('/import');
+        return;
+      }
       setRoute(p === '/studio' ? '/studio' : '/');
     };
     window.addEventListener('popstate', onPopState);
@@ -154,6 +168,9 @@ export default function App() {
     if (route === '/studio') {
       title = `${SITE.name} - Workspace`;
       desc = 'Offline interactive analysis workspace for historical Kannada stone inscriptions.';
+    } else if (route === '/import') {
+      title = `${SITE.name} - Choose Stone Image`;
+      desc = 'Select or upload a historical Kannada stone inscription photograph to begin.';
     } else if (route === '/about') {
       title = `${SITE.name} - About & Documentation`;
       desc = 'Research documentation, pipeline architecture, and attribution for InscripLens Studio.';
@@ -730,9 +747,19 @@ export default function App() {
     }
   }, []);
 
-  // Upload user photograph
-  const handleFileUpload = async (e) => {
-    const file = e.target.files?.[0];
+  // Consume pending file from /import when entering /studio
+  useEffect(() => {
+    if (route === '/studio') {
+      const pending = getPendingFile();
+      if (pending) {
+        clearPendingFile();
+        uploadFile(pending);
+      }
+    }
+  }, [route]);
+
+  // Upload user photograph core handler
+  const uploadFile = async (file) => {
     if (!file) return;
     setLoading(true);
     setLoadingMessage(highAccuracy ? 'Running high accuracy multi-scale enhancement...' : 'Enhancing inscription photograph...');
@@ -769,6 +796,18 @@ export default function App() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleFileUpload = (e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      uploadFile(file);
+    }
+  };
+
+  const handleSelectFileFromImport = (file) => {
+    setPendingFile(file);
+    navigateToStudio(false);
   };
 
     // Predict selected crop region with tiny check and 8s timeout guard
@@ -1106,8 +1145,18 @@ export default function App() {
   if (route === '/') {
     return (
       <LandingPage
-        onEnterStudio={() => navigateToStudio(false)}
+        onEnterStudio={navigateToImport}
         onTryDemo={() => navigateToStudio(true)}
+      />
+    );
+  }
+
+  if (route === '/import') {
+    return (
+      <ImportPage
+        onSelectFile={handleSelectFileFromImport}
+        onSelectDemo={() => navigateToStudio(true)}
+        onBackToLanding={navigateToHome}
       />
     );
   }
@@ -1210,7 +1259,7 @@ export default function App() {
           />
           <button
             className="btn-secondary"
-            onClick={() => fileInputRef.current?.click()}
+            onClick={navigateToImport}
             disabled={loading}
             style={{ whiteSpace: 'nowrap', flexShrink: 0 }}
           >
@@ -1219,7 +1268,7 @@ export default function App() {
           {(!analysis || !analysis.is_demo) && (
             <button
               className={analysis ? "btn-secondary" : "btn-primary btn-magnetic"}
-              onClick={loadDemoStone}
+              onClick={navigateToImport}
               disabled={loading}
               style={{ whiteSpace: 'nowrap', flexShrink: 0 }}
               title="Load the Nagavara demonstration hero stone"
