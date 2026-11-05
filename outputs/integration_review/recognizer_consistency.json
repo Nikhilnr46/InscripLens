@@ -1,0 +1,8 @@
+{
+  "reference_n": 300,
+  "svm_predict_correct": 77,
+  "decision_argmax_correct": 73,
+  "disagreements": 15,
+  "runtime_disagreement_cases_checked": 15,
+  "protocol": "Same saved model and 300 predicted-mask reference crops; no retraining. Runtime SVM uses predict(), alternatives preserve that choice. Unvalidated probability omitted."
+}

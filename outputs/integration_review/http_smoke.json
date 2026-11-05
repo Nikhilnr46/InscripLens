@@ -1,0 +1,12 @@
+{
+  "/api/status": 200,
+  "/api/demo": 200,
+  "/": 200,
+  "/studio": 200,
+  "analysis_candidates": 133,
+  "batch_predictions": 133,
+  "crop_prediction": "l\u0324u",
+  "crop_confidence": null,
+  "new_port": 8001,
+  "note": "Real local HTTP requests and standard enhancement; generated QA analysis retained in local history. Existing port8000 process not replaced."
+}

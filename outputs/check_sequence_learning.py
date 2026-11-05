@@ -42,6 +42,7 @@ def main():
     parser.add_argument('--pack-lengths',action='store_true')
     parser.add_argument('--max-steps',type=int,default=300)
     parser.add_argument('--paired-view',choices=['mask','original'])
+    parser.add_argument('--beam-width',type=int,default=0)
     args=parser.parse_args()
     random.seed(42);np.random.seed(42);torch.manual_seed(42);torch.set_num_threads(4)
     data_dir=ROOT/'outputs/paired_line_data' if args.paired_view else OUT
@@ -91,12 +92,20 @@ def main():
             log={'step':step,'loss':float(loss.detach()),'training_exact':exact,'total':len(chosen)}
             history.append(log);print(json.dumps(log),flush=True)
             if exact==len(chosen):break
+    beam_predictions=None
+    if args.beam_width:
+        from ctc_prefix_decode import decode
+        with torch.inference_mode():lp=model(x,lengths if args.pack_lengths else None).cpu().numpy()
+        beam_predictions=[''.join(alphabet[c-1] for c in decode(lp[:int(n),i],args.beam_width)) for i,n in enumerate(lengths)]
     result={'purpose':'training-only tiny-subset learnability check, not generalization',
+            'beam_width':args.beam_width,'beam_predictions':beam_predictions,
+            'beam_exact':sum(p==r['target'] for p,r in zip(beam_predictions,chosen)) if beam_predictions is not None else None,
             'paired_view':args.paired_view,'eligible_fit_lines':len(eligible),
             'minimum_foreground_pixels_per_character':20 if args.require_foreground or args.paired_view else None,
             'preserve_vertical_features':args.preserve_height,
             'packed_sequence_lengths':args.pack_lengths,
-            'passed':exact==len(chosen),'seconds':time.perf_counter()-started,
+            'greedy_passed':exact==len(chosen),
+            'passed':all(p==r['target'] for p,r in zip(beam_predictions,chosen)) if beam_predictions is not None else exact==len(chosen),'seconds':time.perf_counter()-started,
             'maximum_steps':args.max_steps,'history':history,'validation_used':False,'development_used':False,
             'samples':[{'source_name':r['source_name'],'line_number':r['line_number'],
                         'target':r['target'],'prediction':p} for r,p in zip(chosen,predictions)]}
@@ -105,6 +114,7 @@ def main():
     if args.pack_lengths:filename=filename.replace('.json','_packed.json')
     if args.max_steps!=300:filename=filename.replace('.json',f'_{args.max_steps}steps.json')
     if args.paired_view:filename='learnability_'+args.paired_view+('' if args.max_steps==300 else f'_{args.max_steps}steps')+'.json'
+    if args.beam_width:filename=filename.replace('.json',f'_beam{args.beam_width}.json')
     (data_dir/filename).write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
     print('Training-only check passed:',result['passed'],flush=True)
 

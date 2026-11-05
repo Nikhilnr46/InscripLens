@@ -26,3 +26,11 @@ Run `work/binarizer_env/Scripts/python.exe outputs/check_sequence_learning.py --
 Predicted-mask view: 1/4 exact training sequences after 300 steps. Original grayscale view: 0/4. Both fail the required 4/4 gate. These four examples differ from earlier experiments, so this is not an accuracy comparison with the old 3/4 result. Tiny-subset memorization would still not prove generalization even if successful. No large training run started and no runtime model changed.
 
 Visual comparison against the archive's binary images shows incomplete strokes in some selected examples; even supplied binary images can be sparse. The minimum 20 foreground-pixel filter does not establish glyph completeness. Next investigate source-aligned glyph quality and decoding/optimization controls on a reviewed tiny subset; do not assume adding epochs or more unreviewed images solves the issue.
+
+## 5 November: decoding control passed
+
+The same fixed mask-view four-example training run (seed42,300steps, unchanged CNN/BiLSTM/CTC) was repeated with lexicon-free CTC prefix beam decoding, width10. Greedy still reproduces1/4 sequences; beam decoding reproduces4/4: `0|na`, `a|vi`, `śrī|śrī`, `l̤i|grā`. Decoder receives only model log probabilities, not targets/dictionary/publication context. Prefix-beam implementation was checked against exhaustive aggregation of all CTC paths on32 small random cases, plus repeated-symbol/blank cases.
+
+This passes a tiny-subset memorization gate and establishes decoding as one limitation of the previous check. It does not establish generalization, transcription correctness, or feasibility of reliable arbitrary-stone OCR. No development/validation inference or production sequence-model promotion occurred. Next step is a fixed, bounded training run on the screened fit set with separate development sequence error measurement, preserving all corpus data for other experiments.
+
+Reproduce: `work/binarizer_env/Scripts/python.exe outputs/check_sequence_learning.py --paired-view mask --preserve-height --pack-lengths --beam-width 10`. Report: learnability_mask_beam10.json.

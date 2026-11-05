@@ -2,6 +2,7 @@
 Supports calibrated single-model prediction (Broad CNN), fallback to SVM,
 uncertainty estimation via calibration-split abstain threshold, and model agreement checking.
 """
+from __future__ import annotations
 import io
 import json
 import hashlib
@@ -11,14 +12,15 @@ from typing import Dict, List, Optional, Tuple, Any
 
 ROOT = Path(__file__).resolve().parent.parent.parent
 
-# Ensure binarizer_env packages (PyTorch with CUDA) are available
-ENV_PACKAGES = ROOT / "work/binarizer_env/Lib/site-packages"
-if ENV_PACKAGES.is_dir() and str(ENV_PACKAGES) not in sys.path:
-    sys.path.insert(0, str(ENV_PACKAGES))
+# Binary packages must belong to the running Python. The enhancement worker
+# has its own environment; importing its site-packages can break NumPy/Torch.
 
 import numpy as np
 from PIL import Image, ImageOps
-import torch
+try:
+    import torch
+except ImportError:
+    torch = None
 import joblib
 
 # Paths to models and parameters
@@ -39,7 +41,7 @@ from segment_candidates import candidates
 from recognition_alternatives import rank_labels, source_examples
 
 # PyTorch Broad CNN Architecture definition
-class BroadCharacterCNN(torch.nn.Module):
+class BroadCharacterCNN(torch.nn.Module if torch is not None else object):
     def __init__(self, num_classes: int):
         super().__init__()
         self.features = torch.nn.Sequential(
@@ -83,7 +85,7 @@ class RecognizerEngine:
     """Manages calibrated character recognition inference with graceful fallbacks."""
 
     def __init__(self):
-        self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+        self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu') if torch is not None else None
         self.svm_bundle = None
         self.svm_classes = []
         self.cnn_model = None
@@ -118,7 +120,7 @@ class RecognizerEngine:
                     self.svm_bundle = None
 
         # 2. Load Broad CNN Checkpoint
-        if CNN_CHECKPOINT.is_file():
+        if torch is not None and CNN_CHECKPOINT.is_file():
             try:
                 ckpt = torch.load(CNN_CHECKPOINT, map_location=self.device, weights_only=True)
                 self.cnn_classes = list(ckpt['classes'])
@@ -166,22 +168,23 @@ class RecognizerEngine:
                 dec = self.svm_bundle['model'].decision_function([feat])[0]
                 calib_svm_probs = _softmax(dec / self.t_svm)
                 svm_top_idx = np.argsort(-calib_svm_probs)[:5]
-                svm_pred = self.svm_classes[svm_top_idx[0]]
+                svm_pred = str(self.svm_bundle['model'].predict([feat])[0])
 
                 # If CNN was unavailable, use SVM as fallback
                 if cnn_pred is None:
-                    confidence = float(calib_svm_probs[svm_top_idx[0]])
-                    alts = [self.svm_classes[i] for i in svm_top_idx[:3]]
-                    confidence_scores = [round(float(calib_svm_probs[i]), 4) for i in svm_top_idx[:3]]
-                    uncertain = bool(confidence < self.abstain_tau)
+                    alts = rank_labels(self.svm_bundle['model'], feat, 3)[0]
+                    # Existing temperatures were fitted on training-member,
+                    # source-binary crops. They cannot justify a probability
+                    # or acceptance threshold on predicted-mask crops.
+                    confidence = None
+                    confidence_scores = []
+                    uncertain = True
             except Exception:
                 svm_pred = None
 
         # Agreement
         if svm_pred is not None and cnn_pred is not None:
             models_agree = bool(svm_pred == cnn_pred)
-        elif svm_pred is not None or cnn_pred is not None:
-            models_agree = True
 
         final_pred = cnn_pred if cnn_pred is not None else svm_pred
         if final_pred is None:
@@ -244,7 +247,7 @@ class RecognizerEngine:
             pred = cnn_preds[i]
             conf = float(cnn_confs[i])
             is_uncertain = bool(conf < self.abstain_tau)
-            agree = bool(svm_preds[i] == pred) if svm_preds is not None else True
+            agree = bool(svm_preds[i] == pred) if svm_preds is not None else None
 
             regions.append({
                 'candidate': i + 1,
