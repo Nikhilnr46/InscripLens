@@ -47,6 +47,10 @@ export function getOriginalFile(): File | null {
   return originalFile;
 }
 
+export function hasOriginalFile(): boolean {
+  return originalFile !== null;
+}
+
 export function getSelectionData(): RegionSelectionData | null {
   return selectionData;
 }

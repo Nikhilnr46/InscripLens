@@ -17,11 +17,16 @@ export default function ImportPage({
   onSelectHandoff,
   onSelectFile, // backwards compatibility
   onSelectDemo,
-  onBackToLanding
+  onBackToLanding,
+  initialFile = null,
+  initialSelection = null,
+  restoreSelection = false,
+  hasActiveStudioRun = false,
+  onReturnToStudio = null
 }) {
   // Step state: 'choose' | 'select' (Studio is navigated to on completion)
-  const [step, setStep] = useState('choose');
-  const [selectedFile, setSelectedFile] = useState(null);
+  const [step, setStep] = useState(() => (restoreSelection && initialFile ? 'select' : 'choose'));
+  const [selectedFile, setSelectedFile] = useState(() => (restoreSelection && initialFile ? initialFile : null));
 
   const [isDragging, setIsDragging] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
@@ -124,6 +129,10 @@ export default function ImportPage({
   };
 
   const handleCancelSelect = () => {
+    if (restoreSelection && hasActiveStudioRun && onReturnToStudio) {
+      onReturnToStudio();
+      return;
+    }
     // Release image reference and return to step 1
     setSelectedFile(null);
     setStep('choose');
@@ -137,14 +146,28 @@ export default function ImportPage({
         <div className="studio-brand">
           <button
             type="button"
-            onClick={step === 'select' ? handleCancelSelect : onBackToLanding}
+            onClick={
+              step === 'select'
+                ? handleCancelSelect
+                : (hasActiveStudioRun && onReturnToStudio ? onReturnToStudio : onBackToLanding)
+            }
             className="home-pill-btn"
-            title={step === 'select' ? 'Return to file chooser' : 'Return to InscripLens Overview'}
-            aria-label={step === 'select' ? 'Back to chooser' : 'Back to Overview'}
+            title={
+              step === 'select'
+                ? (hasActiveStudioRun && restoreSelection ? 'Return to Studio workspace' : 'Return to file chooser')
+                : (hasActiveStudioRun ? 'Return to Studio workspace' : 'Return to InscripLens Overview')
+            }
+            aria-label={
+              step === 'select'
+                ? (hasActiveStudioRun && restoreSelection ? 'Back to Studio' : 'Back to chooser')
+                : (hasActiveStudioRun ? 'Back to Studio' : 'Back to Overview')
+            }
           >
             <ArrowLeft size={15} />
             <span className="home-pill-text">
-              {step === 'select' ? 'Back to Chooser' : 'Back to Overview'}
+              {step === 'select'
+                ? (hasActiveStudioRun && restoreSelection ? 'Back to Studio' : 'Back to Chooser')
+                : (hasActiveStudioRun ? 'Back to Studio' : 'Back to Overview')}
             </span>
           </button>
           <div
@@ -216,10 +239,10 @@ export default function ImportPage({
                 <button
                   type="button"
                   className="import-back-nav"
-                  onClick={onBackToLanding}
-                  aria-label="Back to landing page"
+                  onClick={hasActiveStudioRun && onReturnToStudio ? onReturnToStudio : onBackToLanding}
+                  aria-label={hasActiveStudioRun ? "Back to Studio" : "Back to landing page"}
                 >
-                  <ArrowLeft size={14} /> Back
+                  <ArrowLeft size={14} /> {hasActiveStudioRun ? "Back to Studio" : "Back"}
                 </button>
                 <h1 className="import-title">Choose a stone image</h1>
                 <p className="import-subtitle">
@@ -396,6 +419,7 @@ export default function ImportPage({
 
             <RegionSelector
               file={selectedFile}
+              initialSelection={initialSelection}
               onConfirmCrop={handleConfirmCrop}
               onUseWholeImage={handleUseWholeImage}
               onCancel={handleCancelSelect}

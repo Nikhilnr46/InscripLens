@@ -1,5 +1,16 @@
 # InscripLens Studio Handover and Technical Guide
 
+## 6 November: Studio Integration of the Selected Area (Step S3 of 3)
+
+Integrated selected region awareness, metadata synchronization, and re-selection flows into the Epigraphy Studio:
+- Header Selected Area Pill: When an active analysis originated from a region selection, the header status line renders an interactive pill: `Selected area, {w} × {h} px (from {origW} × {origH})`. For full-resolution images or the Nagavara demo stone, standard image dimensions are preserved.
+- Collapsible "Selected Area" Sidebar Card: Displays a live thumbnail of the original photograph with the crop rectangle outlined in gold (`var(--accent-sandstone)`) and dimmed surroundings, accompanied by live pixel dimension readouts for both selected crop and full photo.
+- In-Memory "Change Area" Flow: Clicking "Change area" (or the header pill) navigates back to the `/import` selection stage with the original file and existing crop coordinates intact. Adjusting and re-submitting seamlessly replaces the active run in Studio.
+- Graceful Store Expiration & Reload Safety: The in-memory store remains strictly unpersisted across page reloads. If the store expires or is lost upon reload, the "Change area" button is safely disabled with the guidance notice: *"Reselect by choosing another image"*.
+- Non-Destructive "Try Another" Navigation: Navigating to `/import` preserves the active run; pressing browser Back returns to the Studio session intact.
+- Strict Coordinate Semantics: Candidate coordinates, saved reviews and history refer to the selected area image, not the original photograph. Documented across `HANDOVER.md` and the About page FAQ.
+- Memory Lifecycle Management: Switching between selected photo crops and demo stone clears stale selection metadata. All File references and object URLs are revoked and garbage-collected when navigating to the landing overview.
+
 ## 6 November: Region Selection (Step S2 of 3)
 
 Integrated in-browser region selection (`frontend/src/components/RegionSelector.jsx`) within the `/import` workflow before dispatching to Studio:

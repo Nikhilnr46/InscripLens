@@ -19,6 +19,7 @@ const MAX_EXPORT_LONG_SIDE = 3200;
 
 export default function RegionSelector({
   file,
+  initialSelection = null,
   onConfirmCrop,
   onUseWholeImage,
   onCancel
@@ -125,18 +126,32 @@ export default function RegionSelector({
           }
         }
 
-        // Pre-select centered 80% rectangle
-        const initW = Math.round(origW * 0.8);
-        const initH = Math.round(origH * 0.8);
-        const initX = Math.round((origW - initW) / 2);
-        const initY = Math.round((origH - initH) / 2);
+        // Restore initial selection if provided, otherwise pre-select centered 80% rectangle
+        if (initialSelection && initialSelection.width && initialSelection.height && !initialSelection.isWholeImage) {
+          const selW = Math.max(MIN_SIZE_ORIG_PX, Math.min(origW, initialSelection.width));
+          const selH = Math.max(MIN_SIZE_ORIG_PX, Math.min(origH, initialSelection.height));
+          const selX = Math.max(0, Math.min(origW - selW, initialSelection.x));
+          const selY = Math.max(0, Math.min(origH - selH, initialSelection.y));
 
-        setSelection({
-          x: initX,
-          y: initY,
-          width: Math.max(MIN_SIZE_ORIG_PX, initW),
-          height: Math.max(MIN_SIZE_ORIG_PX, initH)
-        });
+          setSelection({
+            x: selX,
+            y: selY,
+            width: selW,
+            height: selH
+          });
+        } else {
+          const initW = Math.round(origW * 0.8);
+          const initH = Math.round(origH * 0.8);
+          const initX = Math.round((origW - initW) / 2);
+          const initY = Math.round((origH - initH) / 2);
+
+          setSelection({
+            x: initX,
+            y: initY,
+            width: Math.max(MIN_SIZE_ORIG_PX, initW),
+            height: Math.max(MIN_SIZE_ORIG_PX, initH)
+          });
+        }
 
         setLoading(false);
 

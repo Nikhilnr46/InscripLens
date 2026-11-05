@@ -1,5 +1,28 @@
 # InscripLens Studio Project Log
 
+## 6 November: Studio Integration of the Selected Area (Step S3 of 3)
+
+Integrated selected region awareness, metadata synchronization, and re-selection flows into the Epigraphy Studio:
+- Header Selected Area Pill:
+  - When the current image in Studio came from a user selection, the header status line renders an interactive pill displaying: `Selected area, {w} × {h} px (from {origW} × {origH})`.
+  - For whole images and the Nagavara demo stone, the standard dimension readout `{w} × {h} px` is preserved without any alteration.
+- Collapsible "Selected Area" Sidebar Card:
+  - Positioned at the bottom of the left navigation sidebar above the Local Worker section.
+  - Renders a live thumbnail of the original photograph with the selected bounding box outlined in `var(--accent-sandstone)` with a dimmed overlay (`rgba(0, 0, 0, 0.45)`).
+  - Displays live dimension readouts for both selected area and original image pixels.
+  - Includes a "Change area" button which navigates back to the `/import` selection step with the original image and existing crop rectangle restored from the in-memory store.
+  - If the in-memory store is lost (e.g., following a browser page reload), the "Change area" button is safely disabled, and the card displays the guidance notice: *"Reselect by choosing another image"*.
+- Non-Destructive Navigation:
+  - "Try another" navigates to `/import`. If the user presses the browser Back button, they return to the Studio with their active analysis run completely intact.
+  - From the restored selection step during "Change area", clicking "Back to Studio" returns immediately to the active workspace without modifying the existing run.
+- Coordinate & History Semantics:
+  - Candidate coordinates, saved reviews and history refer to the selected area image, not the original photograph.
+  - Added clarifying FAQ entry to the About page and updated technical handover documentation.
+- Memory Lifecycle & Edge Case Handling:
+  - Switching from an uploaded selection to the demo stone and back cleans up stale selection state and revokes object URLs.
+  - All File references, crop data, and preview object URLs are released when the user leaves the Studio for the landing page overview.
+  - Responsive audit across widths 1280, 1536, and 1920 px confirms seamless layout with sidebar collapsed (icon rail at 1280px) and expanded (1536px/1920px) across both obsidian dark and parchment light themes.
+
 ## 6 November: Region Selection Implementation (Step S2 of 3)
 
 Implemented interactive stone region selection (`RegionSelector`) for uploaded images prior to neural analysis:

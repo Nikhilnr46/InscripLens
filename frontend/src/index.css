@@ -4251,3 +4251,214 @@ a.landing-brand:focus-visible {
     display: none;
   }
 }
+
+/* ==========================================================================
+   Selected Area Studio Integration (Step S3)
+   ========================================================================== */
+
+/* Header Status Line Selected Area Pill */
+.header-selected-area-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background-color: var(--accent-subtle);
+  border: 1px solid var(--accent-sandstone);
+  color: var(--accent-sandstone);
+  font-size: 0.74rem;
+  font-weight: 500;
+  padding: 2px 10px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background-color var(--dur-fast) var(--ease-out),
+              border-color var(--dur-fast) var(--ease-out),
+              transform var(--dur-fast) var(--ease-out),
+              box-shadow var(--dur-fast) var(--ease-out);
+  white-space: nowrap;
+  flex-shrink: 0;
+  text-decoration: none;
+}
+
+.header-selected-area-pill:hover {
+  background-color: rgba(201, 166, 107, 0.22);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+}
+
+.header-selected-area-pill:focus-visible {
+  outline: 2px solid var(--accent-sandstone);
+  outline-offset: 2px;
+}
+
+/* Sidebar Selected Area Card */
+.selected-area-card {
+  margin-top: auto;
+  margin-bottom: 12px;
+  padding: 10px;
+  border-radius: 8px;
+  background-color: var(--bg-base);
+  border: 1px solid var(--border-subtle);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transition: all var(--dur-fast) var(--ease-out);
+}
+
+.selected-area-card.sidebar-collapsed {
+  padding: 8px 4px;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.selected-area-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  user-select: none;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.selected-area-card-header:focus-visible {
+  outline: 2px solid var(--accent-sandstone);
+  outline-offset: 1px;
+}
+
+.selected-area-card-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.selected-area-collapse-btn {
+  background: transparent;
+  border: none;
+  padding: 2px;
+  cursor: pointer;
+  color: var(--text-muted);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: color var(--dur-fast) var(--ease-out), background-color var(--dur-fast) var(--ease-out);
+}
+
+.selected-area-collapse-btn:hover {
+  color: var(--text-primary);
+  background-color: var(--bg-surface);
+}
+
+.selected-area-collapse-btn:focus-visible {
+  outline: 2px solid var(--accent-sandstone);
+  outline-offset: 1px;
+}
+
+.selected-area-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.selected-area-thumb-container {
+  position: relative;
+  width: 100%;
+  background-color: rgba(0, 0, 0, 0.25);
+  border-radius: 4px;
+  overflow: hidden;
+  border: 1px solid var(--border-subtle);
+  max-height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.selected-area-thumb-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+.selected-area-thumb-fallback {
+  font-size: 0.7rem;
+  color: var(--text-subtle);
+  padding: 12px;
+  text-align: center;
+}
+
+.selected-area-rect-overlay {
+  position: absolute;
+  border: 2px solid var(--accent-sandstone);
+  box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.45);
+  pointer-events: none;
+}
+
+.selected-area-dimensions-readout {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
+.selected-area-dim-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.selected-area-dim-val {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.change-area-btn {
+  width: 100%;
+  font-size: 0.76rem;
+  height: 28px;
+  padding: 0 8px;
+  justify-content: center;
+  gap: 5px;
+}
+
+.change-area-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.reselect-notice-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.reselect-notice-text {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  text-align: center;
+  line-height: 1.25;
+}
+
+.studio-sidebar.collapsed .selected-area-card-title span,
+.studio-sidebar.collapsed .selected-area-collapse-btn,
+.studio-sidebar.collapsed .selected-area-card-body {
+  display: none !important;
+}
+
+.studio-sidebar.collapsed .selected-area-card {
+  padding: 8px 4px;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 8px;
+}
+
+.studio-sidebar.collapsed .selected-area-card-header {
+  justify-content: center;
+}

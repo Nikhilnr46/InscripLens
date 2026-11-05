@@ -24,11 +24,22 @@ import {
   ChevronLeft,
   ChevronDown,
   Download,
-  Settings
+  Settings,
+  Crop
 } from 'lucide-react';
 import LandingPage from './pages/LandingPage.jsx';
 import ImportPage from './pages/ImportPage.jsx';
-import { setPendingFile, setPendingHandoff, getPendingFile, clearPendingFile } from './utils/fileStore';
+import {
+  setPendingFile,
+  setPendingHandoff,
+  getPendingFile,
+  clearPendingFile,
+  getOriginalFile,
+  getSelectionData,
+  getOriginalSize,
+  hasOriginalFile,
+  clearHandoffStore
+} from './utils/fileStore';
 import ThemeToggle from './components/ThemeToggle.tsx';
 import { SITE } from './config/site.ts';
 import { initSiteInteractions } from './utils/interactions.ts';
@@ -54,6 +65,46 @@ export default function App() {
   });
 
   // Collapsible sidebar state (auto-collapses below 1500px, remembers user manual preference, supports url override)
+  // S3: Selection info and memory management for selected area crop
+  const [selectionInfo, setSelectionInfo] = useState(null);
+  const [isChangingArea, setIsChangingArea] = useState(false);
+  const [selectedAreaCardCollapsed, setSelectedAreaCardCollapsed] = useState(false);
+  const [originalThumbUrl, setOriginalThumbUrl] = useState(null);
+
+  const releaseSelectionMemory = () => {
+    clearHandoffStore();
+    setSelectionInfo(null);
+    setIsChangingArea(false);
+    if (originalThumbUrl) {
+      try {
+        URL.revokeObjectURL(originalThumbUrl);
+      } catch {}
+      setOriginalThumbUrl(null);
+    }
+  };
+
+  const handleChangeArea = () => {
+    if (!hasOriginalFile()) return;
+    setIsChangingArea(true);
+    window.history.pushState(null, '', '/import');
+    setRoute('/import');
+  };
+
+  useEffect(() => {
+    const orig = getOriginalFile();
+    if (orig && selectionInfo && !selectionInfo.isWholeImage) {
+      const url = URL.createObjectURL(orig);
+      setOriginalThumbUrl(url);
+      return () => {
+        try {
+          URL.revokeObjectURL(url);
+        } catch {}
+      };
+    } else {
+      setOriginalThumbUrl(null);
+    }
+  }, [analysis?.id, selectionInfo]);
+
   const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
     try {
       const sp = new URLSearchParams(window.location.search);
@@ -118,6 +169,7 @@ export default function App() {
   };
 
   const navigateToSection = (sectionId = 'overview') => {
+    releaseSelectionMemory();
     const hash = sectionId === 'overview' ? '' : `#${sectionId}`;
     window.history.pushState(null, '', `/${hash}`);
     setRoute('/');
@@ -151,11 +203,17 @@ export default function App() {
         setRoute('/');
         return;
       }
+      if (p === '/studio') {
+        setIsChangingArea(false);
+        setRoute('/studio');
+        return;
+      }
       if (p === '/import') {
         setRoute('/import');
         return;
       }
-      setRoute(p === '/studio' ? '/studio' : '/');
+      releaseSelectionMemory();
+      setRoute('/');
     };
     window.addEventListener('popstate', onPopState);
     return () => window.removeEventListener('popstate', onPopState);
@@ -706,6 +764,7 @@ export default function App() {
 
   // Load demonstration stone
   const loadDemoStone = async () => {
+    releaseSelectionMemory();
     setLoading(true);
     setLoadingMessage(highAccuracy ? 'Running high accuracy multi-scale enhancement...' : 'Loading Nagavara demonstration stone...');
     try {
@@ -753,6 +812,17 @@ export default function App() {
       const pending = getPendingFile();
       if (pending) {
         clearPendingFile();
+        const sel = getSelectionData();
+        const origSize = getOriginalSize();
+        if (sel && !sel.isWholeImage) {
+          setSelectionInfo({
+            ...sel,
+            originalWidth: origSize?.width || sel.imageWidth,
+            originalHeight: origSize?.height || sel.imageHeight
+          });
+        } else {
+          setSelectionInfo(null);
+        }
         uploadFile(pending);
       }
     }
@@ -801,6 +871,7 @@ export default function App() {
   const handleFileUpload = (e) => {
     const file = e.target.files?.[0];
     if (file) {
+      releaseSelectionMemory();
       uploadFile(file);
     }
   };
@@ -811,6 +882,7 @@ export default function App() {
     } else {
       setPendingHandoff(payload);
     }
+    setIsChangingArea(false);
     navigateToStudio(false);
   };
 
@@ -1158,10 +1230,25 @@ export default function App() {
   if (route === '/import') {
     return (
       <ImportPage
+        initialFile={isChangingArea ? getOriginalFile() : null}
+        initialSelection={isChangingArea ? getSelectionData() : null}
+        restoreSelection={isChangingArea}
+        hasActiveStudioRun={!!analysis}
+        onReturnToStudio={() => {
+          setIsChangingArea(false);
+          window.history.pushState(null, '', '/studio');
+          setRoute('/studio');
+        }}
         onSelectHandoff={handleSelectFileFromImport}
         onSelectFile={handleSelectFileFromImport}
-        onSelectDemo={() => navigateToStudio(true)}
-        onBackToLanding={navigateToHome}
+        onSelectDemo={() => {
+          releaseSelectionMemory();
+          navigateToStudio(true);
+        }}
+        onBackToLanding={() => {
+          releaseSelectionMemory();
+          navigateToHome();
+        }}
       />
     );
   }
@@ -1205,7 +1292,22 @@ export default function App() {
                   {analysis.display_name}
                 </span>
                 <span className="status-sep" style={{ flexShrink: 0 }}>&middot;</span>
-                <span style={{ flexShrink: 0 }}>{analysis.width} &times; {analysis.height} px</span>
+                {selectionInfo && !selectionInfo.isWholeImage && !analysis.is_demo ? (
+                  <button
+                    type="button"
+                    className="header-selected-area-pill"
+                    onClick={hasOriginalFile() ? handleChangeArea : undefined}
+                    title={hasOriginalFile() ? "Click to change selected area" : "Reselect by choosing another image"}
+                    aria-label={`Selected area, ${selectionInfo.width} by ${selectionInfo.height} pixels from ${selectionInfo.originalWidth} by ${selectionInfo.originalHeight} pixels`}
+                  >
+                    <Crop size={12} className="text-sandstone" />
+                    <span>
+                      Selected area, {selectionInfo.width} &times; {selectionInfo.height} px (from {selectionInfo.originalWidth} &times; {selectionInfo.originalHeight})
+                    </span>
+                  </button>
+                ) : (
+                  <span style={{ flexShrink: 0 }}>{analysis.width} &times; {analysis.height} px</span>
+                )}
                 <span className="status-sep" style={{ flexShrink: 0 }}>&middot;</span>
                 <span style={{ flexShrink: 0 }}>Local Workspace</span>
               </>
@@ -1372,6 +1474,134 @@ export default function App() {
             <Info size={15} />
             <span className="sidebar-text" style={{ marginLeft: '8px' }}>About & Docs</span>
           </a>
+
+          {/* Small "Selected area" card (collapsible, bottom of the left sidebar) */}
+          {analysis && !analysis.is_demo && selectionInfo && !selectionInfo.isWholeImage && (
+            <div
+              className={`selected-area-card ${sidebarCollapsed ? 'sidebar-collapsed' : ''}`}
+            >
+              <div
+                className="selected-area-card-header"
+                onClick={() => {
+                  if (sidebarCollapsed) {
+                    toggleSidebar();
+                  } else {
+                    setSelectedAreaCardCollapsed(prev => !prev);
+                  }
+                }}
+                title={sidebarCollapsed ? "Expand sidebar to view selected area" : "Toggle selected area card"}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    if (sidebarCollapsed) toggleSidebar();
+                    else setSelectedAreaCardCollapsed(prev => !prev);
+                  }
+                }}
+              >
+                <div className="selected-area-card-title">
+                  <Crop size={14} className="text-sandstone" style={{ flexShrink: 0 }} />
+                  {!sidebarCollapsed && <span>Selected Area</span>}
+                </div>
+                {!sidebarCollapsed && (
+                  <button
+                    type="button"
+                    className="selected-area-collapse-btn"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setSelectedAreaCardCollapsed(prev => !prev);
+                    }}
+                    aria-label={selectedAreaCardCollapsed ? "Expand selected area details" : "Collapse selected area details"}
+                  >
+                    <ChevronDown
+                      size={14}
+                      style={{
+                        transform: selectedAreaCardCollapsed ? 'rotate(-90deg)' : 'rotate(0deg)',
+                        transition: 'transform 0.15s ease'
+                      }}
+                    />
+                  </button>
+                )}
+              </div>
+
+              {!sidebarCollapsed && !selectedAreaCardCollapsed && (
+                <div className="selected-area-card-body">
+                  {/* Thumbnail of original image with selection rectangle outlined */}
+                  <div
+                    className="selected-area-thumb-container"
+                    style={{
+                      aspectRatio: `${selectionInfo.originalWidth || 4} / ${selectionInfo.originalHeight || 3}`
+                    }}
+                  >
+                    {originalThumbUrl ? (
+                      <img
+                        src={originalThumbUrl}
+                        alt="Original photograph overview"
+                        className="selected-area-thumb-img"
+                      />
+                    ) : (
+                      <div className="selected-area-thumb-fallback">
+                        Original Image
+                      </div>
+                    )}
+                    {/* Selected rectangle outline overlay */}
+                    {selectionInfo.originalWidth > 0 && selectionInfo.originalHeight > 0 && (
+                      <div
+                        className="selected-area-rect-overlay"
+                        style={{
+                          left: `${(selectionInfo.x / selectionInfo.originalWidth) * 100}%`,
+                          top: `${(selectionInfo.y / selectionInfo.originalHeight) * 100}%`,
+                          width: `${(selectionInfo.width / selectionInfo.originalWidth) * 100}%`,
+                          height: `${(selectionInfo.height / selectionInfo.originalHeight) * 100}%`
+                        }}
+                      />
+                    )}
+                  </div>
+
+                  <div className="selected-area-dimensions-readout">
+                    <div className="selected-area-dim-row">
+                      <span>Selected:</span>
+                      <strong className="selected-area-dim-val">
+                        {selectionInfo.width} &times; {selectionInfo.height} px
+                      </strong>
+                    </div>
+                    <div className="selected-area-dim-row">
+                      <span>Original:</span>
+                      <span>
+                        {selectionInfo.originalWidth} &times; {selectionInfo.originalHeight} px
+                      </span>
+                    </div>
+                  </div>
+
+                  {hasOriginalFile() ? (
+                    <button
+                      type="button"
+                      className="btn-secondary change-area-btn"
+                      onClick={handleChangeArea}
+                      title="Adjust the selected crop area on the original image"
+                    >
+                      <Crop size={13} /> Change area
+                    </button>
+                  ) : (
+                    <div className="reselect-notice-wrap">
+                      <button
+                        type="button"
+                        className="btn-secondary change-area-btn"
+                        disabled
+                        title="Reselect by choosing another image"
+                      >
+                        <Crop size={13} /> Change area
+                      </button>
+                      <span className="reselect-notice-text">
+                        Reselect by choosing another image
+                      </span>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
 
           <div style={{ marginTop: 'auto', borderTop: '1px solid var(--border-subtle)', paddingTop: '16px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.78rem', color: 'var(--text-muted)', justifyContent: sidebarCollapsed ? 'center' : 'flex-start' }} title="Local Python Worker - No cloud OCR service used.">
