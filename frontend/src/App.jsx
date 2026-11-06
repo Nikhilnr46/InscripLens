@@ -44,6 +44,16 @@ import ThemeToggle from './components/ThemeToggle.tsx';
 import { SITE } from './config/site.ts';
 import { initSiteInteractions } from './utils/interactions.ts';
 import { formatDisplayLabel } from './utils/kannadaConverter';
+import ReportPreviewDialog from './report/ReportPreviewDialog.jsx';
+import {
+  CompareCard,
+  RedrawOverlay,
+  RedrawFloatingBar,
+  SavedComparisonsDrawer,
+  predictCrop,
+  normalizeBbox
+} from './compare';
+import './compare/compare.css';
 
 export default function App() {
   // Routing: '/' for single-page landing site, '/studio' for epigraphic workspace
@@ -70,6 +80,7 @@ export default function App() {
   const [isChangingArea, setIsChangingArea] = useState(false);
   const [selectedAreaCardCollapsed, setSelectedAreaCardCollapsed] = useState(false);
   const [originalThumbUrl, setOriginalThumbUrl] = useState(null);
+  const [reportDialogOpen, setReportDialogOpen] = useState(false);
 
   const releaseSelectionMemory = () => {
     clearHandoffStore();
@@ -337,6 +348,16 @@ export default function App() {
   const isDraggingCurtain = useRef(false);
   const [isCurtainDragging, setIsCurtainDragging] = useState(false);
   const panStartRef = useRef(null);
+
+  // Glyph Redraw & Compare State (Step R2 & R3)
+  const [isRedrawMode, setIsRedrawMode] = useState(false);
+  const [redrawnBbox, setRedrawnBbox] = useState(null);
+  const [redrawLayer, setRedrawLayer] = useState('mask'); // 'mask' | 'photo'
+  const [isComparing, setIsComparing] = useState(false);
+  const [comparisonData, setComparisonData] = useState(null);
+  const [savedDrawerOpen, setSavedDrawerOpen] = useState(false);
+  const compareRequestIdRef = useRef(0);
+  const savedSliderPosRef = useRef(50);
 
   const canvasPanelRef = useRef(null);
   const [panelWidth, setPanelWidth] = useState(1200);
@@ -622,6 +643,9 @@ export default function App() {
   // Automatically fit image when a new analysis loads
   useEffect(() => {
     if (analysis) {
+      setComparisonData(null);
+      setIsComparing(false);
+      setIsRedrawMode(false);
       const timer = setTimeout(() => {
         fitToViewport(false);
       }, 60);
@@ -1006,14 +1030,200 @@ export default function App() {
     setTimeout(() => setIsTransitioning(false), 350);
   };
 
+  // Redraw Mode Actions (Step R2)
+  const startRedrawMode = (initialBox = null) => {
+    if (selectedBoxIndex === null || !analysis || !analysis.boxes?.[selectedBoxIndex]) return;
+    const baseBox = initialBox || analysis.boxes[selectedBoxIndex];
+    setRedrawnBbox([...baseBox]);
+    setRedrawLayer('mask');
+
+    // Save previous curtain position
+    savedSliderPosRef.current = sliderPos;
+
+    // Zoom to candidate with generous margin (about 2.5 times box size on each side, never beyond 0.1 - 5.0)
+    if (viewportRef.current) {
+      const vpRect = viewportRef.current.getBoundingClientRect();
+      const origBox = analysis.boxes[selectedBoxIndex];
+      const boxW = Math.max(1, origBox[2] - origBox[0]);
+      const boxH = Math.max(1, origBox[3] - origBox[1]);
+      const boxCenterX = (origBox[0] + origBox[2]) / 2;
+      const boxCenterY = (origBox[1] + origBox[3]) / 2;
+
+      // 2.5 times margin on each side: total view span is 6 * boxW and 6 * boxH
+      const fitW = vpRect.width / (boxW * 6);
+      const fitH = vpRect.height / (boxH * 6);
+      const targetScale = Math.max(0.1, Math.min(5.0, Math.min(fitW, fitH)));
+
+      const targetPanX = (vpRect.width / 2) - (boxCenterX * targetScale);
+      const targetPanY = (vpRect.height / 2) - (boxCenterY * targetScale);
+
+      setIsTransitioning(true);
+      setScale(targetScale);
+      setPan({ x: targetPanX, y: targetPanY });
+      setTimeout(() => setIsTransitioning(false), 300);
+    }
+
+    setIsRedrawMode(true);
+  };
+
+  const cancelRedrawMode = () => {
+    setIsRedrawMode(false);
+    setSliderPos(savedSliderPosRef.current);
+  };
+
+  const resetRedrawnBox = () => {
+    if (selectedBoxIndex !== null && analysis?.boxes?.[selectedBoxIndex]) {
+      setRedrawnBbox([...analysis.boxes[selectedBoxIndex]]);
+    }
+  };
+
+  const applyRedrawAndCompare = async () => {
+    if (!analysis || selectedBoxIndex === null || !redrawnBbox) return;
+
+    setIsRedrawMode(false);
+    setSliderPos(savedSliderPosRef.current);
+
+    const autoBbox = analysis.boxes[selectedBoxIndex];
+    const currentRedrawn = [...redrawnBbox];
+
+    setIsComparing(true);
+    setComparisonData(null);
+
+    const reqId = ++compareRequestIdRef.current;
+
+    const [autoRes, redrawnRes] = await Promise.allSettled([
+      predictCrop(analysis.id, autoBbox),
+      predictCrop(analysis.id, currentRedrawn)
+    ]);
+
+    if (reqId !== compareRequestIdRef.current) return;
+
+    setComparisonData({
+      automatic: {
+        bbox: autoBbox,
+        result: autoRes.status === 'fulfilled' ? autoRes.value : null,
+        error: autoRes.status === 'rejected' ? (autoRes.reason?.message || 'Prediction failed') : null
+      },
+      redrawn: {
+        bbox: currentRedrawn,
+        result: redrawnRes.status === 'fulfilled' ? redrawnRes.value : null,
+        error: redrawnRes.status === 'rejected' ? (redrawnRes.reason?.message || 'Prediction failed') : null
+      }
+    });
+    setIsComparing(false);
+  };
+
+  const retryAutoPrediction = async () => {
+    if (!analysis || selectedBoxIndex === null) return;
+    const autoBbox = comparisonData?.automatic?.bbox || analysis.boxes[selectedBoxIndex];
+    const reqId = ++compareRequestIdRef.current;
+
+    setComparisonData(prev => prev ? {
+      ...prev,
+      automatic: { ...prev.automatic, error: null, result: null }
+    } : null);
+
+    try {
+      const res = await predictCrop(analysis.id, autoBbox);
+      if (reqId !== compareRequestIdRef.current) return;
+      setComparisonData(prev => prev ? {
+        ...prev,
+        automatic: { ...prev.automatic, result: res, error: null }
+      } : null);
+    } catch (err) {
+      if (reqId !== compareRequestIdRef.current) return;
+      setComparisonData(prev => prev ? {
+        ...prev,
+        automatic: { ...prev.automatic, error: err.message || 'Retry failed', result: null }
+      } : null);
+    }
+  };
+
+  const retryRedrawnPrediction = async () => {
+    if (!analysis || !comparisonData?.redrawn?.bbox) return;
+    const targetBbox = comparisonData.redrawn.bbox;
+    const reqId = ++compareRequestIdRef.current;
+
+    setComparisonData(prev => prev ? {
+      ...prev,
+      redrawn: { ...prev.redrawn, error: null, result: null }
+    } : null);
+
+    try {
+      const res = await predictCrop(analysis.id, targetBbox);
+      if (reqId !== compareRequestIdRef.current) return;
+      setComparisonData(prev => prev ? {
+        ...prev,
+        redrawn: { ...prev.redrawn, result: res, error: null }
+      } : null);
+    } catch (err) {
+      if (reqId !== compareRequestIdRef.current) return;
+      setComparisonData(prev => prev ? {
+        ...prev,
+        redrawn: { ...prev.redrawn, error: err.message || 'Retry failed', result: null }
+      } : null);
+    }
+  };
+
+  const handleDiscardComparison = () => {
+    setComparisonData(null);
+    setIsComparing(false);
+  };
+
   // Handle box click from canvas or bottom gallery chips
   const handleSelectAndFocusBox = (boxIndex) => {
+    if (isRedrawMode) {
+      setIsRedrawMode(false);
+      setSliderPos(savedSliderPosRef.current);
+    }
+    setComparisonData(null);
+    setIsComparing(false);
     setSelectedBoxIndex(boxIndex);
     predictBox(boxIndex);
     focusOnBox(boxIndex);
   };
 
-  // Arrow key navigation between candidates
+  // Open saved comparison from drawer: focus candidate and restore comparison view (Step R3)
+  const handleOpenSavedCandidate = (candidateIndex, savedRecord) => {
+    if (isRedrawMode) {
+      setIsRedrawMode(false);
+      setSliderPos(savedSliderPosRef.current);
+    }
+    setSelectedBoxIndex(candidateIndex);
+    focusOnBox(candidateIndex);
+
+    if (savedRecord) {
+      setComparisonData({
+        automatic: {
+          bbox: savedRecord.automatic.bbox,
+          result: {
+            prediction: savedRecord.automatic.prediction,
+            predictionKannada: savedRecord.automatic.prediction_kannada,
+            alternatives: savedRecord.automatic.alternatives,
+            confidence: savedRecord.automatic.confidence,
+            cropUrl: savedRecord.automatic_thumbnail || ''
+          },
+          error: null
+        },
+        redrawn: {
+          bbox: savedRecord.redrawn.bbox,
+          result: {
+            prediction: savedRecord.redrawn.prediction,
+            predictionKannada: savedRecord.redrawn.prediction_kannada,
+            alternatives: savedRecord.redrawn.alternatives,
+            confidence: savedRecord.redrawn.confidence,
+            cropUrl: savedRecord.redrawn_thumbnail || ''
+          },
+          error: null
+        }
+      });
+      setRedrawnBbox(savedRecord.redrawn.bbox);
+    } else {
+      predictBox(candidateIndex);
+    }
+  };
+
+  // Global keydown handler: Redraw mode shortcuts, 'R' shortcut, and candidate arrow navigation
   useEffect(() => {
     const handleKeyDown = (e) => {
       // Ignore if user is in an input, textarea or interacting with curtain slider
@@ -1025,6 +1235,61 @@ export default function App() {
           active.classList?.contains('curtain-handle'))
       ) {
         return;
+      }
+
+      // Redraw Mode keyboard shortcuts (Step R2)
+      if (isRedrawMode) {
+        if (e.key === 'Escape') {
+          e.preventDefault();
+          cancelRedrawMode();
+          return;
+        }
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          applyRedrawAndCompare();
+          return;
+        }
+        if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(e.key)) {
+          e.preventDefault();
+          if (!redrawnBbox || !analysis) return;
+          const step = e.shiftKey ? 10 : 1;
+          let [x1, y1, x2, y2] = redrawnBbox;
+
+          if (e.altKey) {
+            // Resize with Alt + Arrow (Shift for 10px)
+            if (e.key === 'ArrowRight') x2 += step;
+            if (e.key === 'ArrowLeft') x2 -= step;
+            if (e.key === 'ArrowDown') y2 += step;
+            if (e.key === 'ArrowUp') y2 -= step;
+            const normalized = normalizeBbox([x1, y1, x2, y2], { width: analysis.width, height: analysis.height }, 8);
+            setRedrawnBbox(normalized);
+          } else {
+            // Nudge move with Arrow (Shift for 10px)
+            const w = x2 - x1;
+            const h = y2 - y1;
+            let dx = 0;
+            let dy = 0;
+            if (e.key === 'ArrowRight') dx = step;
+            if (e.key === 'ArrowLeft') dx = -step;
+            if (e.key === 'ArrowDown') dy = step;
+            if (e.key === 'ArrowUp') dy = -step;
+
+            let newX1 = Math.max(0, Math.min(analysis.width - w, x1 + dx));
+            let newY1 = Math.max(0, Math.min(analysis.height - h, y1 + dy));
+            setRedrawnBbox([newX1, newY1, newX1 + w, newY1 + h]);
+          }
+          return;
+        }
+        return;
+      }
+
+      // 'R' key enters redraw mode for currently selected candidate
+      if ((e.key === 'r' || e.key === 'R') && !e.ctrlKey && !e.metaKey && !e.altKey) {
+        if (selectedBoxIndex !== null && analysis?.boxes?.[selectedBoxIndex]) {
+          e.preventDefault();
+          startRedrawMode();
+          return;
+        }
       }
 
       if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
@@ -1062,7 +1327,7 @@ export default function App() {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [visibleCandidates, selectedBoxIndex]);
+  }, [visibleCandidates, selectedBoxIndex, isRedrawMode, redrawnBbox, analysis, sliderPos, hasUsedArrowKeys]);
 
   // Auto-scroll gallery strip to selected candidate chip
   useEffect(() => {
@@ -1811,6 +2076,18 @@ export default function App() {
                                 <div style={{ fontSize: '0.68rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '6px' }}>
                                   Export
                                 </div>
+                                <button
+                                  type="button"
+                                  className="popover-action-item"
+                                  onClick={() => {
+                                    setViewDropdownOpen(false);
+                                    setReportDialogOpen(true);
+                                  }}
+                                  title="Open printable analysis report preview (Save as PDF)"
+                                  style={{ background: 'transparent', border: 'none', width: '100%', textAlign: 'left', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', padding: '6px 10px', fontSize: '0.8rem', color: 'var(--text-primary)' }}
+                                >
+                                  <FileText size={13} /> PDF report...
+                                </button>
                                 <a
                                   href={analysis.mask_url}
                                   download={`mask_${analysis.id}.png`}
@@ -1970,6 +2247,18 @@ export default function App() {
                               </button>
                               {exportMenuOpen && (
                                 <div className="toolbar-popover-menu right-aligned" style={{ minWidth: '160px', padding: '6px' }}>
+                                  <button
+                                    type="button"
+                                    className="popover-action-item"
+                                    onClick={() => {
+                                      setExportMenuOpen(false);
+                                      setReportDialogOpen(true);
+                                    }}
+                                    title="Open printable analysis report preview (Save as PDF)"
+                                    style={{ background: 'transparent', border: 'none', width: '100%', textAlign: 'left', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', padding: '6px 10px', fontSize: '0.8rem', color: 'var(--text-primary)' }}
+                                  >
+                                    <FileText size={13} /> PDF report...
+                                  </button>
                                   <a
                                     href={analysis.mask_url}
                                     download={`mask_${analysis.id}.png`}
@@ -1993,6 +2282,18 @@ export default function App() {
                       ref={viewportRef}
                       onMouseDown={handleViewportMouseDown}
                     >
+                      {/* Floating Redraw Toolbar (Step R2) */}
+                      {isRedrawMode && selectedBoxIndex !== null && (
+                        <RedrawFloatingBar
+                          candidateNumber={selectedBoxIndex + 1}
+                          layer={redrawLayer}
+                          onLayerChange={setRedrawLayer}
+                          onReset={resetRedrawnBox}
+                          onCancel={cancelRedrawMode}
+                          onApply={applyRedrawAndCompare}
+                        />
+                      )}
+
                       {/* Transformed Stage */}
                       <div
                         className="canvas-stage"
@@ -2024,7 +2325,7 @@ export default function App() {
                           {/* Overlay: Shilalekhya Mask */}
                           <div
                             className="curtain-overlay"
-                            style={{ width: `${sliderPos}%` }}
+                            style={{ width: `${isRedrawMode ? (redrawLayer === 'mask' ? 100 : 0) : sliderPos}%` }}
                           >
                             <img
                               src={analysis.mask_url}
@@ -2037,30 +2338,36 @@ export default function App() {
                           </div>
 
                           {/* Floating Labels */}
-                          <div className="curtain-label curtain-label-mask">Mask</div>
-                          <div className="curtain-label curtain-label-original">Original</div>
+                          {!isRedrawMode && (
+                            <>
+                              <div className="curtain-label curtain-label-mask">Mask</div>
+                              <div className="curtain-label curtain-label-original">Original</div>
+                            </>
+                          )}
 
                           {/* Slider Handle (Keyboard Accessible, Touch & Draggable) */}
-                          <div
-                            className={`curtain-handle ${isCurtainDragging ? 'dragging' : ''}`}
-                            style={{ left: `${sliderPos}%` }}
-                            tabIndex={0}
-                            role="slider"
-                            aria-label="Mask and original image curtain comparison"
-                            aria-valuenow={Math.round(sliderPos)}
-                            aria-valuemin={0}
-                            aria-valuemax={100}
-                            onMouseDown={handleCurtainHandleMouseDown}
-                            onTouchStart={handleCurtainTouchStart}
-                            onKeyDown={handleCurtainKeyDown}
-                          >
-                            <div className="curtain-handle-knob">
-                              <Sliders size={14} />
+                          {!isRedrawMode && (
+                            <div
+                              className={`curtain-handle ${isCurtainDragging ? 'dragging' : ''}`}
+                              style={{ left: `${sliderPos}%` }}
+                              tabIndex={0}
+                              role="slider"
+                              aria-label="Mask and original image curtain comparison"
+                              aria-valuenow={Math.round(sliderPos)}
+                              aria-valuemin={0}
+                              aria-valuemax={100}
+                              onMouseDown={handleCurtainHandleMouseDown}
+                              onTouchStart={handleCurtainTouchStart}
+                              onKeyDown={handleCurtainKeyDown}
+                            >
+                              <div className="curtain-handle-knob">
+                                <Sliders size={14} />
+                              </div>
                             </div>
-                          </div>
+                          )}
 
                           {/* Candidate Boxes as Scalable SVG Overlay with Status Styling */}
-                          {showBoxes && (
+                          {(showBoxes || isRedrawMode) && (
                             <svg
                               viewBox={`0 0 ${analysis.width} ${analysis.height}`}
                               className="svg-overlay"
@@ -2073,7 +2380,7 @@ export default function App() {
                                 pointerEvents: 'none'
                               }}
                             >
-                              {allCandidatesInfo.map((cand) => {
+                              {!isRedrawMode && allCandidatesInfo.map((cand) => {
                                 const isSelected = selectedBoxIndex === cand.idx;
                                 const isHiddenByFilter = hideTiny && cand.isTiny;
                                 if (isHiddenByFilter) return null;
@@ -2125,6 +2432,17 @@ export default function App() {
                                   </rect>
                                 );
                               })}
+
+                              {/* Interactive Redraw Layer (Step R2) */}
+                              {isRedrawMode && redrawnBbox && selectedBoxIndex !== null && (
+                                <RedrawOverlay
+                                  originalBbox={analysis.boxes[selectedBoxIndex]}
+                                  redrawnBbox={redrawnBbox}
+                                  onChange={setRedrawnBbox}
+                                  imageBounds={{ width: analysis.width, height: analysis.height }}
+                                  scale={scale}
+                                />
+                              )}
                             </svg>
                           )}
                         </div>
@@ -2382,6 +2700,26 @@ export default function App() {
                             )}
                           </div>
                         </div>
+
+                        {/* Redraw and Compare Card (Step R2 & R3) */}
+                        {analysis && selectedBoxIndex !== null && (
+                          <CompareCard
+                            candidateIndex={selectedBoxIndex}
+                            candidateNumber={selectedBoxIndex + 1}
+                            analysis={analysis}
+                            scriptMode={scriptMode}
+                            modernLetters={modernLetters}
+                            highAccuracy={highAccuracy}
+                            isComparing={isComparing}
+                            comparisonData={comparisonData}
+                            onStartRedraw={() => startRedrawMode()}
+                            onRedrawAgain={() => startRedrawMode(comparisonData?.redrawn?.bbox || redrawnBbox)}
+                            onDiscard={handleDiscardComparison}
+                            onRetryAuto={retryAutoPrediction}
+                            onRetryRedrawn={retryRedrawnPrediction}
+                            onOpenSavedDrawer={() => setSavedDrawerOpen(true)}
+                          />
+                        )}
 
                         {/* Verification & Expert Review Section */}
                         <div className="inspector-section">
@@ -2952,6 +3290,34 @@ export default function App() {
           )}
         </main>
       </div>
+
+      {/* Printable Analysis Report Preview Dialog (Steps E1 & E2) */}
+      {reportDialogOpen && analysis && (
+        <ReportPreviewDialog
+          isOpen={reportDialogOpen}
+          onClose={() => setReportDialogOpen(false)}
+          analysis={analysis}
+          selectionInfo={selectionInfo}
+          batchRegions={batchRegions}
+          predictionCache={predictionCache}
+          reviewsList={reviewsList}
+          highAccuracy={highAccuracy}
+          scriptMode={scriptMode}
+          initialModernLetters={modernLetters}
+          onClassifyAll={runBatchRecognize}
+          isClassifying={isClassifying}
+        />
+      )}
+
+      {/* Saved Comparisons Drawer (Step R3) */}
+      <SavedComparisonsDrawer
+        isOpen={savedDrawerOpen}
+        onClose={() => setSavedDrawerOpen(false)}
+        currentRunId={analysis?.id || null}
+        scriptMode={scriptMode}
+        modernLetters={modernLetters}
+        onOpenCandidate={handleOpenSavedCandidate}
+      />
     </div>
   );
 }
