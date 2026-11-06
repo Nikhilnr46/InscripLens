@@ -1,5 +1,58 @@
 # InscripLens Studio Handover and Technical Guide
 
+## 6 November: PDF Report White Background, Script Switch & Paper Size Resolution
+
+Hardened the PDF report preview and print pipeline against layout truncation and control synchronization:
+
+- **White Background Continuity (`frontend/src/report/report.css`)**:
+  - Enforced `height: auto !important; flex-shrink: 0 !important; display: block !important; overflow: visible !important;` on `.inscriplens-report-root`.
+  - Prevents Chromium flexbox from freezing root paper height at `min-height: 297mm`, ensuring the white sheet stretches across all candidate cards (#1–133), epigraphic summary, and research credits without border discontinuation.
+- **Dynamic Print Paper Size (`frontend/src/report/ReportPreviewDialog.jsx` & `frontend/src/report/ReportView.jsx`)**:
+  - Injected runtime `@page { size: ... portrait; margin: 14mm; }` style tag reflecting active paper toggle (`a4` vs `letter`).
+  - Added paper dimensions subtitle and live report header badge (`A4 (210 × 297 mm)` vs `Letter (215.9 × 279.4 mm)`).
+- **Interactive Script Switching (`frontend/src/report/ReportPreviewDialog.jsx` & `frontend/src/report/ReportView.jsx`)**:
+  - Added Script segmented toggle (`[ ಕನ್ನಡ | Roman ]`) alongside Kannada style (`[ Faithful | Modern letters ]`).
+  - Dynamically swaps primary/secondary card glyphs: Roman mode displays prominent Roman transliteration (`ma`, `śrī`, `pa`) with subtle Kannada script; Kannada mode displays authentic Kannada characters (`ಮ`, `ಶ್ರೀ`, `ಪ`) with Roman transliteration subtitles.
+
+## 6 November: Halmidi Inscription Epigraphic Brief Integration (PDF Export)
+
+Integrated curated archaeological and epigraphic brief data for the demonstration stone into the printable PDF analysis report:
+
+- **Stone Profile Configuration (`frontend/src/report/stoneProfile.js`)**:
+  - Sets primary title to `"The Halmidi Inscription"` for demonstration runs while preserving the fallback subtitle `"Nagavara demonstration stone"`.
+  - Added structured metadata sections:
+    - `overview`: Date of Origin (c. 450–500 CE), Location (Halmidi village, Hassan district), Discovery (1936 by Dr. M. H. Krishna, Director of Archaeology for Mysore), Medium (Carved stone pillar).
+    - `significance`: Language milestone (oldest confirmed inscription in Kannada), Script & Dialect (Kadamba script, Puruvada-hala Kannada), Administrative proof (earliest evidence of Kannada as an administrative language).
+    - `narrative`: Issuing authority (Kadamba dynasty), Purpose (royal land grant), Story (donation of Palmadi village to warrior Vija Arasa for battlefield heroism against the Kekayas and Pallavas).
+    - `storySource`: Epigraphia Carnatica & Archaeological Survey of Mysore (Dr. M. H. Krishna, 1936).
+
+- **Report View & Print Layout (`frontend/src/report/ReportView.jsx` & `frontend/src/report/report.css`)**:
+  - Formatted into a responsive 2-column facts grid (`.report-facts-grid`), structured significance bullet points, and narrative summary.
+  - Excluded external scanning and third-party preservation claims to maintain an accurate, self-contained epigraphic stone brief.
+  - Configured page-break avoidance (`break-inside: avoid !important;`) across all brief sections to guarantee clean A4 print output.
+  - PDF document title automatically defaults to `"InscripLens report - The Halmidi Inscription - <date>.pdf"`.
+
+## 6 November: Predict-Crop Latency & Robustness Hardening (Step D1 & Performance Fix)
+
+Hardened and optimized character recognition inference across the `POST /api/predict-crop` endpoint and Epigraphy Studio frontend:
+
+- **Backend Architecture (`api/server.py`)**:
+  - Recognizers (`mask_svm_bundle.joblib` and calibrated Broad CNN checkpoint) are loaded once into memory on startup and retained.
+  - PyTorch CUDA acceleration executes CNN forward pass in under 5ms under `torch.no_grad()`.
+  - Inference is thread-safe and serialized through `_INFERENCE_LOCK` to prevent GPU memory collisions under concurrent requests.
+  - Automatic fallback to CPU if CUDA OutOfMemoryError occurs, logging a single clean notice `"CUDA out of memory in character recognition, falling back to CPU."` and freeing PyTorch cached memory.
+  - Agreement check leverages fast SVM DAG classification (`predict()`, ~15ms) rather than redundant multi-second `decision_function` computations.
+  - Strict error handling: rejects invalid bounding boxes with HTTP 422, missing image records with HTTP 404, and service failures with HTTP 503 without ever leaking internal filesystem paths or stack traces.
+  - Verified across 20 candidate bounding boxes: predictions, transliterations, alternatives, and confidences match 100% identically with baseline (confidences within 1e-6). Repeat call latency dropped from 14.25s to 38.0ms.
+
+- **Frontend Studio Hardening (`frontend/src/`)**:
+  - `predictCrop` enqueued via single-flight queue in `apiClient.js` with `AbortController` cancellation.
+  - Arrow key navigation and candidate clicks debounced by 200ms.
+  - Session caching by `${runId}:${bbox.join(',')}` eliminates duplicate API requests and enables instant Compare views (0ms).
+  - 12-second timeout guard guarantees loading skeletons always resolve to plain error states with Retry buttons.
+  - Crop image `onLoad` and `onError` handlers prevent hung image states.
+  - Diagnostics pill in Glyph Inspector shows response code and latency in milliseconds when `status.advanced_mode` is enabled.
+
 ## 6 November: Glyph Inspector Save, Drawer & JSON Export (Step R3 of 3)
 
 Delivered complete client-side persistence, comparison history drawer, and standardized JSON export for redrawn candidate comparisons:

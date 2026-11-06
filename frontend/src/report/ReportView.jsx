@@ -32,8 +32,12 @@ const ReportView = forwardRef(function ReportView(
   const {
     includeUncertain = true,
     includeTiny = false,
-    includeReviewerNames = true
+    includeReviewerNames = true,
+    scriptMode = 'kannada',
+    modernLetters = false
   } = options;
+
+  const isRomanMode = scriptMode === 'roman';
 
   // Filter candidates according to options
   const visibleCandidates = candidates.filter(cand => {
@@ -47,7 +51,9 @@ const ReportView = forwardRef(function ReportView(
   const getProvenanceText = (source) => {
     switch (source) {
       case 'demo':
-        return 'Demonstration stone';
+        return stoneProfile.alternateName
+          ? `Demonstration stone (${stoneProfile.alternateName}) · Kadamba dynasty (c. 450–500 CE)`
+          : 'Demonstration stone · Kadamba dynasty (c. 450–500 CE)';
       case 'user':
         return 'Name entered by the user';
       case 'unidentified':
@@ -72,7 +78,9 @@ const ReportView = forwardRef(function ReportView(
             <span className="report-wordmark-primary">InscripLens</span>{' '}
             <span className="report-wordmark-studio">Studio</span>
           </div>
-          <div className="report-type-badge">Analysis report</div>
+          <div className="report-type-badge">
+            Analysis report &middot; {paperSize === 'letter' ? 'Letter' : 'A4'}
+          </div>
         </div>
 
         <div className="report-meta-row">
@@ -120,13 +128,13 @@ const ReportView = forwardRef(function ReportView(
             </figcaption>
           </figure>
 
-          {/* Scanned Strokes (Mask) on Black Background */}
+          {/* Extracted Strokes (Mask) on Black Background */}
           <figure className="report-figure figure-mask">
             <div className="report-img-frame mask-frame">
               {maskSrc ? (
                 <img
                   src={maskSrc}
-                  alt="Scanned strokes (mask)"
+                  alt="Extracted strokes (mask)"
                   className="report-img"
                 />
               ) : (
@@ -134,7 +142,7 @@ const ReportView = forwardRef(function ReportView(
               )}
             </div>
             <figcaption className="report-figcaption">
-              <span className="figcaption-title">Scanned strokes (mask)</span>
+              <span className="figcaption-title">Extracted strokes (mask)</span>
               <span className="figcaption-dims">
                 {dimensions.width} &times; {dimensions.height} px
               </span>
@@ -147,7 +155,13 @@ const ReportView = forwardRef(function ReportView(
       <section className="report-characters-section">
         <h2 className="report-section-heading">Detected characters</h2>
         <div className="report-characters-intro">
-          {candidates.length} candidate regions. Machine suggestions, unverified. Listed in detection order, not reading order.
+          {candidates.length} candidate regions. Machine suggestions, unverified. {
+            isRomanMode
+              ? 'Primary display: Roman IAST transliteration.'
+              : modernLetters
+                ? 'Primary display: Kannada script (modern substitution active).'
+                : 'Primary display: Authentic epigraphic Kannada script.'
+          } Listed in detection order, not reading order.
         </div>
 
         {!hasClassificationRun ? (
@@ -192,9 +206,11 @@ const ReportView = forwardRef(function ReportView(
                       </div>
 
                       <div className="cand-labels-wrap">
-                        <div className="cand-kannada-letter">
-                          {cand.kannadaLabel || <span className="cand-dash">&ndash;</span>}
-                          {cand.isLossy && (
+                        <div className={isRomanMode ? 'cand-roman-letter' : 'cand-kannada-letter'}>
+                          {(isRomanMode ? cand.romanLabel : cand.kannadaLabel) || (
+                            <span className="cand-dash">&ndash;</span>
+                          )}
+                          {!isRomanMode && cand.isLossy && (
                             <span
                               className="cand-lossy-marker"
                               title="Lossy modern transliteration"
@@ -204,8 +220,10 @@ const ReportView = forwardRef(function ReportView(
                           )}
                         </div>
 
-                        <div className="cand-roman-label">
-                          {cand.romanLabel || <span className="cand-dash">&ndash;</span>}
+                        <div className={isRomanMode ? 'cand-kannada-sublabel' : 'cand-roman-label'}>
+                          {(isRomanMode ? cand.kannadaLabel : cand.romanLabel) || (
+                            <span className="cand-dash">&ndash;</span>
+                          )}
                         </div>
 
                         {cand.confidence != null && (
@@ -235,14 +253,71 @@ const ReportView = forwardRef(function ReportView(
         )}
       </section>
 
-      {/* e. Story Section (RENDERED ONLY IF PROFILE HAS A STORY) */}
-      {stoneProfile.story && (
+      {/* e. Historical Context & Epigraphic Brief */}
+      {(stoneProfile.overview || stoneProfile.story) && (
         <section className="report-story-section">
           <div className="story-header-row">
-            <h2 className="report-section-heading">Historical context &amp; story</h2>
-            <span className="curated-text-badge">Curated text, not generated</span>
+            <h2 className="report-section-heading">Historical context &amp; epigraphic brief</h2>
+            <span className="curated-text-badge">Curated record, not generated</span>
           </div>
-          <p className="report-story-body">{stoneProfile.story}</p>
+
+          {stoneProfile.overview && (
+            <div className="report-facts-grid">
+              <div className="report-fact-card">
+                <span className="fact-label">Date of Origin</span>
+                <span className="fact-value">{stoneProfile.overview.dateOfOrigin}</span>
+              </div>
+              <div className="report-fact-card">
+                <span className="fact-label">Location of Discovery</span>
+                <span className="fact-value">{stoneProfile.overview.location}</span>
+              </div>
+              <div className="report-fact-card">
+                <span className="fact-label">Discovery Details</span>
+                <span className="fact-value">{stoneProfile.overview.discovery}</span>
+              </div>
+              <div className="report-fact-card">
+                <span className="fact-label">Medium &amp; Script</span>
+                <span className="fact-value">
+                  {stoneProfile.overview.medium}
+                  {stoneProfile.significance?.scriptAndDialect ? ` · ${stoneProfile.significance.scriptAndDialect}` : ''}
+                </span>
+              </div>
+            </div>
+          )}
+
+          {stoneProfile.significance && (
+            <div className="report-brief-block">
+              <h3 className="brief-subheading">Linguistic &amp; Cultural Significance</h3>
+              <ul className="brief-points-list">
+                <li>
+                  <strong>Language Milestone:</strong> {stoneProfile.significance.languageMilestone}
+                </li>
+                <li>
+                  <strong>Script &amp; Dialect:</strong> {stoneProfile.significance.scriptAndDialect}
+                </li>
+                <li>
+                  <strong>Administrative Evidence:</strong> {stoneProfile.significance.administrativeEvidence}
+                </li>
+              </ul>
+            </div>
+          )}
+
+          {stoneProfile.narrative && (
+            <div className="report-brief-block">
+              <h3 className="brief-subheading">Core Narrative &amp; Historical Context</h3>
+              <div className="narrative-meta-row">
+                <span><strong>Issuing Authority:</strong> {stoneProfile.narrative.issuingAuthority}</span>
+                <span className="narrative-sep">&middot;</span>
+                <span><strong>Purpose:</strong> {stoneProfile.narrative.purpose}</span>
+              </div>
+              <p className="report-story-body">{stoneProfile.narrative.story}</p>
+            </div>
+          )}
+
+          {!stoneProfile.overview && stoneProfile.story && (
+            <p className="report-story-body">{stoneProfile.story}</p>
+          )}
+
           {stoneProfile.storySource && (
             <div className="report-story-source">
               Source: {stoneProfile.storySource}

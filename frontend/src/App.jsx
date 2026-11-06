@@ -51,6 +51,9 @@ import {
   RedrawFloatingBar,
   SavedComparisonsDrawer,
   predictCrop,
+  getCachedPrediction,
+  setCachedPrediction,
+  clearPredictionCache,
   normalizeBbox
 } from './compare';
 import './compare/compare.css';
@@ -100,21 +103,6 @@ export default function App() {
     window.history.pushState(null, '', '/import');
     setRoute('/import');
   };
-
-  useEffect(() => {
-    const orig = getOriginalFile();
-    if (orig && selectionInfo && !selectionInfo.isWholeImage) {
-      const url = URL.createObjectURL(orig);
-      setOriginalThumbUrl(url);
-      return () => {
-        try {
-          URL.revokeObjectURL(url);
-        } catch {}
-      };
-    } else {
-      setOriginalThumbUrl(null);
-    }
-  }, [analysis?.id, selectionInfo]);
 
   const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
     try {
@@ -298,6 +286,21 @@ export default function App() {
   
   // Active analysis record
   const [analysis, setAnalysis] = useState(null);
+
+  useEffect(() => {
+    const orig = getOriginalFile();
+    if (orig && selectionInfo && !selectionInfo.isWholeImage) {
+      const url = URL.createObjectURL(orig);
+      setOriginalThumbUrl(url);
+      return () => {
+        try {
+          URL.revokeObjectURL(url);
+        } catch {}
+      };
+    } else {
+      setOriginalThumbUrl(null);
+    }
+  }, [analysis?.id, selectionInfo]);
   const [sliderPos, setSliderPos] = useState(50); // percentage 0 - 100 for curtain
   const [showBoxes, setShowBoxes] = useState(true);
   const [selectedBoxIndex, setSelectedBoxIndex] = useState(null);
@@ -344,6 +347,9 @@ export default function App() {
   const galleryStripRef = useRef(null);
   const inspectorRef = useRef(null);
   const predictRequestIdRef = useRef(0);
+  const debouncePredictTimerRef = useRef(null);
+  const [advancedMetrics, setAdvancedMetrics] = useState(null);
+  const [cropImageStatus, setCropImageStatus] = useState('idle'); // 'idle' | 'loading' | 'loaded' | 'error'
   const autoPredictedAnalysisIdRef = useRef(null);
   const isDraggingCurtain = useRef(false);
   const [isCurtainDragging, setIsCurtainDragging] = useState(false);
@@ -387,14 +393,27 @@ export default function App() {
   const cropTimeoutRef = useRef(null);
   const cropAbortControllerRef = useRef(null);
 
-  // Sync test popovers from URL when analysis loads
+  // Sync test popovers and redraw mode from URL when analysis loads
   useEffect(() => {
     if (!analysis) return;
     try {
-      const p = new URLSearchParams(window.location.search).get('popover');
+      const sp = new URLSearchParams(window.location.search);
+      const p = sp.get('popover');
       if (p === 'view') setViewDropdownOpen(true);
       if (p === 'display') setDisplayOptionsOpen(true);
       if (p === 'export') setExportMenuOpen(true);
+
+      const r = sp.get('redraw');
+      if (r !== null) {
+        const candidateNum = parseInt(r, 10);
+        const idx = Number.isFinite(candidateNum) ? Math.max(0, candidateNum - 1) : 0;
+        if (analysis?.boxes?.[idx]) {
+          setSelectedBoxIndex(idx);
+          setTimeout(() => {
+            startRedrawMode(analysis.boxes[idx]);
+          }, 120);
+        }
+      }
     } catch {}
   }, [analysis]);
 
@@ -689,7 +708,10 @@ export default function App() {
     if (
       e.target.closest('.curtain-handle') ||
       e.target.closest('.svg-box') ||
-      e.target.closest('.svg-box-selected')
+      e.target.closest('.svg-box-selected') ||
+      e.target.closest('.redraw-active-box') ||
+      e.target.closest('.redraw-handle-group') ||
+      e.target.closest('.redraw-floating-bar')
     ) {
       return;
     }
@@ -802,6 +824,7 @@ export default function App() {
       setAnalysis(data);
       setBatchRegions([]);
       setPredictionCache({});
+      clearPredictionCache();
       setClassifyComplete(false);
       setClassifyProgress(0);
       setCropPrediction(null);
@@ -809,7 +832,7 @@ export default function App() {
       fetchReviews(data.id);
       if (data.boxes && data.boxes.length > 0) {
         setSelectedBoxIndex(0);
-        predictBox(0, data.id, data.boxes[0]);
+        predictBox(0, data.id, data.boxes[0], { immediate: true });
       } else {
         setSelectedBoxIndex(null);
       }
@@ -871,6 +894,7 @@ export default function App() {
       setAnalysis(data);
       setBatchRegions([]);
       setPredictionCache({});
+      clearPredictionCache();
       setClassifyComplete(false);
       setClassifyProgress(0);
       setCropPrediction(null);
@@ -878,7 +902,7 @@ export default function App() {
       fetchReviews(data.id);
       if (data.boxes && data.boxes.length > 0) {
         setSelectedBoxIndex(0);
-        predictBox(0, data.id, data.boxes[0]);
+        predictBox(0, data.id, data.boxes[0], { immediate: true });
       } else {
         setSelectedBoxIndex(null);
       }
@@ -910,8 +934,8 @@ export default function App() {
     navigateToStudio(false);
   };
 
-    // Predict selected crop region with tiny check and 8s timeout guard
-  const predictBox = async (boxIndex, overrideAnalysisId, overrideBbox) => {
+    // Predict selected crop region with session cache, single-flight queue, debounce, and 12s timeout guard
+  const predictBox = async (boxIndex, overrideAnalysisId, overrideBbox, options = {}) => {
     const currentAnalysisId = overrideAnalysisId || analysis?.id;
     const boxes = analysis?.boxes;
     const bbox = overrideBbox || (boxes && boxIndex !== null ? boxes[boxIndex] : null);
@@ -919,7 +943,13 @@ export default function App() {
 
     setSelectedBoxIndex(boxIndex);
 
-    // Clear any previous crop timeout timer and in-flight abort controller
+    // Clear any previous debounce timer
+    if (debouncePredictTimerRef.current) {
+      clearTimeout(debouncePredictTimerRef.current);
+      debouncePredictTimerRef.current = null;
+    }
+
+    // Clear any previous crop timeout timer and abort stale in-flight request
     if (cropTimeoutRef.current) {
       clearTimeout(cropTimeoutRef.current);
       cropTimeoutRef.current = null;
@@ -936,51 +966,84 @@ export default function App() {
       setPredictingCrop(false);
       setCropError(null);
       setCropTimedOut(false);
+      setCropImageStatus('idle');
       return;
+    }
+
+    // Check session cache first (instant return, 0ms)
+    if (!options.force) {
+      const cached = getCachedPrediction(currentAnalysisId, bbox);
+      if (cached) {
+        setCropTimedOut(false);
+        setCropError(null);
+        setPredictingCrop(false);
+        setCropPrediction({ ...cached, candidateIndex: boxIndex });
+        setCropImageStatus(cached.crop_url || cached.cropUrl ? 'loading' : 'idle');
+        setPredictionCache(prev => ({
+          ...prev,
+          [boxIndex]: {
+            prediction: cached.prediction,
+            confidence: cached.confidence,
+            uncertain: cached.uncertain,
+            models_agree: cached.models_agree
+          }
+        }));
+        if (status?.advanced_mode) {
+          setAdvancedMetrics({ status: '200 OK (cached)', durationMs: 0 });
+        }
+        return;
+      }
     }
 
     setCropPrediction(prev => (prev?.candidateIndex === boxIndex ? prev : null));
     setPredictingCrop(true);
     setCropError(null);
     setCropTimedOut(false);
+    setCropImageStatus('idle');
 
     const requestId = ++predictRequestIdRef.current;
     const controller = new AbortController();
     cropAbortControllerRef.current = controller;
 
-    // 8-second timeout guard: cancel skeleton and display retry button
-    cropTimeoutRef.current = setTimeout(() => {
-      if (requestId === predictRequestIdRef.current) {
-        controller.abort();
-        setPredictingCrop(false);
-        setCropTimedOut(true);
-        setCropError('Character preview took longer than 8 seconds to respond.');
-      }
-    }, 8000);
+    const executePrediction = async () => {
+      const startTime = performance.now();
 
-    try {
-      const res = await fetch('/api/predict-crop', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ run_id: currentAnalysisId, bbox }),
-        signal: controller.signal
-      });
+      // 12-second timeout guard: cancel skeleton and display retry button
+      cropTimeoutRef.current = setTimeout(() => {
+        if (requestId === predictRequestIdRef.current) {
+          controller.abort();
+          setPredictingCrop(false);
+          setCropTimedOut(true);
+          setCropError('Character preview took longer than 12 seconds to respond.');
+          if (status?.advanced_mode) {
+            setAdvancedMetrics({ status: 'Timed out (12s)', durationMs: 12000 });
+          }
+        }
+      }, 12000);
 
-      if (cropTimeoutRef.current) {
-        clearTimeout(cropTimeoutRef.current);
-        cropTimeoutRef.current = null;
-      }
+      try {
+        const data = await predictCrop(currentAnalysisId, bbox, {
+          signal: controller.signal,
+          bypassCache: Boolean(options.force),
+          timeoutMs: 12000,
+          retry: false
+        });
 
-      if (requestId !== predictRequestIdRef.current) return;
+        if (cropTimeoutRef.current) {
+          clearTimeout(cropTimeoutRef.current);
+          cropTimeoutRef.current = null;
+        }
 
-      if (!res.ok) {
-        const errData = await res.json().catch(() => ({}));
-        throw new Error(errData.detail || 'Character prediction could not be completed.');
-      }
-      const data = await res.json();
+        if (requestId !== predictRequestIdRef.current) return;
 
-      if (requestId === predictRequestIdRef.current) {
+        const duration = Math.round(performance.now() - startTime);
+        if (status?.advanced_mode) {
+          setAdvancedMetrics({ status: '200 OK', durationMs: duration });
+        }
+
         setCropTimedOut(false);
+        setCropError(null);
+        setCropImageStatus((data.crop_url || data.cropUrl) ? 'loading' : 'idle');
         setCropPrediction({ ...data, candidateIndex: boxIndex });
         setPredictionCache(prev => ({
           ...prev,
@@ -991,21 +1054,36 @@ export default function App() {
             models_agree: data.models_agree
           }
         }));
-      }
-    } catch (err) {
-      if (requestId === predictRequestIdRef.current) {
-        if (err.name !== 'AbortError') {
-          setCropError(err.message || 'Crop preview could not be loaded.');
+      } catch (err) {
+        if (requestId === predictRequestIdRef.current) {
+          if (err.name !== 'AbortError') {
+            const duration = Math.round(performance.now() - startTime);
+            if (status?.advanced_mode) {
+              setAdvancedMetrics({ status: 'Failed', durationMs: duration });
+            }
+            if (err.message && err.message.toLowerCase().includes('timed out')) {
+              setCropTimedOut(true);
+              setCropError('Character preview took longer than 12 seconds to respond.');
+            } else {
+              setCropError(err.message || 'Crop preview could not be loaded.');
+            }
+          }
+        }
+      } finally {
+        if (cropTimeoutRef.current) {
+          clearTimeout(cropTimeoutRef.current);
+          cropTimeoutRef.current = null;
+        }
+        if (requestId === predictRequestIdRef.current) {
+          setPredictingCrop(false);
         }
       }
-    } finally {
-      if (cropTimeoutRef.current) {
-        clearTimeout(cropTimeoutRef.current);
-        cropTimeoutRef.current = null;
-      }
-      if (requestId === predictRequestIdRef.current) {
-        setPredictingCrop(false);
-      }
+    };
+
+    if (options.immediate) {
+      executePrediction();
+    } else {
+      debouncePredictTimerRef.current = setTimeout(executePrediction, 200);
     }
   };
 
@@ -1030,20 +1108,63 @@ export default function App() {
     setTimeout(() => setIsTransitioning(false), 350);
   };
 
+  // Computes a comfortable medium-sized initial box for redrawing (at least 38x38 px, centered on candidate)
+  const getMediumRedrawBox = (box) => {
+    if (!box || !analysis) return box;
+    const [x1, y1, x2, y2] = box;
+    const w = Math.max(1, x2 - x1);
+    const h = Math.max(1, y2 - y1);
+    const centerX = Math.round((x1 + x2) / 2);
+    const centerY = Math.round((y1 + y2) / 2);
+
+    // Ensure initial redraw box starts at a comfortable medium glyph size (at least 38x38 px)
+    const TARGET_MEDIUM_SIZE = 38;
+    const targetW = Math.max(w, TARGET_MEDIUM_SIZE);
+    const targetH = Math.max(h, TARGET_MEDIUM_SIZE);
+
+    let newX1 = Math.round(centerX - targetW / 2);
+    let newY1 = Math.round(centerY - targetH / 2);
+    let newX2 = newX1 + targetW;
+    let newY2 = newY1 + targetH;
+
+    const imgW = analysis.width || 10000;
+    const imgH = analysis.height || 10000;
+
+    if (newX1 < 0) {
+      newX2 = Math.min(imgW, newX2 - newX1);
+      newX1 = 0;
+    }
+    if (newX2 > imgW) {
+      newX1 = Math.max(0, newX1 - (newX2 - imgW));
+      newX2 = imgW;
+    }
+    if (newY1 < 0) {
+      newY2 = Math.min(imgH, newY2 - newY1);
+      newY1 = 0;
+    }
+    if (newY2 > imgH) {
+      newY1 = Math.max(0, newY1 - (newY2 - imgH));
+      newY2 = imgH;
+    }
+
+    return [newX1, newY1, newX2, newY2];
+  };
+
   // Redraw Mode Actions (Step R2)
   const startRedrawMode = (initialBox = null) => {
     if (selectedBoxIndex === null || !analysis || !analysis.boxes?.[selectedBoxIndex]) return;
-    const baseBox = initialBox || analysis.boxes[selectedBoxIndex];
+    const rawBox = initialBox || analysis.boxes[selectedBoxIndex];
+    const baseBox = getMediumRedrawBox(rawBox);
     setRedrawnBbox([...baseBox]);
     setRedrawLayer('mask');
 
     // Save previous curtain position
     savedSliderPosRef.current = sliderPos;
 
-    // Zoom to candidate with generous margin (about 2.5 times box size on each side, never beyond 0.1 - 5.0)
+    // Zoom to candidate with generous margin (about 2.5 times box size on each side, comfortable zoom)
     if (viewportRef.current) {
       const vpRect = viewportRef.current.getBoundingClientRect();
-      const origBox = analysis.boxes[selectedBoxIndex];
+      const origBox = baseBox;
       const boxW = Math.max(1, origBox[2] - origBox[0]);
       const boxH = Math.max(1, origBox[3] - origBox[1]);
       const boxCenterX = (origBox[0] + origBox[2]) / 2;
@@ -1052,7 +1173,7 @@ export default function App() {
       // 2.5 times margin on each side: total view span is 6 * boxW and 6 * boxH
       const fitW = vpRect.width / (boxW * 6);
       const fitH = vpRect.height / (boxH * 6);
-      const targetScale = Math.max(0.1, Math.min(5.0, Math.min(fitW, fitH)));
+      const targetScale = Math.max(0.1, Math.min(3.2, Math.min(fitW, fitH)));
 
       const targetPanX = (vpRect.width / 2) - (boxCenterX * targetScale);
       const targetPanY = (vpRect.height / 2) - (boxCenterY * targetScale);
@@ -1073,7 +1194,7 @@ export default function App() {
 
   const resetRedrawnBox = () => {
     if (selectedBoxIndex !== null && analysis?.boxes?.[selectedBoxIndex]) {
-      setRedrawnBbox([...analysis.boxes[selectedBoxIndex]]);
+      setRedrawnBbox(getMediumRedrawBox(analysis.boxes[selectedBoxIndex]));
     }
   };
 
@@ -1124,7 +1245,7 @@ export default function App() {
     } : null);
 
     try {
-      const res = await predictCrop(analysis.id, autoBbox);
+      const res = await predictCrop(analysis.id, autoBbox, { bypassCache: true });
       if (reqId !== compareRequestIdRef.current) return;
       setComparisonData(prev => prev ? {
         ...prev,
@@ -1150,7 +1271,7 @@ export default function App() {
     } : null);
 
     try {
-      const res = await predictCrop(analysis.id, targetBbox);
+      const res = await predictCrop(analysis.id, targetBbox, { bypassCache: true });
       if (reqId !== compareRequestIdRef.current) return;
       setComparisonData(prev => prev ? {
         ...prev,
@@ -2278,7 +2399,7 @@ export default function App() {
 
                     {/* Interactive Zoom/Pan Viewport */}
                     <div
-                      className={`canvas-viewport ${isPanning ? 'panning' : ''}`}
+                      className={`canvas-viewport ${isPanning ? 'panning' : ''} ${isRedrawMode ? 'redraw-mode' : ''}`}
                       ref={viewportRef}
                       onMouseDown={handleViewportMouseDown}
                     >
@@ -2459,6 +2580,24 @@ export default function App() {
                       <div style={{ fontSize: '1.1rem', fontWeight: '600', color: '#EDEDEC', marginTop: '2px' }}>
                         {selectedBoxIndex !== null ? `Candidate #${selectedBoxIndex + 1}` : 'Select a Region'}
                       </div>
+                      {Boolean(status?.advanced_mode) && advancedMetrics && (
+                        <div style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '8px',
+                          marginTop: '6px',
+                          fontSize: '0.68rem',
+                          color: '#A09B94',
+                          backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                          padding: '3px 8px',
+                          borderRadius: '4px',
+                          border: '1px solid var(--border-subtle)'
+                        }}>
+                          <span>Status: {advancedMetrics.status}</span>
+                          <span>&bull;</span>
+                          <span>Duration: {advancedMetrics.durationMs}ms</span>
+                        </div>
+                      )}
                     </div>
 
                     {selectedBoxIndex !== null ? (
@@ -2481,11 +2620,11 @@ export default function App() {
                                   Crop preview timed out
                                 </span>
                                 <span style={{ fontSize: '0.68rem', color: '#7E7A75', marginBottom: '8px' }}>
-                                  Request took longer than 8 seconds.
+                                  Request took longer than 12 seconds.
                                 </span>
                                 <button
                                   className="btn-secondary"
-                                  onClick={() => predictBox(selectedBoxIndex)}
+                                  onClick={() => predictBox(selectedBoxIndex, null, null, { immediate: true, force: true })}
                                   style={{ padding: '3px 10px', fontSize: '0.72rem', gap: '4px', height: '24px' }}
                                 >
                                   <RotateCcw size={11} /> Retry
@@ -2501,16 +2640,34 @@ export default function App() {
                                 </span>
                                 <button
                                   className="btn-secondary"
-                                  onClick={() => predictBox(selectedBoxIndex)}
+                                  onClick={() => predictBox(selectedBoxIndex, null, null, { immediate: true, force: true })}
                                   style={{ padding: '3px 10px', fontSize: '0.72rem', gap: '4px', height: '24px' }}
                                 >
                                   <RotateCcw size={11} /> Retry
                                 </button>
                               </div>
-                            ) : isMatchingPrediction && cropPrediction.crop_url ? (
+                            ) : cropImageStatus === 'error' ? (
+                              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '20px', color: '#D97706', textAlign: 'center' }}>
+                                <span style={{ fontSize: '0.75rem', fontWeight: '600', marginBottom: '4px' }}>
+                                  Crop image failed to load
+                                </span>
+                                <span style={{ fontSize: '0.68rem', color: '#7E7A75', marginBottom: '8px' }}>
+                                  The magnified crop could not be displayed.
+                                </span>
+                                <button
+                                  className="btn-secondary"
+                                  onClick={() => predictBox(selectedBoxIndex, null, null, { immediate: true, force: true })}
+                                  style={{ padding: '3px 10px', fontSize: '0.72rem', gap: '4px', height: '24px' }}
+                                >
+                                  <RotateCcw size={11} /> Retry
+                                </button>
+                              </div>
+                            ) : isMatchingPrediction && (cropPrediction.crop_url || cropPrediction.cropUrl) ? (
                               <img
-                                src={cropPrediction.crop_url}
+                                src={cropPrediction.crop_url || cropPrediction.cropUrl}
                                 alt={`Magnified candidate region #${selectedBoxIndex + 1} predicted as transliteration ${cropPrediction.prediction}`}
+                                onLoad={() => setCropImageStatus('loaded')}
+                                onError={() => setCropImageStatus('error')}
                                 style={{
                                   maxHeight: '160px',
                                   maxWidth: '160px',

@@ -37,13 +37,33 @@ from kannada_converter import to_kannada
 from proposed_reading_rank import reading_rank
 
 # Import calibrated recognizer engine from reading module
+BINARIZER_SITE_PACKAGES = ROOT / "work/binarizer_env/Lib/site-packages"
+if BINARIZER_SITE_PACKAGES.is_dir() and str(BINARIZER_SITE_PACKAGES) not in sys.path:
+    sys.path.append(str(BINARIZER_SITE_PACKAGES))
+
+try:
+    import torch
+except ImportError:
+    torch = None
+
+import threading
+import logging
+import numpy as np
+
+logger = logging.getLogger("inscriplens.server")
+
+# GPU/inference lock to serialize concurrent recognition requests and avoid collisions
+_INFERENCE_LOCK = threading.Lock()
+
 READING_DIR = Path(__file__).resolve().parent / "reading"
 if str(READING_DIR) not in sys.path:
     sys.path.insert(0, str(READING_DIR))
 try:
-    from recognizer import get_engine
+    from recognizer import get_engine, _pixels_64, _softmax
 except Exception:
     get_engine = None
+    _pixels_64 = None
+    _softmax = None
 
 DATA_DIR = ROOT / "work/app_data"
 DATA_DIR.mkdir(parents=True, exist_ok=True)
@@ -330,8 +350,8 @@ def run_predict_crop(req: PredictCropRequest):
     """Predict character label for a specific bounding box."""
     run_id = req.run_id
     bbox = req.bbox
-    if len(bbox) != 4 or bbox[2] <= bbox[0] or bbox[3] <= bbox[1]:
-        raise HTTPException(status_code=400, detail="Invalid region coordinates selected.")
+    if not isinstance(bbox, (list, tuple)) or len(bbox) != 4 or bbox[2] <= bbox[0] or bbox[3] <= bbox[1]:
+        raise HTTPException(status_code=422, detail="Invalid region coordinates selected.")
 
     mask_path = DATA_DIR / run_id / "mask.png"
     orig_path = DATA_DIR / run_id / "input.png"
@@ -345,56 +365,121 @@ def run_predict_crop(req: PredictCropRequest):
     if not model_path.exists():
         raise HTTPException(status_code=503, detail="Character recognition is temporarily unavailable.")
 
+    bundle, model_sha = get_loaded_bundle(model_path)
+    if bundle is None:
+        raise HTTPException(status_code=503, detail="Character recognition is temporarily unavailable.")
+
     try:
         x1, y1, x2, y2 = bbox
         with Image.open(mask_path if clean else orig_path) as base_img:
             crop = base_img.crop((x1, y1, x2, y2))
             crop_path = DATA_DIR / run_id / f"crop_{x1}_{y1}_{x2}_{y2}.png"
             crop.save(crop_path)
-
-        bundle, model_sha = get_loaded_bundle(model_path)
-        if bundle is None:
-            raise HTTPException(status_code=503, detail="Character recognition is temporarily unavailable.")
-        feat = features(crop_path, bundle["preprocessing"])
-        ranking_requested = bool(req.proposed_reading and req.proposed_reading.strip())
-        ranked_labels = rank_labels(bundle["model"], feat, len(bundle["model"].classes_) if ranking_requested else 3)[0]
-        alts = ranked_labels[:3]
-        pred = alts[0]
-        confidence = None
-        uncertain = False
-        models_agree = None
-        confidence_scores = []
-
-        # Predict with calibrated reading engine if available
-        engine = get_engine() if get_engine is not None else None
-        if engine is not None and engine.is_available:
-            try:
-                with Image.open(crop_path) as crop_im:
-                    res_info = engine.predict_crop(crop_im, top_k=10000 if ranking_requested else 3)
-                if res_info:
-                    pred = res_info.get("prediction", pred)
-                    confidence = res_info.get("confidence")
-                    uncertain = res_info.get("uncertain", False)
-                    models_agree = res_info.get("models_agree")
-                    confidence_scores = res_info.get("confidence_scores", [])
-                    if res_info.get("alternatives"):
-                        ranked_labels = res_info["alternatives"]
-                        alts = ranked_labels[:3]
-                        confidence_scores = confidence_scores[:3]
-            except Exception:
-                pass
-
-        # Source examples without file paths
-        ref_zip = ROOT / "outputs/recognition_references.zip"
-        examples = source_examples(bundle["model"], feat, alts, model_path, ref_zip) if ref_zip.is_file() else []
-        clean_examples = []
-        for ex in examples:
-            clean_examples.append({
-                "label": ex.get("label"),
-                "source_name": "Reference inscription example"
-            })
     except Exception:
-        raise HTTPException(status_code=500, detail="Character prediction could not be completed.")
+        raise HTTPException(status_code=422, detail="Unable to extract image region.")
+
+    pred = None
+    confidence = None
+    uncertain = False
+    models_agree = None
+    alts = []
+    ranked_labels = []
+    confidence_scores = []
+    feat = None
+    ranking_requested = bool(req.proposed_reading and req.proposed_reading.strip())
+
+    try:
+        engine = get_engine() if get_engine is not None else None
+        # Calibrated Broad CNN prediction under GPU lock and torch.no_grad()
+        if engine is not None and getattr(engine, 'cnn_model', None) is not None and _pixels_64 is not None and _softmax is not None:
+            with _INFERENCE_LOCK:
+                tensor = None
+                try:
+                    if torch is not None:
+                        with torch.no_grad():
+                            tensor = torch.from_numpy(_pixels_64(crop))[None].to(engine.device)
+                            logits_t = engine.cnn_model(tensor)
+                            logits = logits_t.cpu().numpy()[0]
+                    else:
+                        raise RuntimeError("PyTorch runtime unavailable.")
+                except (getattr(torch.cuda, 'OutOfMemoryError', ()), RuntimeError) as oom_err:
+                    is_oom = "out of memory" in str(oom_err).lower() or (
+                        torch is not None and hasattr(torch.cuda, 'OutOfMemoryError') and isinstance(oom_err, torch.cuda.OutOfMemoryError)
+                    )
+                    if is_oom:
+                        logger.warning("CUDA out of memory in character recognition, falling back to CPU.")
+                        if torch is not None and torch.cuda.is_available():
+                            torch.cuda.empty_cache()
+                        engine.device = torch.device('cpu')
+                        engine.cnn_model = engine.cnn_model.to('cpu')
+                        with torch.no_grad():
+                            tensor = torch.from_numpy(_pixels_64(crop))[None].to(engine.device)
+                            logits_t = engine.cnn_model(tensor)
+                            logits = logits_t.cpu().numpy()[0]
+                    else:
+                        raise
+                finally:
+                    if tensor is not None:
+                        del tensor
+                    if 'logits_t' in locals():
+                        del logits_t
+                    if torch is not None and torch.cuda.is_available():
+                        torch.cuda.empty_cache()
+
+                calib_probs = _softmax(logits / engine.t_cnn)
+                if ranking_requested:
+                    ranked_indices = np.argsort(-calib_probs)
+                    ranked_labels = [engine.cnn_classes[i] for i in ranked_indices]
+                    top_indices = ranked_indices[:5]
+                else:
+                    top_indices = np.argsort(-calib_probs)[:5]
+                    ranked_labels = [engine.cnn_classes[i] for i in top_indices]
+
+                cnn_pred = engine.cnn_classes[top_indices[0]]
+                confidence = float(calib_probs[top_indices[0]])
+                alts = [engine.cnn_classes[i] for i in top_indices[:3]]
+                confidence_scores = [round(float(calib_probs[i]), 4) for i in top_indices[:3]]
+                uncertain = bool(confidence < engine.abstain_tau)
+                pred = cnn_pred
+
+                # SVM agreement check (fast DAG predict, ~15ms)
+                if engine.svm_bundle is not None:
+                    try:
+                        feat = features(crop, engine.svm_bundle.get('preprocessing', 'median'))
+                        svm_pred = str(engine.svm_bundle['model'].predict([feat])[0])
+                        models_agree = bool(svm_pred == cnn_pred)
+                    except Exception:
+                        models_agree = None
+        else:
+            # Fallback to SVM model
+            feat = features(crop, bundle["preprocessing"])
+            ranked_labels = rank_labels(bundle["model"], feat, len(bundle["model"].classes_) if ranking_requested else 3)[0]
+            alts = ranked_labels[:3]
+            pred = alts[0]
+            confidence = None
+            uncertain = True
+            models_agree = None
+            confidence_scores = []
+    except HTTPException:
+        raise
+    except Exception:
+        raise HTTPException(status_code=503, detail="Character prediction could not be completed.")
+
+    # Source examples without file paths
+    ref_zip = ROOT / "outputs/recognition_references.zip"
+    clean_examples = []
+    if ref_zip.is_file():
+        try:
+            if feat is None:
+                feat = features(crop, bundle["preprocessing"])
+            examples = source_examples(bundle["model"], feat, alts, model_path, ref_zip)
+            for ex in examples:
+                clean_examples.append({
+                    "label": ex.get("label"),
+                    "source_name": "Reference inscription example"
+                })
+        except Exception:
+            clean_examples = []
 
     return {
         "run_id": run_id,

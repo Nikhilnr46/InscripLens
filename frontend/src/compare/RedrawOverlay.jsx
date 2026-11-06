@@ -8,8 +8,7 @@
  * full boundary clamping and minimum 8x8 px enforcement.
  */
 
-import React, { useRef, useState, useCallback } from 'react';
-import { normalizeBbox } from './coordinates';
+import React, { useRef, useState, useEffect } from 'react';
 
 export default function RedrawOverlay({
   originalBbox,
@@ -18,7 +17,9 @@ export default function RedrawOverlay({
   imageBounds,
   scale = 1
 }) {
-  const [dragState, setDragState] = useState(null); // { mode: 'move'|'resize', handle?: string, startClientX, startClientY, startBbox }
+  const [activeHandle, setActiveHandle] = useState(null);
+  const [isMoving, setIsMoving] = useState(false);
+  const dragRef = useRef(null);
 
   const origX1 = originalBbox[0];
   const origY1 = originalBbox[1];
@@ -50,87 +51,91 @@ export default function RedrawOverlay({
     { id: 'w', x: currX1, y: currY1 + currH / 2, cursor: 'ew-resize' }
   ];
 
-  // Initiate box move
-  const handleMoveDown = (e) => {
-    if (e.button !== 0) return;
+  // Initiate drag operation (move or resize) with global window listeners
+  const startDrag = (e, mode, handleId = null) => {
+    if (e.button !== 0 && e.pointerType === 'mouse') return;
     e.stopPropagation();
     e.preventDefault();
-    try {
-      e.currentTarget.setPointerCapture(e.pointerId);
-    } catch {}
 
-    setDragState({
-      mode: 'move',
-      startClientX: e.clientX,
-      startClientY: e.clientY,
-      startBbox: [...redrawnBbox]
-    });
-  };
+    const startClientX = e.clientX;
+    const startClientY = e.clientY;
+    const startBbox = [...redrawnBbox];
 
-  // Initiate handle resize
-  const handleResizeDown = (e, handleId) => {
-    if (e.button !== 0) return;
-    e.stopPropagation();
-    e.preventDefault();
-    try {
-      e.currentTarget.setPointerCapture(e.pointerId);
-    } catch {}
+    dragRef.current = {
+      mode,
+      handleId,
+      startClientX,
+      startClientY,
+      startBbox
+    };
 
-    setDragState({
-      mode: 'resize',
-      handle: handleId,
-      startClientX: e.clientX,
-      startClientY: e.clientY,
-      startBbox: [...redrawnBbox]
-    });
-  };
-
-  const handlePointerMove = (e) => {
-    if (!dragState) return;
-    e.stopPropagation();
-
-    const dx = (e.clientX - dragState.startClientX) / scale;
-    const dy = (e.clientY - dragState.startClientY) / scale;
-    const snap = dragState.startBbox;
-
-    if (dragState.mode === 'move') {
-      const boxW = snap[2] - snap[0];
-      const boxH = snap[3] - snap[1];
-
-      let newX1 = Math.round(snap[0] + dx);
-      let newY1 = Math.round(snap[1] + dy);
-
-      // Clamp within image boundary
-      newX1 = Math.max(0, Math.min(imageBounds.width - boxW, newX1));
-      newY1 = Math.max(0, Math.min(imageBounds.height - boxH, newY1));
-
-      const newBbox = [newX1, newY1, newX1 + boxW, newY1 + boxH];
-      onChange(newBbox);
-      return;
+    if (mode === 'move') {
+      setIsMoving(true);
+    } else {
+      setActiveHandle(handleId);
     }
 
-    if (dragState.mode === 'resize' && dragState.handle) {
-      let [x1, y1, x2, y2] = snap;
-      const h = dragState.handle;
+    const onPointerMove = (moveEvt) => {
+      if (!dragRef.current) return;
+      moveEvt.preventDefault();
 
-      if (h.includes('w')) x1 = Math.round(snap[0] + dx);
-      if (h.includes('e')) x2 = Math.round(snap[2] + dx);
-      if (h.includes('n')) y1 = Math.round(snap[1] + dy);
-      if (h.includes('s')) y2 = Math.round(snap[3] + dy);
+      const { mode: currentMode, handleId: currentHandle, startClientX: startX, startClientY: startY, startBbox: snap } = dragRef.current;
+      const dx = (moveEvt.clientX - startX) / scale;
+      const dy = (moveEvt.clientY - startY) / scale;
 
-      const normalized = normalizeBbox([x1, y1, x2, y2], imageBounds, 8);
-      onChange(normalized);
-    }
+      if (currentMode === 'move') {
+        const boxW = snap[2] - snap[0];
+        const boxH = snap[3] - snap[1];
+
+        let newX1 = Math.round(snap[0] + dx);
+        let newY1 = Math.round(snap[1] + dy);
+
+        // Clamp within image boundary
+        newX1 = Math.max(0, Math.min(imageBounds.width - boxW, newX1));
+        newY1 = Math.max(0, Math.min(imageBounds.height - boxH, newY1));
+
+        onChange([newX1, newY1, newX1 + boxW, newY1 + boxH]);
+      } else if (currentMode === 'resize' && currentHandle) {
+        let [x1, y1, x2, y2] = snap;
+        const minSize = 8;
+
+        if (currentHandle.includes('w')) {
+          x1 = Math.max(0, Math.min(snap[2] - minSize, Math.round(snap[0] + dx)));
+        }
+        if (currentHandle.includes('e')) {
+          x2 = Math.min(imageBounds.width, Math.max(snap[0] + minSize, Math.round(snap[2] + dx)));
+        }
+        if (currentHandle.includes('n')) {
+          y1 = Math.max(0, Math.min(snap[3] - minSize, Math.round(snap[1] + dy)));
+        }
+        if (currentHandle.includes('s')) {
+          y2 = Math.min(imageBounds.height, Math.max(snap[1] + minSize, Math.round(snap[3] + dy)));
+        }
+
+        onChange([x1, y1, x2, y2]);
+      }
+    };
+
+    const onPointerUp = () => {
+      dragRef.current = null;
+      setIsMoving(false);
+      setActiveHandle(null);
+      window.removeEventListener('pointermove', onPointerMove);
+      window.removeEventListener('pointerup', onPointerUp);
+      window.removeEventListener('pointercancel', onPointerUp);
+    };
+
+    window.addEventListener('pointermove', onPointerMove, { passive: false });
+    window.addEventListener('pointerup', onPointerUp);
+    window.addEventListener('pointercancel', onPointerUp);
   };
 
-  const handlePointerUp = (e) => {
-    if (!dragState) return;
-    e.stopPropagation();
-    try {
-      e.currentTarget.releasePointerCapture(e.pointerId);
-    } catch {}
-    setDragState(null);
-  };
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      dragRef.current = null;
+    };
+  }, []);
 
   // Badge positioning: place slightly above box, or below if near top edge
   const badgeY = currY1 > 32 / scale ? currY1 - (12 / scale) : currY2 + (16 / scale);
@@ -139,10 +144,7 @@ export default function RedrawOverlay({
   return (
     <g
       className="redraw-interactive-layer"
-      onPointerMove={handlePointerMove}
-      onPointerUp={handlePointerUp}
-      onPointerCancel={handlePointerUp}
-      style={{ pointerEvents: 'all' }}
+      style={{ pointerEvents: 'none', userSelect: 'none' }}
     >
       {/* 1. Original Candidate Box (dashed neutral outline) */}
       <rect
@@ -162,9 +164,10 @@ export default function RedrawOverlay({
         y={currY1}
         width={currW}
         height={currH}
-        className="redraw-active-box"
+        className={`redraw-active-box ${isMoving ? 'moving' : ''}`}
         strokeWidth={strokeW}
-        onPointerDown={handleMoveDown}
+        onPointerDown={(e) => startDrag(e, 'move')}
+        onMouseDown={(e) => { e.stopPropagation(); }}
         title="Drag inside to move redrawn box"
       />
 
@@ -191,30 +194,34 @@ export default function RedrawOverlay({
       </g>
 
       {/* 4. 8 Resize Handles */}
-      {handles.map((h) => (
-        <g
-          key={h.id}
-          className="redraw-handle-group"
-          style={{ cursor: h.cursor }}
-          onPointerDown={(e) => handleResizeDown(e, h.id)}
-        >
-          {/* Expanded transparent touch/hit area */}
-          <circle
-            cx={h.x}
-            cy={h.y}
-            r={touchRadius}
-            className="redraw-handle-touch"
-          />
-          {/* Crisp visible handle point */}
-          <circle
-            cx={h.x}
-            cy={h.y}
-            r={handleRadius}
-            className="redraw-handle-dot"
-            strokeWidth={Math.max(1.5, 2 / scale)}
-          />
-        </g>
-      ))}
+      {handles.map((h) => {
+        const isActive = activeHandle === h.id;
+        return (
+          <g
+            key={h.id}
+            className={`redraw-handle-group ${isActive ? 'active' : ''}`}
+            style={{ cursor: h.cursor }}
+            onPointerDown={(e) => startDrag(e, 'resize', h.id)}
+            onMouseDown={(e) => { e.stopPropagation(); }}
+          >
+            {/* Expanded transparent touch/hit area */}
+            <circle
+              cx={h.x}
+              cy={h.y}
+              r={touchRadius}
+              className="redraw-handle-touch"
+            />
+            {/* Crisp visible handle point */}
+            <circle
+              cx={h.x}
+              cy={h.y}
+              r={isActive ? handleRadius * 1.2 : handleRadius}
+              className="redraw-handle-dot"
+              strokeWidth={Math.max(1.5, 2 / scale)}
+            />
+          </g>
+        );
+      })}
     </g>
   );
 }

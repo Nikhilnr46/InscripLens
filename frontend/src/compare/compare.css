@@ -160,17 +160,22 @@
 }
 
 .redraw-handle-dot {
-  fill: #FFFFFF;
+  fill: #1B1B1F;
   stroke: var(--accent-sandstone, #C9A66B);
   stroke-width: 2px;
   cursor: inherit;
-  transition: transform 0.1s ease;
+  transition: fill 0.12s ease, stroke 0.12s ease, stroke-width 0.12s ease;
 }
 
-.redraw-handle-group:hover .redraw-handle-dot {
-  transform-origin: center;
-  transform: scale(1.25);
+.redraw-handle-group:hover .redraw-handle-dot,
+.redraw-handle-group.active .redraw-handle-dot {
+  fill: var(--accent-sandstone, #C9A66B);
+  stroke: #FFFFFF;
   stroke-width: 2.5px;
+}
+
+.redraw-active-box.moving {
+  cursor: grabbing;
 }
 
 .redraw-dim-badge {
@@ -477,9 +482,6 @@
 @media (prefers-reduced-motion: reduce) {
   .redraw-floating-bar {
     animation: none;
-  }
-  .redraw-handle-group:hover .redraw-handle-dot {
-    transform: none;
   }
 }
 

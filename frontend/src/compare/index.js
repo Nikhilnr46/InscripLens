@@ -4,7 +4,12 @@
  * and UI Components (RedrawOverlay, RedrawFloatingBar, CompareCard).
  */
 
-export { predictCrop } from './apiClient';
+export {
+  predictCrop,
+  getCachedPrediction,
+  setCachedPrediction,
+  clearPredictionCache
+} from './apiClient';
 export {
   screenToImage,
   imageToScreen,

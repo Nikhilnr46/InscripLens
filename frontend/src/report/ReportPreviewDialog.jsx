@@ -26,6 +26,7 @@ export default function ReportPreviewDialog({
   const [includeUncertain, setIncludeUncertain] = useState(true);
   const [includeTiny, setIncludeTiny] = useState(false);
   const [includeReviewerNames, setIncludeReviewerNames] = useState(true);
+  const [script, setScript] = useState(scriptMode || 'kannada');
   const [kannadaStyle, setKannadaStyle] = useState(initialModernLetters ? 'modern' : 'faithful');
   const [paperSize, setPaperSize] = useState('a4');
   const [exportWithoutLabels, setExportWithoutLabels] = useState(false);
@@ -39,11 +40,12 @@ export default function ReportPreviewDialog({
   // Sync initial state from Studio when dialog opens
   useEffect(() => {
     if (isOpen) {
+      setScript(scriptMode || 'kannada');
       setKannadaStyle(initialModernLetters ? 'modern' : 'faithful');
       setUserEnteredName('');
       setExportWithoutLabels(false);
     }
-  }, [isOpen, initialModernLetters]);
+  }, [isOpen, scriptMode, initialModernLetters]);
 
   // Prepare images on open
   useEffect(() => {
@@ -102,6 +104,7 @@ export default function ReportPreviewDialog({
     reviewsList,
     highAccuracy,
     options: {
+      scriptMode: script,
       modernLetters
     },
     thumbnails: preparedImages.thumbnails
@@ -240,6 +243,32 @@ export default function ReportPreviewDialog({
             </label>
           </div>
 
+          {/* Script Selection (Kannada vs Roman) */}
+          <div className="option-group">
+            <span className="option-group-title">Script</span>
+            <div className="segmented-control option-segmented">
+              <button
+                type="button"
+                className={`segmented-btn ${script === 'kannada' ? 'active' : ''}`}
+                onClick={() => setScript('kannada')}
+              >
+                ಕನ್ನಡ
+              </button>
+              <button
+                type="button"
+                className={`segmented-btn ${script === 'roman' ? 'active' : ''}`}
+                onClick={() => setScript('roman')}
+              >
+                Roman
+              </button>
+            </div>
+            <span className="option-help-text">
+              {script === 'kannada'
+                ? 'Displays Kannada script as the primary glyph label with Roman transliteration subtitle.'
+                : 'Displays Roman IAST transliteration as the primary label with Kannada script subtitle.'}
+            </span>
+          </div>
+
           {/* Kannada Style (Faithful vs Modern Letters) */}
           <div className="option-group">
             <span className="option-group-title">Kannada style</span>
@@ -261,7 +290,7 @@ export default function ReportPreviewDialog({
             </div>
             <span className="option-help-text">
               {kannadaStyle === 'modern'
-                ? 'Maps archaic Halegannada letters (ಱ, ೞ) to modern forms with an asterisk.'
+                ? 'Maps archaic Halegannada letters (ಱ, ೞ) to modern forms (ರ, ಳ) with an asterisk.'
                 : 'Preserves authentic epigraphic characters without modern substitution.'}
             </span>
           </div>
@@ -285,6 +314,11 @@ export default function ReportPreviewDialog({
                 Letter
               </button>
             </div>
+            <span className="option-help-text">
+              {paperSize === 'a4'
+                ? '210 × 297 mm · International A4 portrait standard.'
+                : '215.9 × 279.4 mm · US / North American Letter portrait standard.'}
+            </span>
           </div>
 
           {/* Helper destination notice */}
@@ -373,6 +407,14 @@ export default function ReportPreviewDialog({
           </div>
         )}
 
+        {/* Dynamic @page rule ensuring exact printed paper dimensions */}
+        <style>{`
+          @page {
+            size: ${paperSize === 'letter' ? 'letter portrait' : 'A4 portrait'} !important;
+            margin: 14mm !important;
+          }
+        `}</style>
+
         <ReportView
           ref={reportRef}
           reportData={reportData}
@@ -382,6 +424,7 @@ export default function ReportPreviewDialog({
             includeUncertain,
             includeTiny,
             includeReviewerNames,
+            scriptMode: script,
             modernLetters
           }}
           paperSize={paperSize}

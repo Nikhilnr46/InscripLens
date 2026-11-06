@@ -402,7 +402,7 @@ export default function CompareCard({
             <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', padding: '8px', color: '#E06C75', fontSize: '0.72rem' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                 <AlertCircle size={12} />
-                <span>Prediction failed</span>
+                <span>{autoErr || 'Prediction failed'}</span>
               </div>
               <button
                 type="button"
@@ -505,7 +505,7 @@ export default function CompareCard({
             <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', padding: '8px', color: '#E06C75', fontSize: '0.72rem' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                 <AlertCircle size={12} />
-                <span>Prediction failed</span>
+                <span>{redrawnErr || 'Prediction failed'}</span>
               </div>
               <button
                 type="button"
