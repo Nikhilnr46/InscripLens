@@ -11,7 +11,7 @@ import io
 import json
 import hashlib
 from typing import List, Optional
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from PIL import Image, ImageOps
 
 from fastapi import FastAPI, UploadFile, File, Form, HTTPException, Request
@@ -34,6 +34,7 @@ from recognition_alternatives import rank_labels, source_examples
 from run_character_benchmark import features
 from translation_core import analyze_inscription_text
 from kannada_converter import to_kannada
+from proposed_reading_rank import reading_rank
 
 # Import calibrated recognizer engine from reading module
 READING_DIR = Path(__file__).resolve().parent / "reading"
@@ -102,6 +103,7 @@ app.mount("/app_data", StaticFiles(directory=str(DATA_DIR)), name="app_data")
 
 # Request models
 class PredictCropRequest(BaseModel):
+    proposed_reading: Optional[str] = Field(default=None, max_length=256)
     run_id: str
     bbox: List[int]  # [x1, y1, x2, y2]
 
@@ -354,7 +356,9 @@ def run_predict_crop(req: PredictCropRequest):
         if bundle is None:
             raise HTTPException(status_code=503, detail="Character recognition is temporarily unavailable.")
         feat = features(crop_path, bundle["preprocessing"])
-        alts = rank_labels(bundle["model"], feat, 3)[0]
+        ranking_requested = bool(req.proposed_reading and req.proposed_reading.strip())
+        ranked_labels = rank_labels(bundle["model"], feat, len(bundle["model"].classes_) if ranking_requested else 3)[0]
+        alts = ranked_labels[:3]
         pred = alts[0]
         confidence = None
         uncertain = False
@@ -366,7 +370,7 @@ def run_predict_crop(req: PredictCropRequest):
         if engine is not None and engine.is_available:
             try:
                 with Image.open(crop_path) as crop_im:
-                    res_info = engine.predict_crop(crop_im)
+                    res_info = engine.predict_crop(crop_im, top_k=10000 if ranking_requested else 3)
                 if res_info:
                     pred = res_info.get("prediction", pred)
                     confidence = res_info.get("confidence")
@@ -374,7 +378,9 @@ def run_predict_crop(req: PredictCropRequest):
                     models_agree = res_info.get("models_agree")
                     confidence_scores = res_info.get("confidence_scores", [])
                     if res_info.get("alternatives"):
-                        alts = res_info["alternatives"]
+                        ranked_labels = res_info["alternatives"]
+                        alts = ranked_labels[:3]
+                        confidence_scores = confidence_scores[:3]
             except Exception:
                 pass
 
@@ -400,6 +406,7 @@ def run_predict_crop(req: PredictCropRequest):
         "model": "Experimental recognizer",
         "model_sha256": model_sha or hashlib.sha256(model_path.read_bytes()).hexdigest(),
         "reference_examples": clean_examples,
+        "proposed_reading_rank": reading_rank(req.proposed_reading, ranked_labels) if ranking_requested else None,
         "confidence": confidence,
         "uncertain": uncertain,
         "models_agree": models_agree,

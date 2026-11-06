@@ -12,7 +12,7 @@
  * - rank_note always states that ranks beyond 3 are not available
  */
 
-import { toKannada } from '../utils/kannadaConverter';
+import { toKannada } from '../utils/kannadaConverter.js';
 
 const RANKS_NOTE_SUFFIX = 'Ranks beyond 3 are not available.';
 

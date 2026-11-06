@@ -135,7 +135,7 @@ class RecognizerEngine:
     def is_available(self) -> bool:
         return self.svm_bundle is not None or self.cnn_model is not None
 
-    def predict_crop(self, crop: Image.Image) -> Dict[str, Any]:
+    def predict_crop(self, crop: Image.Image, top_k: int = 3) -> Dict[str, Any]:
         """Predict character label, confidence, uncertainty, and agreement for a single crop."""
         svm_pred = None
         cnn_pred = None
@@ -152,11 +152,11 @@ class RecognizerEngine:
                 with torch.inference_mode():
                     logits = self.cnn_model(tensor).cpu().numpy()[0]
                 calib_probs = _softmax(logits / self.t_cnn)
-                top_indices = np.argsort(-calib_probs)[:5]
+                top_indices = np.argsort(-calib_probs, kind='stable')[:max(5, top_k)]
                 cnn_pred = self.cnn_classes[top_indices[0]]
                 confidence = float(calib_probs[top_indices[0]])
-                alts = [self.cnn_classes[i] for i in top_indices[:3]]
-                confidence_scores = [round(float(calib_probs[i]), 4) for i in top_indices[:3]]
+                alts = [self.cnn_classes[i] for i in top_indices[:top_k]]
+                confidence_scores = [round(float(calib_probs[i]), 4) for i in top_indices[:top_k]]
                 uncertain = bool(confidence < self.abstain_tau)
             except Exception:
                 cnn_pred = None
@@ -172,7 +172,7 @@ class RecognizerEngine:
 
                 # If CNN was unavailable, use SVM as fallback
                 if cnn_pred is None:
-                    alts = rank_labels(self.svm_bundle['model'], feat, 3)[0]
+                    alts = rank_labels(self.svm_bundle['model'], feat, top_k)[0]
                     # Existing temperatures were fitted on training-member,
                     # source-binary crops. They cannot justify a probability
                     # or acceptance threshold on predicted-mask crops.
