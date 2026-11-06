@@ -14,6 +14,7 @@ __pycache__/
 *.png
 *.jpg
 *.jpeg
+!frontend/src/assets/**
 .env
 .env.*
 !.env.example

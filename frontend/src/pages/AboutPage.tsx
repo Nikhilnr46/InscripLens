@@ -18,6 +18,7 @@ import {
 import { SITE } from '../config/site';
 import ThemeToggle from '../components/ThemeToggle';
 import Footer from '../components/Footer';
+import pesLogo from '../assets/pes-logo.png';
 
 interface AboutPageProps {
   onNavigateHome: () => void;
@@ -370,7 +371,7 @@ export default function AboutPage({ onNavigateHome, onNavigateStudio }: AboutPag
             <h2 className="about-section-heading">Developer</h2>
             <div className="developer-card card-spotlight">
               <div className="developer-avatar-box">
-                <User size={24} className="text-sandstone" />
+                <img src={pesLogo} alt="PES College Logo" style={{ width: '38px', height: '38px', borderRadius: '50%', objectFit: 'contain' }} />
               </div>
               <div>
                 <h3 className="developer-title">

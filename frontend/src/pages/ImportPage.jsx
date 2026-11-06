@@ -143,33 +143,7 @@ export default function ImportPage({
     <div className="import-page-root">
       {/* Top Header matching Studio & Landing design system */}
       <header className="import-header studio-header">
-        <div className="studio-brand">
-          <button
-            type="button"
-            onClick={
-              step === 'select'
-                ? handleCancelSelect
-                : (hasActiveStudioRun && onReturnToStudio ? onReturnToStudio : onBackToLanding)
-            }
-            className="home-pill-btn"
-            title={
-              step === 'select'
-                ? (hasActiveStudioRun && restoreSelection ? 'Return to Studio workspace' : 'Return to file chooser')
-                : (hasActiveStudioRun ? 'Return to Studio workspace' : 'Return to InscripLens Overview')
-            }
-            aria-label={
-              step === 'select'
-                ? (hasActiveStudioRun && restoreSelection ? 'Back to Studio' : 'Back to chooser')
-                : (hasActiveStudioRun ? 'Back to Studio' : 'Back to Overview')
-            }
-          >
-            <ArrowLeft size={15} />
-            <span className="home-pill-text">
-              {step === 'select'
-                ? (hasActiveStudioRun && restoreSelection ? 'Back to Studio' : 'Back to Chooser')
-                : (hasActiveStudioRun ? 'Back to Studio' : 'Back to Overview')}
-            </span>
-          </button>
+        <div className="studio-brand" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           <div
             className="brand-logo-shimmer"
             style={{

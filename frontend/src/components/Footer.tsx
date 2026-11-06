@@ -1,5 +1,6 @@
 import React from 'react';
 import { SITE } from '../config/site';
+import pesLogo from '../assets/pes-logo.png';
 
 interface FooterProps {
   onNavigateHome?: () => void;
@@ -36,7 +37,10 @@ export default function Footer({ onNavigateHome }: FooterProps) {
           <div className="site-footer-credit">
             <span>Developed by {SITE.developer}</span>
             <span className="footer-credit-sep" aria-hidden="true">|</span>
-            <span className="institution-pill">{SITE.collegeFull || SITE.college}</span>
+            <span className="footer-institution-freeform" title="PES">
+              <img src={pesLogo} alt="PES" className="footer-institution-logo" />
+              <span className="footer-institution-name">{SITE.collegeFull || SITE.college}</span>
+            </span>
           </div>
           <div className="site-footer-sub">
             Runs locally on this machine. No cloud OCR service used.

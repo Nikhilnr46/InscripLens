@@ -1,5 +1,207 @@
 # InscripLens Studio Handover and Technical Guide
 
+## 6 November: PDF Analysis Report Export in Run History
+
+Replaced JSON downloads in the Run History table with full printable PDF analysis report export:
+
+- **Run History Export Button (`frontend/src/App.jsx`)**:
+  - Replaced the previous `<a href="/api/export/{id}" download>Export</a>` link with `<button className="tool-btn btn-export-highlight" onClick={() => handleExportHistoryPdf(item)}><FileText size={12} /> Export PDF</button>`.
+  - Added visual spinner feedback (`historyExportingId`) during asynchronous character box and figure preparation.
+- **Client-Side Mask Candidate Extractor (`frontend/src/utils/maskExtractor.js`)**:
+  - Implements browser-based connected component labeling on binary mask pixel buffers matching `outputs/segment_candidates.py` criteria (`area >= 12`, `w >= 3`, `h >= 3`, sorted top-to-bottom).
+  - Ensures historical analysis runs from the database open cleanly in `ReportPreviewDialog` with all 133 candidate regions, stroke thumbnails, and recorded reviews.
+- **Report Dialog Integration (`frontend/src/App.jsx`)**:
+  - Introduced `reportTargetAnalysis` and `reportTargetReviews` states to decouple report preview generation from the currently active Studio workspace stone.
+
+## 6 November: Free-Form PES Logo Presentation in Footer
+
+Unconstrained the PES college logo in the website footer from the pill container:
+
+- **Free-Form Implementation (`frontend/src/components/Footer.tsx`)**:
+  - Removed `.institution-pill` and wrapped the logo and label inside `<span className="footer-institution-freeform" title="PES">`.
+  - Replaced the 16px `.institution-logo` with `.footer-institution-logo` and `.footer-institution-name`.
+- **Styling & Legibility (`frontend/src/index.css`)**:
+  - Rendered `.footer-institution-logo` at 32px × 32px with `object-fit: contain` and `filter: drop-shadow(0 1px 4px rgba(0,0,0,0.25))`, making all compass details sharp and visible across both dark and light modes.
+  - Set `.footer-institution-name` to `font-weight: 700; font-size: 0.95rem; letter-spacing: 0.05em;` for crisp institutional hierarchy.
+  - Added desktop right padding clearance (`padding-right: 52px;` in `.site-footer-meta`) preventing the fixed `.back-to-top-btn` from overlapping footer metadata.
+
+## 6 November: PES College Logo Placement (Footer & Credits Only)
+
+Configured the PES University compass logo across appropriate institutional sections:
+
+- **Asset Location**: Copied the circular PES compass logo to `frontend/src/assets/pes-logo.png`.
+- **Navigation Header (`frontend/src/pages/LandingPage.jsx`)**:
+  - Restored clean primary brand title (`InscripLens Studio`) without any college badges.
+- **Home Page Footer (`frontend/src/components/Footer.tsx` & `frontend/src/index.css`)**:
+  - Embedded `.institution-logo` inside `.institution-pill` directly beside the college name (`Developed by Nikhil Vasista N R | [PES Logo] PES`).
+- **About & Credits Section (`frontend/src/components/AboutSection.tsx` & `frontend/src/pages/AboutPage.tsx`)**:
+  - Positioned the circular PES emblem inside `.about-authorship-card` highlighting academic research authorship at PES.
+
+## 6 November: Sidebar Footer Cleanup (Removed Local Worker Pill)
+
+Simplified the navigation sidebar footer:
+
+- **Removed Local Worker Pill (`frontend/src/App.jsx`)**:
+  - Removed `<div className="sidebar-worker-pill">` housing `<Cpu />` and `Local Worker`.
+- **Preserved Attribution Notice (`frontend/src/App.jsx` & `frontend/src/index.css`)**:
+  - Maintained `Developed by Nikhil Vasista N R, PES · 2026` (`.sidebar-footer-text`) under a clean hairline top border.
+  - In collapsed rail mode, the footer section cleanly hides (`.studio-sidebar.collapsed .sidebar-footer-section { display: none !important; }`), keeping the icon rail uncluttered.
+
+## 6 November: Light Mode Anti-Glare Calibration & Contrast Overhaul
+
+Calibrated light theme color tokens and eliminated screen glare across the landing page, workflow sections, and studio workspace:
+
+- **Soft Stone Neutral Palette (`frontend/src/index.css`)**:
+  - Calibrated `--bg-base` from glaring high-saturation yellow-white (`#F7F2E8`, ~95% lightness) to soft, soothing natural limestone paper (`#E7E3DA`, ~88% lightness).
+  - Softened `--bg-surface` (`#DCD6CB`), `--bg-surface-raised` (`#EDE9E0`), and `--card-bg` (`#EFEBE2`), eliminating pure `#FFFFFF` glare on cards, sidebar, buttons, and popovers.
+  - Reduced `--grid-line` intensity by over 50% (`rgba(28, 26, 23, 0.018)`), softening the high-frequency graph-paper pattern across the landing hero and about sections.
+- **Studio Glyph Inspector & Candidate Contrast Hardening (`frontend/src/App.jsx` & `frontend/src/index.css`)**:
+  - Replaced 42 hardcoded inline dark-mode colors (`#EDEDEC`, `#A8A29A`, `#7E7A75`, `#161619`) with semantic CSS custom properties (`var(--text-primary)`, `var(--text-secondary)`, `var(--text-muted)`, `var(--text-subtle)`, `var(--bg-elevated)`).
+  - Fixed candidate inspector header ("Candidate #10"), which was previously invisible due to inline white `#EDEDEC` on a light card.
+  - Styled `.inspector-crop-box` with a dark viewing easel background (`#16161B`), seamlessly framing the binarized mask crop and white chiseled strokes without jarring black-on-white cutoffs.
+  - Calibrated `.glyph-chip.is-uncertain` for light mode: increased opacity from 0.65 to 0.95 with solid amber accenting (`#92400E`), ensuring full legibility for uncertain candidates and tags.
+  - Review form inputs in the inspector now reactively use `var(--bg-elevated)` and `var(--text-primary)` rather than hardcoded obsidian backgrounds.
+
+Relocated the Home button inside the sidebar Navigation section and adjusted the brand title placement:
+
+- **Home Button in Navigation Section (`frontend/src/App.jsx`)**:
+  - Removed the standalone `Home` button from the top header bar.
+  - Added `Home` (`<Home size={15} />`) to the top of `.sidebar-nav-list` inside the Navigation sidebar.
+  - In collapsed mode: displays cleanly as the first icon in the navigation rail beneath the burger button.
+  - In expanded mode: displays with icon and text (`[Home] Home`), styled identically to all other sidebar items with sandstone hover bloom, border highlight, and micro-translation.
+- **Masthead Alignment (`frontend/src/App.jsx` & `frontend/src/index.css`)**:
+  - `InscripLens Studio` now comfortably anchors the start of the top header bar, naturally aligned with the metadata status capsule.
+
+## 6 November: Studio Header Redesign (Home Button & Metadata Capsule)
+
+Upgraded the top navigation header bar with matching studio geometry and structured metadata tokens:
+
+- **Refined Home Navigation Button (`frontend/src/App.jsx` & `frontend/src/index.css`)**:
+  - Replaced the bulky 36px oval stadium pill (`border-radius: 9999px`) with a sleek 32px height, 7px radius obsidian card button matching the sidebar burger button and candidate nav controls.
+  - Features `<Home size={13} />` with warm sandstone hover border, elevation bloom, and smooth micro-interaction.
+- **Segmented Metadata Capsule (`frontend/src/App.jsx` & `frontend/src/index.css`)**:
+  - Replaced cramped inline text and raw middot characters with a structured multi-token status capsule (`.header-status-line`).
+  - **Stone Title Token**: Bold title with glowing sandstone active beacon dot and expanded `max-width: 240px` (avoiding premature truncation).
+  - **Resolution Token**: Monospace image dimensions badge (`525 × 1080 px`) separated by hairline vertical dividers.
+  - **Environment Token**: Offline workspace badge with warm sandstone `<Cpu size={12} />` indicator.
+
+## 6 November: Toolbar Zoom Removal & Direct Script Toggle Placement
+
+Streamlined the stone toolbar by removing redundant zoom controls in favor of the canvas HUD, and permanently exposing the script selector:
+
+- **Redundant Toolbar Zoom Removal (`frontend/src/App.jsx`)**:
+  - Removed `[Fit]`, `[-]`, `XX%`, `[+]` from the stone viewer toolbar (`toolbar-group-right`), eliminating dual zoom controls since the on-canvas vertical Zoom Scale HUD (`.zoom-scale-hud`) fully handles viewport scaling and fitting.
+- **Direct Kannada | Roman Script Toggle (`frontend/src/App.jsx`)**:
+  - Removed the `View` popover dropdown menu and replaced it with directly visible `[ ಕನ್ನಡ | Roman ]` segmented buttons in the right group of the stone toolbar.
+  - Placed adjacent to `Export PDF` for fast 1-click script switching across candidate labels.
+
+## 6 November: Mouse Wheel Zoom Restoration & Precision Disambiguation
+
+Reverted the discrete mouse wheel zoom calculation directly back to the original formula:
+
+- **Original Mouse Zoom Formula Restored (`frontend/src/App.jsx`)**:
+  - Replaced the delta thresholding (`Math.abs(e.deltaY) >= 80`) which caused standard Windows mouse wheels (emitting deltaY of 40–60) to fail or drop into sluggish continuous scaling.
+  - Standard physical mouse wheel scrolling (`!e.ctrlKey`) now unconditionally executes the exact original discrete formula `e.deltaY < 0 ? 1.15 : 1 / 1.15`.
+  - Precision touchpad pinch gestures (`e.ctrlKey === true` in Chromium) retain dampened continuous scaling (`Math.exp(-clampedDelta * 0.012)`) without interfering with physical mouse detents.
+
+## 6 November: Image Splitter Curtain Handle Icon Redesign
+
+Replaced the audio equalizer slider icon on the stone curtain divider with dedicated dual comparison triangles:
+
+- **Dual Directional Comparison Triangles (`frontend/src/App.jsx`)**:
+  - Replaced the confusing `<Sliders size={14} />` icon (which resembled an audio equalizer mixing console) in `.curtain-handle-knob` with clean dual directional triangles (`◀ ▶` SVG) pointing outwards to the mask and original photograph.
+  - Updated the Curtain toolbar chip from `<Sliders size={13} />` to `<ChevronsLeftRight size={13} />` for complete semantic consistency.
+  - Sized and centered within the 32px circular sandstone knob, ensuring crisp legibility, interactive hover scaling (1.12x), and active drag bloom (1.22x).
+
+## 6 November: Left Sidebar Burger Button & Navigation Redesign
+
+Replaced the chevron arrow collapse button and upgraded the sidebar navigation styling:
+
+- **Actual Burger Menu Button (`frontend/src/App.jsx` & `frontend/src/index.css`)**:
+  - Replaced the chevron arrow (`<` / `>`) with an authentic hamburger menu button (`<Menu size={16} />`).
+  - Added a dedicated header bar (`.sidebar-header-row`) pairing the burger button with the "Navigation" title when open, and centering the burger button in the icon rail when collapsed.
+- **Site-Matching Navigation Items**:
+  - Redesigned all sidebar items (`Epigraphy Studio`, `Run History`, `Project Credits`, `About & Docs`).
+  - Removed generic `btn-secondary` and inline style overrides.
+  - Active tab features a sandstone gold gradient background (`linear-gradient(135deg, rgba(201, 166, 107, 0.16), rgba(201, 166, 107, 0.04))`), a vertical sandstone indicator pill, and glowing sandstone text and icon.
+  - Hover states feature a smooth `translateX(2px)` micro-interaction, sandstone border highlight, and icon scaling.
+  - Added a count badge for Run History (`.sidebar-nav-badge`) and refined the "Local Worker" footer pill.
+
+## 6 November: Removal of Non-Functional "Modern Letters" Display Options
+
+Eliminated the non-functional "Modern letters" switch and gear menu:
+
+- **Toolbar Declutter (`frontend/src/App.jsx`)**:
+  - Removed the `Settings` gear button and its `Display options` popover menu adjacent to `[ ಕನ್ನಡ | Roman ]`.
+  - Removed the `Modern letters` toggle from both standard and compact viewer toolbars.
+  - Removed redundant state variables (`modernLetters`, `displayOptionsOpen`, `exportMenuOpen`), refs (`displayOptionsRef`, `exportMenuRef`), and their window click/escape event listeners.
+- **Authentic Script Default**:
+  - Kannada script display directly renders authentic epigraphic characters (`scriptMode === 'kannada'`), removing unnecessary and unnoticeable substitution toggles.
+
+## 6 November: Convenient High Accuracy Button Relocation
+
+Relocated the "High accuracy" toggle to a logical and convenient position in the UI:
+
+- **Moved from Global Navbar to Viewer Toolbar (`frontend/src/App.jsx`)**:
+  - Removed the misplaced toggle from the top navbar right group (which was grouped with `ThemeToggle` and `Try another`).
+  - Placed the functional `High accuracy` toggle switch directly into the primary Stone Viewer Toolbar (`toolbar-group-left`) alongside `Boxes` and `Curtain`.
+  - Groups all stone visual layer and enhancement parameters (`Boxes`, `Curtain`, `High accuracy`) directly above the stone canvas.
+- **Instant Re-Enhancement on Toggle (`frontend/src/App.jsx`)**:
+  - Toggling `High accuracy` in the toolbar now immediately calls `loadDemoStone(nextMode)` or `uploadFile(currentFileRef.current, nextMode)` without needing to re-import or navigate back.
+  - Automatically synchronizes toggle state with `analysis.mode` (`high_accuracy` vs `standard`).
+
+## 6 November: Candidate Letter Navigation (Prev / Next Buttons)
+
+Replaced passive, non-clickable keyboard hint with real interactive navigation controls in the Candidate Gallery:
+
+- **Interactive Navigation Buttons (`frontend/src/App.jsx` & `frontend/src/index.css`)**:
+  - Removed passive `<kbd>` indicator (`[<-] [->] Navigate`) and fading timer logic.
+  - Added real `<button>` controls (`[< Prev]` and `[Next >]`) with accessible tooltips and disabled states when no candidates are visible.
+  - Styled with `.candidate-nav-btn` conforming to `.chip-switch` metrics (`height: 26px`, `border-radius: 5px`, subtle sandstone hover border).
+- **Synchronized State and Auto-Centering (`frontend/src/App.jsx`)**:
+  - Clicking `Prev` or `Next` shifts selection through `visibleCandidates` with wrap-around support.
+  - Automatically triggers candidate focus on canvas (`focusOnBox`), candidate character prediction (`predictBox`), and horizontal chip centering in the gallery strip (`scrollIntoView`).
+  - Physical keyboard arrows (`ArrowLeft` / `ArrowRight`) call the same navigation functions (`goToPrevCandidate`, `goToNextCandidate`).
+
+## 6 November: Plan B - Canvas Zoom HUD, Bottom Scroll Line & Trackpad Normalization
+
+Enhanced canvas navigation and viewport scaling while maintaining physical mouse mechanics:
+
+- **Mouse Wheel Isolation (`frontend/src/App.jsx`)**:
+  - Discrete detent notches (`Math.abs(deltaY) >= 80 || deltaMode !== 0`) execute the exact original discrete formula `e.deltaY < 0 ? 1.15 : 1 / 1.15`. Physical mouse zoom responsiveness and cursor-centering remain completely unaltered.
+- **Continuous Trackpad Scaling (`frontend/src/App.jsx`)**:
+  - Continuous micro-deltas emitted by touchpad pinches are clamped to `[-25, 25]` and scaled continuously with `Math.exp(-clampedDelta * 0.012)`.
+  - Delivers fine-grained, progressive zoom control without runaway sensitivity spikes.
+- **On-Canvas Zoom Scale Widget (`frontend/src/App.jsx` & `frontend/src/index.css`)**:
+  - Vertical HUD (`.zoom-scale-hud`) anchored to the left of the black canvas viewport.
+  - Combines `+`, percentage readout, vertical scrubbable range slider, `-`, and a `Fit` button.
+- **Bottom Horizontal Scroll Line (`frontend/src/App.jsx` & `frontend/src/index.css`)**:
+  - Activates when the image exceeds viewport width (`.canvas-bottom-scroll-track`).
+  - Provides a draggable/clickable sandstone gold thumb to scrub horizontal pan across the inscription.
+
+## 6 November: Standalone Visible Export PDF Action (Removed Secondary Dropdown)
+
+Streamlined the export workflow into a single prominent action:
+
+- **Standalone Toolbar Control (`frontend/src/App.jsx`)**:
+  - Removed the chevron dropdown button and popover menu entirely.
+  - Eliminated the redundant "Download mask" link and duplicate "PDF report..." triggers.
+  - Retained an always-visible, standalone `Export PDF` button (`<FileText size={13} /> Export PDF`) on the viewer toolbar right group.
+  - 1-click execution immediately presents the printable PDF analysis report preview modal.
+
+## 6 November: Import Screen Navigation Normalization & SPA Fallback Route Fix
+
+Resolved navigation discrepancies on the `/import` screen and ensured persistent browser refresh handling:
+
+- **Navigation Scope & Semantics (`frontend/src/App.jsx` & `frontend/src/pages/ImportPage.jsx`)**:
+  - Removed redundant unstyled button in `.studio-brand` header.
+  - Bound `hasActiveStudioRun` in `App.jsx` to `isChangingArea && !!analysis`. 
+  - On the "Choose a stone image" screen, the card header back button now cleanly displays `← Back` routing to the landing page overview, rather than `Back to Studio`.
+  - The `← Back to Studio` button only activates when explicitly within the "Change area" crop workflow.
+- **FastAPI SPA Route Mapping (`api/server.py`)**:
+  - Registered `@app.get("/import")` alongside `@app.get("/studio")` to serve `frontend/dist/index.html`.
+  - Fixes direct browser GET requests and hard reloads returning `{"detail":"Not Found"}`.
+
 ## 6 November: PDF Report White Background, Script Switch & Paper Size Resolution
 
 Hardened the PDF report preview and print pipeline against layout truncation and control synchronization:
@@ -335,7 +537,7 @@ Epigraphic Recognition Status: Character recognition is strictly experimental an
 ## 2. Credits and Licences
 
 ### Project Authorship
-- Developer: Nikhil N R Vasista
+- Developer: Nikhil Vasista N R
 - Institution: PES
 - Year: 2026
 - Verified from: `frontend/src/config/site.ts`

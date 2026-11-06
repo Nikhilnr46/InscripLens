@@ -696,12 +696,13 @@ def get_credits():
 # Mount production frontend build and SPA routes if present
 dist_dir = ROOT / "frontend/dist"
 if dist_dir.is_dir():
+    @app.get("/import")
     @app.get("/studio")
     def serve_studio_page():
         index_html = dist_dir / "index.html"
         if index_html.is_file():
             return FileResponse(str(index_html))
-        raise HTTPException(status_code=404, detail="Studio interface not found.")
+        raise HTTPException(status_code=404, detail="Interface not found.")
 
     @app.get("/about")
     @app.get("/workflow")

@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import { SITE } from '../config/site';
 import Reveal from './Reveal';
+import pesLogo from '../assets/pes-logo.png';
 
 const FAQ_ITEMS = [
   {
@@ -206,8 +207,19 @@ export default function AboutSection() {
             {/* F. Credits and Licences */}
             <div id="credits" className="about-section card-spotlight">
               <Reveal variant="up" delay={0}>
-                <span className="section-eyebrow">ATTRIBUTION</span>
-                <h3 className="about-section-heading">Credits and licences</h3>
+                <span className="section-eyebrow">ATTRIBUTION & INSTITUTION</span>
+                <h3 className="about-section-heading">Credits and authorship</h3>
+                <div className="about-authorship-card card-spotlight">
+                  <img src={pesLogo} alt="PES College Logo" className="about-authorship-logo" />
+                  <div className="about-authorship-info">
+                    <div className="about-authorship-name">
+                      Designed and developed by {SITE.developer}
+                    </div>
+                    <div className="about-authorship-college">
+                      {SITE.collegeFull || SITE.college} &middot; Academic research in historical Kannada epigraphy &middot; {SITE.year}
+                    </div>
+                  </div>
+                </div>
                 <p className="about-body-text">
                   Enhancement approach and code: Shilalekhya, IIIT Hyderabad (MIT licence). Public EpiSAM images and checkpoints: CC BY-SA 4.0; imagery acknowledged to The Mythic Society, Bengaluru. Dataset previews shown in the application are derived works.
                 </p>

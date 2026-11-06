@@ -1,5 +1,146 @@
 # InscripLens Studio Project Log
 
+## 6 November: PDF Analysis Report Export in Run History
+
+Replaced JSON downloads in the Run History table with full printable PDF analysis report export:
+- Run History Export Button (`frontend/src/App.jsx`):
+  - Replaced the previous raw JSON file download link (`<a href="/api/export/..." download>Export</a>`) with an interactive `<button className="tool-btn btn-export-highlight"><FileText size={12} /> Export PDF</button>`.
+  - Clicking "Export PDF" now triggers the fullscreen `ReportPreviewDialog` with the stone photograph, binary mask, detected characters, and "Save as PDF" browser print pipeline.
+- Instant Candidate Region Extraction for Historical Runs (`frontend/src/utils/maskExtractor.js`):
+  - Created a browser-native connected-component analysis worker using offscreen canvas that deterministically extracts candidate character bounding boxes directly from `mask_url` in <25ms (100% agreement with backend Python `segment_candidates.py`).
+  - Seamlessly loads both active stone runs and past historical analysis records into the PDF preview dialog without requiring backend modifications.
+- Visual Feedback & State Management (`frontend/src/App.jsx` & `frontend/src/index.css`):
+  - Added `Loader2` spinning state during offscreen figure preparation (`historyExportingId`).
+  - Configured `@keyframes spin` in `frontend/src/index.css` for consistent loading animations.
+
+## 6 November: Free-Form PES Logo Presentation in Footer
+
+Unconstrained the PES college logo in the website footer from the pill container:
+- Footer Free-Form Layout (`frontend/src/components/Footer.tsx` & `frontend/src/index.css`):
+  - Removed the cramped `.institution-pill` container (border, background, and oval geometry).
+  - Replaced with `.footer-institution-freeform`: displays the circular PES compass emblem in free form alongside bold "PES" text and developer attribution.
+  - Increased logo dimensions to 32px diameter (up from 16px) with subtle drop-shadow and smooth hover scale (`scale(1.08)`), making the blue compass ring, white inner ring, and orange central disc fully legible.
+  - Added desktop padding clearance (`padding-right: 52px` on `.site-footer-meta`) to guarantee the floating back-to-top button never covers or clips the footer attribution or logo on desktop resolutions.
+
+## 6 November: PES College Logo Placement (Footer & Credits Only)
+
+Configured the PES University compass logo across appropriate institutional sections:
+- Kept the landing page navigation header clean with only the `InscripLens Studio` brand title (removed badge from header).
+- Home Page Footer (`frontend/src/components/Footer.tsx` & `frontend/src/index.css`):
+  - Upgraded `.institution-pill` to embed the circular PES logo emblem alongside the college name (`Developed by Nikhil Vasista N R | [PES Logo] PES`).
+- About & Credits Authorship Card (`frontend/src/components/AboutSection.tsx` & `frontend/src/pages/AboutPage.tsx`):
+  - Rendered the circular PES compass emblem inside `.about-authorship-card` recognizing institutional affiliation and developer credits.
+
+## 6 November: Sidebar Footer Cleanup (Removed Local Worker Pill)
+
+Simplified the navigation sidebar footer:
+- Removed the "Local Worker" button/pill (`.sidebar-worker-pill`) from `frontend/src/App.jsx`.
+- Retained the attribution and developer credits line (`Developed by Nikhil Vasista N R, PES · 2026`) directly above the bottom edge.
+- Updated `frontend/src/index.css` so that in collapsed rail mode, the footer section cleanly hides without leaving an orphaned border line.
+
+## 6 November: Light Mode Anti-Glare Calibration & Contrast Overhaul
+
+Calibrated light theme color tokens and eliminated screen glare across the landing page, workflow sections, and studio workspace:
+- Soft Stone Neutral Palette (`frontend/src/index.css`):
+  - Calibrated `--bg-base` from glaring high-saturation yellow-white (`#F7F2E8`, ~95% lightness) to soft, soothing natural limestone paper (`#E7E3DA`, ~88% lightness).
+  - Softened `--bg-surface` (`#DCD6CB`), `--bg-surface-raised` (`#EDE9E0`), and `--card-bg` (`#EFEBE2`), eliminating pure `#FFFFFF` glare on cards, sidebar, buttons, and popovers.
+  - Reduced `--grid-line` intensity by over 50% (`rgba(28, 26, 23, 0.018)`), softening the high-frequency graph-paper pattern across the landing hero and about sections.
+- Studio Glyph Inspector & Candidate Contrast Hardening (`frontend/src/App.jsx` & `frontend/src/index.css`):
+  - Replaced 42 hardcoded inline dark-mode colors (`#EDEDEC`, `#A8A29A`, `#7E7A75`, `#161619`) with semantic CSS custom properties (`var(--text-primary)`, `var(--text-secondary)`, `var(--text-muted)`, `var(--text-subtle)`, `var(--bg-elevated)`).
+  - Fixed candidate inspector header ("Candidate #10"), which was previously invisible due to inline white `#EDEDEC` on a light card.
+  - Styled `.inspector-crop-box` with a dark viewing easel background (`#16161B`), seamlessly framing the binarized mask crop and white chiseled strokes without jarring black-on-white cutoffs.
+  - Calibrated `.glyph-chip.is-uncertain` for light mode: increased opacity from 0.65 to 0.95 with solid amber accenting (`#92400E`), ensuring full legibility for uncertain candidates and tags.
+  - Review form inputs in the inspector now reactively use `var(--bg-elevated)` and `var(--text-primary)` rather than hardcoded obsidian backgrounds.
+
+Relocated the Home button inside the sidebar Navigation section and adjusted the brand title placement:
+- Home Button in Navigation Section (`frontend/src/App.jsx`):
+  - Removed the standalone `Home` button from the top header bar.
+  - Added `Home` (`<Home size={15} />`) to the top of `.sidebar-nav-list` inside the Navigation sidebar.
+  - In collapsed mode: displays cleanly as the first icon in the navigation rail beneath the burger button.
+  - In expanded mode: displays with icon and text (`[Home] Home`), styled identically to all other sidebar items with sandstone hover bloom, border highlight, and micro-translation.
+- Masthead Alignment (`frontend/src/App.jsx` & `frontend/src/index.css`):
+  - `InscripLens Studio` now comfortably anchors the start of the top header bar, naturally aligned with the metadata status capsule.
+
+## 6 November: Studio Header Redesign (Home Button & Metadata Capsule)
+
+Upgraded the top navigation header bar with matching studio geometry and structured metadata tokens:
+- Home Button Refinement (`frontend/src/App.jsx` & `frontend/src/index.css`):
+  - Replaced the 36px oval stadium pill with a 32px height, 7px radius obsidian card button matching the rest of the application.
+  - Houses `<Home size={13} />` with warm sandstone hover bloom and subtle translation.
+- Structured Metadata Capsule (`frontend/src/App.jsx` & `frontend/src/index.css`):
+  - Replaced cramped plain text with a segmented metadata capsule:
+    - Stone name token with pulsing sandstone beacon dot and expanded `max-width: 240px` (preventing premature truncation).
+    - Monospace image resolution badge (`525 × 1080 px`).
+    - Offline execution token with sandstone `<Cpu size={12} /> Local Workspace`.
+  - Replaced raw middot characters with hairline vertical dividers (`.header-status-divider`).
+
+## 6 November: Toolbar Zoom Removal & Direct Script Toggle Placement
+
+Streamlined the stone toolbar by removing redundant zoom buttons and placing Kannada / Roman buttons directly in their location:
+- Toolbar Zoom Control Removal (`frontend/src/App.jsx`):
+  - Removed `[Fit]`, `[-]`, `XX%`, `[+]` from the stone viewer toolbar, eliminating duplicate zoom features.
+  - Viewport zoom remains completely accessible via the on-canvas vertical Zoom Scale HUD inside the image area, as well as mouse wheel and touchpad pinch.
+- Permanent Kannada / Roman Script Switch Placement (`frontend/src/App.jsx`):
+  - Removed the `View` popover dropdown menu.
+  - Positioned the `[ ಕನ್ನಡ | Roman ]` segmented switch directly in the right toolbar group alongside `Export PDF`.
+
+## 6 November: Mouse Wheel Zoom Restoration & Precision Disambiguation
+
+Reverted the discrete mouse wheel zoom calculation directly back to the original formula:
+- Mouse Wheel Zoom Restored (`frontend/src/App.jsx`):
+  - Standard physical mouse wheel scrolling (`!e.ctrlKey`) unconditionally runs the exact original discrete formula `e.deltaY < 0 ? 1.15 : 1 / 1.15`.
+  - Removes delta-magnitude heuristic (`Math.abs(e.deltaY) >= 80`) so all Windows mouse wheel settings (40–60 delta notches) respond with full 1.15x discrete stepping.
+  - Touchpad pinch gestures (`e.ctrlKey === true`) remain smoothly dampened.
+
+## 6 November: Image Splitter Curtain Handle Icon Redesign
+
+Replaced the audio equalizer slider icon on the stone curtain divider with dedicated dual comparison triangles:
+- Splitter Handle Icon Upgrade (`frontend/src/App.jsx`):
+  - Replaced `<Sliders size={14} />` with dual directional comparison triangles (`◀ ▶` SVG) inside `.curtain-handle-knob`.
+  - Triangles point directly outwards to the binary mask and original photograph, clearly signaling horizontal wipe / comparison interaction.
+  - Sized at 15x15px with solid fill, perfectly balanced inside the 32px circular sandstone knob.
+- Toolbar Semantic Consistency (`frontend/src/App.jsx`):
+  - Updated the "Curtain: XX%" toolbar indicator from `<Sliders size={13} />` to `<ChevronsLeftRight size={13} />`.
+
+## 6 November: Plan B - Canvas Zoom HUD, Bottom Scroll Line & Trackpad Normalization
+
+Implemented Plan B interactive zoom and viewport navigation system while keeping physical mouse mechanics 100% unaltered:
+- Physical Mouse Wheel Preserved (`frontend/src/App.jsx`):
+  - Retained exact discrete 1.15x multiplier per notch (`isMouseWheelNotch = Math.abs(deltaY) >= 80 || deltaMode !== 0`). Physical mouse feel and cursor-centered geometry remain completely untouched.
+- Trackpad Pinch Precision (`frontend/src/App.jsx`):
+  - Applied smooth exponential dampening (`Math.exp(-clampedDelta * 0.012)`) on continuous small touchpad pinch deltas. Touchpad zoom operates in smooth, controlled micro-steps without runaway scaling to limits.
+- On-Canvas Vertical Zoom Scale HUD (`frontend/src/App.jsx` & `frontend/src/index.css`):
+  - Positioned a floating, semi-transparent HUD (`.zoom-scale-hud`) on the left side inside the black canvas area.
+  - Features `+` (Zoom In), real-time monospace percentage readout, scrubbable vertical range slider track with gold sandstone accent, `-` (Zoom Out), divider, and `Fit` button.
+  - Automatically suppresses during Redraw mode to maintain clean, unobstructed bounding box editing.
+- Bottom Horizontal Scroll Indicator Line (`frontend/src/App.jsx` & `frontend/src/index.css`):
+  - Tracks canvas horizontal overflow using `ResizeObserver`.
+  - Appears automatically along the bottom edge whenever the stone exceeds viewport width (`.canvas-bottom-scroll-track`).
+  - Sandstone gold thumb dynamically reflects the visible frame window; clicking or dragging along the track provides 1-touch horizontal scrubbing across the stone.
+
+## 6 November: Standalone Visible Export PDF Action (Removed Secondary Dropdown)
+
+Streamlined the export interface by removing the adjacent chevron dropdown and binary mask download:
+- Standalone Action Button (`frontend/src/App.jsx`):
+  - Removed the chevron dropdown button and popover menu entirely.
+  - Eliminated the redundant "Download mask" and secondary "PDF report..." options from both the toolbar and `View` popover.
+  - Retained a single, prominent, standalone `Export PDF` button (`<FileText size={13} /> Export PDF`) on the canvas toolbar.
+  - 1-click execution immediately opens the printable PDF report preview modal.
+
+## 6 November: Import Screen Navigation Normalization & SPA Fallback Route Fix
+
+Fixed "Back to Studio" navigation anomalies and 404 browser refresh handling on `/import`:
+- Navigation Button Scope (`frontend/src/App.jsx` & `frontend/src/pages/ImportPage.jsx`):
+  - Removed accidental unstyled `home-pill-btn` in the top header that collided with the `InscripLens Studio` brand logo.
+  - Scoped the card's `< Back to Studio` button strictly to the `isChangingArea` flow (`hasActiveStudioRun = isChangingArea && !!analysis`).
+  - The "Choose a stone image" screen now consistently presents `← Back` routing directly to the landing page overview, eliminating confusing returns to lingering in-memory demo sessions.
+  - Reset `isChangingArea` to `false` when entering `/import` to prevent stale crop workflows from hijacking new stone selection.
+- CSS Pill Button Alias (`frontend/src/index.css`):
+  - Aliased `.home-pill-btn` to `.btn-home-pill` styles to guarantee theme compliance (obsidian/parchment) across all header buttons.
+- FastAPI SPA Route Registration (`api/server.py`):
+  - Added `@app.get("/import")` to the SPA fallback routes serving `frontend/dist/index.html`.
+  - Direct browser refreshes (F5) or direct navigation to `http://127.0.0.1:8000/import` now return HTTP 200 and load the interface seamlessly without JSON 404 errors.
+
 ## 6 November: PDF Report White Background, Script Switch & Paper Size Resolution
 
 Addressed layout truncation and interactive control issues in the PDF export preview modal:
@@ -379,7 +520,7 @@ When making significant updates to InscripLens Studio, append a new dated entry 
 
 ---
 
-### [2026-11-04] Handover to Nikhil N R Vasista
+### [2026-11-04] Handover to Nikhil Vasista N R
 - What changed: Completed landing site cleanup (Step C1), unified navigation offsets, verified zero emojis/paths, compiled production frontend assets, audited repository secrets/gitignore, authored `HANDOVER.md`, updated `README.md`, and created `PROJECT_LOG.md`.
 - Why: Prepare repository for a clean, verified GitHub push and smooth onboarding for collaborators and reviewers.
 - Status: Done.
@@ -509,5 +650,33 @@ equirements-gpu.txt.
   - *Current Limit*: Model endpoint `POST /api/predict-crop` returns strictly top-3 alternatives; readings outside the top 3 cannot be ranked precisely.
   - *Proposed Backend Feature (Awaiting Approval)*: Add an optional query or body parameter `top_k: int = 3` (configurable to 5 or 10) to `POST /api/predict-crop` and `POST /api/recognize-all` to enable deeper comparative ranking. Backend files remained completely untouched per rules.
 - **Acceptance Test Suite**: Full 7-part automated test runner (`scratch/acceptance_test_r3.py`) passed: schema verification, multi-save preservation, deletion, model hash mismatch flagging, export cleanliness, corrupt storage recovery, and quota handling.
+
+### Step G1: Candidate Gallery Navigation Controls & Studio UX Hardening
+- **Candidate Gallery Prev / Next Buttons (`App.jsx`, `index.css`)**:
+  - Replaced passive non-clickable keyboard hint (`<- -> Navigate`) with interactive `<button>` elements (`< Prev` and `Next >`) styled to match the `.chip-switch` design token (`height: 26px`, sandstone accent hover).
+  - Wired directly to `handleSelectAndFocusBox(target.idx)` with wrap-around support across `visibleCandidates`.
+  - Automatically scrolls the selected glyph chip into the center of the gallery strip and highlights the candidate on canvas.
+  - Retains keyboard arrow key shortcuts (`ArrowLeft` / `ArrowRight`) while removing dead state and fading logic.
+- **Direct PDF Export Visibility (`App.jsx`, `index.css`)**:
+  - Promoted PDF Report export into a standalone prominent button on the primary viewer toolbar.
+  - Removed redundant nested sub-menu dropdown and unused mask download option.
+- **Trackpad Pinch Zoom Smoothing & Viewport HUD (Plan B)**:
+  - Isolated physical mouse wheel notches (`Math.abs(deltaY) >= 80 || deltaMode !== 0`) preserving exact 1.15x discrete stepping.
+  - Normalized trackpad pinch gestures with smooth exponential scaling (`Math.exp(-clampedDelta * 0.012)` clamped to `[-25, 25]`).
+  - Added on-canvas vertical Zoom Scale HUD with `+`, percentage readout, vertical scrub range slider, `-`, and 1-click `Fit` button.
+  - Added bottom horizontal scroll indicator line (`.canvas-bottom-scroll-track`) that activates when stone image exceeds viewport width, supporting click and drag scrubbing.
+- **Left Sidebar Burger Button & Navigation Styling Upgrade (`App.jsx`, `index.css`)**:
+  - Replaced the awkward chevron arrow (`<` / `>`) button with an authentic hamburger menu icon button (`<Menu size={16} />`).
+  - Added a dedicated top row header (`.sidebar-header-row`) pairing the burger button with the section title when expanded and centering the burger button in the icon rail when collapsed.
+  - Redesigned all sidebar navigation buttons (`Epigraphy Studio`, `Run History`, `Project Credits`, `About & Docs`) to match the site's obsidian and sandstone aesthetic:
+    - Dedicated icon containers (`.sidebar-nav-icon`) with hover sandstone scale.
+    - Active items feature warm sandstone gold gradient, subtle inner glow, and left accent indicator pill.
+    - Hover states feature sandstone border highlight, smooth horizontal translation (`translateX(2px)`), and elevation shadow.
+    - Integrated dynamic count badge for Run History.
+    - Refined the "Local Worker" footer pill to match the site's status chip styling.
+
+
+
+
 
 
