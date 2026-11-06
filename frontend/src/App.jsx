@@ -24,13 +24,36 @@ import {
   ChevronLeft,
   ChevronDown,
   Download,
-  Settings
+  Settings,
+  Crop
 } from 'lucide-react';
 import LandingPage from './pages/LandingPage.jsx';
+import ImportPage from './pages/ImportPage.jsx';
+import {
+  setPendingFile,
+  setPendingHandoff,
+  getPendingFile,
+  clearPendingFile,
+  getOriginalFile,
+  getSelectionData,
+  getOriginalSize,
+  hasOriginalFile,
+  clearHandoffStore
+} from './utils/fileStore';
 import ThemeToggle from './components/ThemeToggle.tsx';
 import { SITE } from './config/site.ts';
 import { initSiteInteractions } from './utils/interactions.ts';
 import { formatDisplayLabel } from './utils/kannadaConverter';
+import ReportPreviewDialog from './report/ReportPreviewDialog.jsx';
+import {
+  CompareCard,
+  RedrawOverlay,
+  RedrawFloatingBar,
+  SavedComparisonsDrawer,
+  predictCrop,
+  normalizeBbox
+} from './compare';
+import './compare/compare.css';
 
 export default function App() {
   // Routing: '/' for single-page landing site, '/studio' for epigraphic workspace
@@ -42,6 +65,9 @@ export default function App() {
       window.history.replaceState(null, '', `/#${section}`);
       return '/';
     }
+    if (p === '/import') {
+      return '/import';
+    }
     if (p === '/studio' || window.location.search.includes('studio=1') || window.location.search.includes('demo=1')) {
       return '/studio';
     }
@@ -49,6 +75,47 @@ export default function App() {
   });
 
   // Collapsible sidebar state (auto-collapses below 1500px, remembers user manual preference, supports url override)
+  // S3: Selection info and memory management for selected area crop
+  const [selectionInfo, setSelectionInfo] = useState(null);
+  const [isChangingArea, setIsChangingArea] = useState(false);
+  const [selectedAreaCardCollapsed, setSelectedAreaCardCollapsed] = useState(false);
+  const [originalThumbUrl, setOriginalThumbUrl] = useState(null);
+  const [reportDialogOpen, setReportDialogOpen] = useState(false);
+
+  const releaseSelectionMemory = () => {
+    clearHandoffStore();
+    setSelectionInfo(null);
+    setIsChangingArea(false);
+    if (originalThumbUrl) {
+      try {
+        URL.revokeObjectURL(originalThumbUrl);
+      } catch {}
+      setOriginalThumbUrl(null);
+    }
+  };
+
+  const handleChangeArea = () => {
+    if (!hasOriginalFile()) return;
+    setIsChangingArea(true);
+    window.history.pushState(null, '', '/import');
+    setRoute('/import');
+  };
+
+  useEffect(() => {
+    const orig = getOriginalFile();
+    if (orig && selectionInfo && !selectionInfo.isWholeImage) {
+      const url = URL.createObjectURL(orig);
+      setOriginalThumbUrl(url);
+      return () => {
+        try {
+          URL.revokeObjectURL(url);
+        } catch {}
+      };
+    } else {
+      setOriginalThumbUrl(null);
+    }
+  }, [analysis?.id, selectionInfo]);
+
   const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
     try {
       const sp = new URLSearchParams(window.location.search);
@@ -98,6 +165,11 @@ export default function App() {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  const navigateToImport = () => {
+    window.history.pushState(null, '', '/import');
+    setRoute('/import');
+  };
+
   const navigateToStudio = (autoDemo = false) => {
     const target = autoDemo ? '/studio?demo=1' : '/studio';
     window.history.pushState(null, '', target);
@@ -108,6 +180,7 @@ export default function App() {
   };
 
   const navigateToSection = (sectionId = 'overview') => {
+    releaseSelectionMemory();
     const hash = sectionId === 'overview' ? '' : `#${sectionId}`;
     window.history.pushState(null, '', `/${hash}`);
     setRoute('/');
@@ -141,7 +214,17 @@ export default function App() {
         setRoute('/');
         return;
       }
-      setRoute(p === '/studio' ? '/studio' : '/');
+      if (p === '/studio') {
+        setIsChangingArea(false);
+        setRoute('/studio');
+        return;
+      }
+      if (p === '/import') {
+        setRoute('/import');
+        return;
+      }
+      releaseSelectionMemory();
+      setRoute('/');
     };
     window.addEventListener('popstate', onPopState);
     return () => window.removeEventListener('popstate', onPopState);
@@ -154,6 +237,9 @@ export default function App() {
     if (route === '/studio') {
       title = `${SITE.name} - Workspace`;
       desc = 'Offline interactive analysis workspace for historical Kannada stone inscriptions.';
+    } else if (route === '/import') {
+      title = `${SITE.name} - Choose Stone Image`;
+      desc = 'Select or upload a historical Kannada stone inscription photograph to begin.';
     } else if (route === '/about') {
       title = `${SITE.name} - About & Documentation`;
       desc = 'Research documentation, pipeline architecture, and attribution for InscripLens Studio.';
@@ -262,6 +348,16 @@ export default function App() {
   const isDraggingCurtain = useRef(false);
   const [isCurtainDragging, setIsCurtainDragging] = useState(false);
   const panStartRef = useRef(null);
+
+  // Glyph Redraw & Compare State (Step R2 & R3)
+  const [isRedrawMode, setIsRedrawMode] = useState(false);
+  const [redrawnBbox, setRedrawnBbox] = useState(null);
+  const [redrawLayer, setRedrawLayer] = useState('mask'); // 'mask' | 'photo'
+  const [isComparing, setIsComparing] = useState(false);
+  const [comparisonData, setComparisonData] = useState(null);
+  const [savedDrawerOpen, setSavedDrawerOpen] = useState(false);
+  const compareRequestIdRef = useRef(0);
+  const savedSliderPosRef = useRef(50);
 
   const canvasPanelRef = useRef(null);
   const [panelWidth, setPanelWidth] = useState(1200);
@@ -547,6 +643,9 @@ export default function App() {
   // Automatically fit image when a new analysis loads
   useEffect(() => {
     if (analysis) {
+      setComparisonData(null);
+      setIsComparing(false);
+      setIsRedrawMode(false);
       const timer = setTimeout(() => {
         fitToViewport(false);
       }, 60);
@@ -689,6 +788,7 @@ export default function App() {
 
   // Load demonstration stone
   const loadDemoStone = async () => {
+    releaseSelectionMemory();
     setLoading(true);
     setLoadingMessage(highAccuracy ? 'Running high accuracy multi-scale enhancement...' : 'Loading Nagavara demonstration stone...');
     try {
@@ -730,9 +830,30 @@ export default function App() {
     }
   }, []);
 
-  // Upload user photograph
-  const handleFileUpload = async (e) => {
-    const file = e.target.files?.[0];
+  // Consume pending file from /import when entering /studio
+  useEffect(() => {
+    if (route === '/studio') {
+      const pending = getPendingFile();
+      if (pending) {
+        clearPendingFile();
+        const sel = getSelectionData();
+        const origSize = getOriginalSize();
+        if (sel && !sel.isWholeImage) {
+          setSelectionInfo({
+            ...sel,
+            originalWidth: origSize?.width || sel.imageWidth,
+            originalHeight: origSize?.height || sel.imageHeight
+          });
+        } else {
+          setSelectionInfo(null);
+        }
+        uploadFile(pending);
+      }
+    }
+  }, [route]);
+
+  // Upload user photograph core handler
+  const uploadFile = async (file) => {
     if (!file) return;
     setLoading(true);
     setLoadingMessage(highAccuracy ? 'Running high accuracy multi-scale enhancement...' : 'Enhancing inscription photograph...');
@@ -769,6 +890,24 @@ export default function App() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleFileUpload = (e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      releaseSelectionMemory();
+      uploadFile(file);
+    }
+  };
+
+  const handleSelectFileFromImport = (payload) => {
+    if (payload instanceof File) {
+      setPendingFile(payload);
+    } else {
+      setPendingHandoff(payload);
+    }
+    setIsChangingArea(false);
+    navigateToStudio(false);
   };
 
     // Predict selected crop region with tiny check and 8s timeout guard
@@ -891,14 +1030,200 @@ export default function App() {
     setTimeout(() => setIsTransitioning(false), 350);
   };
 
+  // Redraw Mode Actions (Step R2)
+  const startRedrawMode = (initialBox = null) => {
+    if (selectedBoxIndex === null || !analysis || !analysis.boxes?.[selectedBoxIndex]) return;
+    const baseBox = initialBox || analysis.boxes[selectedBoxIndex];
+    setRedrawnBbox([...baseBox]);
+    setRedrawLayer('mask');
+
+    // Save previous curtain position
+    savedSliderPosRef.current = sliderPos;
+
+    // Zoom to candidate with generous margin (about 2.5 times box size on each side, never beyond 0.1 - 5.0)
+    if (viewportRef.current) {
+      const vpRect = viewportRef.current.getBoundingClientRect();
+      const origBox = analysis.boxes[selectedBoxIndex];
+      const boxW = Math.max(1, origBox[2] - origBox[0]);
+      const boxH = Math.max(1, origBox[3] - origBox[1]);
+      const boxCenterX = (origBox[0] + origBox[2]) / 2;
+      const boxCenterY = (origBox[1] + origBox[3]) / 2;
+
+      // 2.5 times margin on each side: total view span is 6 * boxW and 6 * boxH
+      const fitW = vpRect.width / (boxW * 6);
+      const fitH = vpRect.height / (boxH * 6);
+      const targetScale = Math.max(0.1, Math.min(5.0, Math.min(fitW, fitH)));
+
+      const targetPanX = (vpRect.width / 2) - (boxCenterX * targetScale);
+      const targetPanY = (vpRect.height / 2) - (boxCenterY * targetScale);
+
+      setIsTransitioning(true);
+      setScale(targetScale);
+      setPan({ x: targetPanX, y: targetPanY });
+      setTimeout(() => setIsTransitioning(false), 300);
+    }
+
+    setIsRedrawMode(true);
+  };
+
+  const cancelRedrawMode = () => {
+    setIsRedrawMode(false);
+    setSliderPos(savedSliderPosRef.current);
+  };
+
+  const resetRedrawnBox = () => {
+    if (selectedBoxIndex !== null && analysis?.boxes?.[selectedBoxIndex]) {
+      setRedrawnBbox([...analysis.boxes[selectedBoxIndex]]);
+    }
+  };
+
+  const applyRedrawAndCompare = async () => {
+    if (!analysis || selectedBoxIndex === null || !redrawnBbox) return;
+
+    setIsRedrawMode(false);
+    setSliderPos(savedSliderPosRef.current);
+
+    const autoBbox = analysis.boxes[selectedBoxIndex];
+    const currentRedrawn = [...redrawnBbox];
+
+    setIsComparing(true);
+    setComparisonData(null);
+
+    const reqId = ++compareRequestIdRef.current;
+
+    const [autoRes, redrawnRes] = await Promise.allSettled([
+      predictCrop(analysis.id, autoBbox),
+      predictCrop(analysis.id, currentRedrawn)
+    ]);
+
+    if (reqId !== compareRequestIdRef.current) return;
+
+    setComparisonData({
+      automatic: {
+        bbox: autoBbox,
+        result: autoRes.status === 'fulfilled' ? autoRes.value : null,
+        error: autoRes.status === 'rejected' ? (autoRes.reason?.message || 'Prediction failed') : null
+      },
+      redrawn: {
+        bbox: currentRedrawn,
+        result: redrawnRes.status === 'fulfilled' ? redrawnRes.value : null,
+        error: redrawnRes.status === 'rejected' ? (redrawnRes.reason?.message || 'Prediction failed') : null
+      }
+    });
+    setIsComparing(false);
+  };
+
+  const retryAutoPrediction = async () => {
+    if (!analysis || selectedBoxIndex === null) return;
+    const autoBbox = comparisonData?.automatic?.bbox || analysis.boxes[selectedBoxIndex];
+    const reqId = ++compareRequestIdRef.current;
+
+    setComparisonData(prev => prev ? {
+      ...prev,
+      automatic: { ...prev.automatic, error: null, result: null }
+    } : null);
+
+    try {
+      const res = await predictCrop(analysis.id, autoBbox);
+      if (reqId !== compareRequestIdRef.current) return;
+      setComparisonData(prev => prev ? {
+        ...prev,
+        automatic: { ...prev.automatic, result: res, error: null }
+      } : null);
+    } catch (err) {
+      if (reqId !== compareRequestIdRef.current) return;
+      setComparisonData(prev => prev ? {
+        ...prev,
+        automatic: { ...prev.automatic, error: err.message || 'Retry failed', result: null }
+      } : null);
+    }
+  };
+
+  const retryRedrawnPrediction = async () => {
+    if (!analysis || !comparisonData?.redrawn?.bbox) return;
+    const targetBbox = comparisonData.redrawn.bbox;
+    const reqId = ++compareRequestIdRef.current;
+
+    setComparisonData(prev => prev ? {
+      ...prev,
+      redrawn: { ...prev.redrawn, error: null, result: null }
+    } : null);
+
+    try {
+      const res = await predictCrop(analysis.id, targetBbox);
+      if (reqId !== compareRequestIdRef.current) return;
+      setComparisonData(prev => prev ? {
+        ...prev,
+        redrawn: { ...prev.redrawn, result: res, error: null }
+      } : null);
+    } catch (err) {
+      if (reqId !== compareRequestIdRef.current) return;
+      setComparisonData(prev => prev ? {
+        ...prev,
+        redrawn: { ...prev.redrawn, error: err.message || 'Retry failed', result: null }
+      } : null);
+    }
+  };
+
+  const handleDiscardComparison = () => {
+    setComparisonData(null);
+    setIsComparing(false);
+  };
+
   // Handle box click from canvas or bottom gallery chips
   const handleSelectAndFocusBox = (boxIndex) => {
+    if (isRedrawMode) {
+      setIsRedrawMode(false);
+      setSliderPos(savedSliderPosRef.current);
+    }
+    setComparisonData(null);
+    setIsComparing(false);
     setSelectedBoxIndex(boxIndex);
     predictBox(boxIndex);
     focusOnBox(boxIndex);
   };
 
-  // Arrow key navigation between candidates
+  // Open saved comparison from drawer: focus candidate and restore comparison view (Step R3)
+  const handleOpenSavedCandidate = (candidateIndex, savedRecord) => {
+    if (isRedrawMode) {
+      setIsRedrawMode(false);
+      setSliderPos(savedSliderPosRef.current);
+    }
+    setSelectedBoxIndex(candidateIndex);
+    focusOnBox(candidateIndex);
+
+    if (savedRecord) {
+      setComparisonData({
+        automatic: {
+          bbox: savedRecord.automatic.bbox,
+          result: {
+            prediction: savedRecord.automatic.prediction,
+            predictionKannada: savedRecord.automatic.prediction_kannada,
+            alternatives: savedRecord.automatic.alternatives,
+            confidence: savedRecord.automatic.confidence,
+            cropUrl: savedRecord.automatic_thumbnail || ''
+          },
+          error: null
+        },
+        redrawn: {
+          bbox: savedRecord.redrawn.bbox,
+          result: {
+            prediction: savedRecord.redrawn.prediction,
+            predictionKannada: savedRecord.redrawn.prediction_kannada,
+            alternatives: savedRecord.redrawn.alternatives,
+            confidence: savedRecord.redrawn.confidence,
+            cropUrl: savedRecord.redrawn_thumbnail || ''
+          },
+          error: null
+        }
+      });
+      setRedrawnBbox(savedRecord.redrawn.bbox);
+    } else {
+      predictBox(candidateIndex);
+    }
+  };
+
+  // Global keydown handler: Redraw mode shortcuts, 'R' shortcut, and candidate arrow navigation
   useEffect(() => {
     const handleKeyDown = (e) => {
       // Ignore if user is in an input, textarea or interacting with curtain slider
@@ -910,6 +1235,61 @@ export default function App() {
           active.classList?.contains('curtain-handle'))
       ) {
         return;
+      }
+
+      // Redraw Mode keyboard shortcuts (Step R2)
+      if (isRedrawMode) {
+        if (e.key === 'Escape') {
+          e.preventDefault();
+          cancelRedrawMode();
+          return;
+        }
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          applyRedrawAndCompare();
+          return;
+        }
+        if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(e.key)) {
+          e.preventDefault();
+          if (!redrawnBbox || !analysis) return;
+          const step = e.shiftKey ? 10 : 1;
+          let [x1, y1, x2, y2] = redrawnBbox;
+
+          if (e.altKey) {
+            // Resize with Alt + Arrow (Shift for 10px)
+            if (e.key === 'ArrowRight') x2 += step;
+            if (e.key === 'ArrowLeft') x2 -= step;
+            if (e.key === 'ArrowDown') y2 += step;
+            if (e.key === 'ArrowUp') y2 -= step;
+            const normalized = normalizeBbox([x1, y1, x2, y2], { width: analysis.width, height: analysis.height }, 8);
+            setRedrawnBbox(normalized);
+          } else {
+            // Nudge move with Arrow (Shift for 10px)
+            const w = x2 - x1;
+            const h = y2 - y1;
+            let dx = 0;
+            let dy = 0;
+            if (e.key === 'ArrowRight') dx = step;
+            if (e.key === 'ArrowLeft') dx = -step;
+            if (e.key === 'ArrowDown') dy = step;
+            if (e.key === 'ArrowUp') dy = -step;
+
+            let newX1 = Math.max(0, Math.min(analysis.width - w, x1 + dx));
+            let newY1 = Math.max(0, Math.min(analysis.height - h, y1 + dy));
+            setRedrawnBbox([newX1, newY1, newX1 + w, newY1 + h]);
+          }
+          return;
+        }
+        return;
+      }
+
+      // 'R' key enters redraw mode for currently selected candidate
+      if ((e.key === 'r' || e.key === 'R') && !e.ctrlKey && !e.metaKey && !e.altKey) {
+        if (selectedBoxIndex !== null && analysis?.boxes?.[selectedBoxIndex]) {
+          e.preventDefault();
+          startRedrawMode();
+          return;
+        }
       }
 
       if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
@@ -947,7 +1327,7 @@ export default function App() {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [visibleCandidates, selectedBoxIndex]);
+  }, [visibleCandidates, selectedBoxIndex, isRedrawMode, redrawnBbox, analysis, sliderPos, hasUsedArrowKeys]);
 
   // Auto-scroll gallery strip to selected candidate chip
   useEffect(() => {
@@ -1106,8 +1486,34 @@ export default function App() {
   if (route === '/') {
     return (
       <LandingPage
-        onEnterStudio={() => navigateToStudio(false)}
+        onEnterStudio={navigateToImport}
         onTryDemo={() => navigateToStudio(true)}
+      />
+    );
+  }
+
+  if (route === '/import') {
+    return (
+      <ImportPage
+        initialFile={isChangingArea ? getOriginalFile() : null}
+        initialSelection={isChangingArea ? getSelectionData() : null}
+        restoreSelection={isChangingArea}
+        hasActiveStudioRun={!!analysis}
+        onReturnToStudio={() => {
+          setIsChangingArea(false);
+          window.history.pushState(null, '', '/studio');
+          setRoute('/studio');
+        }}
+        onSelectHandoff={handleSelectFileFromImport}
+        onSelectFile={handleSelectFileFromImport}
+        onSelectDemo={() => {
+          releaseSelectionMemory();
+          navigateToStudio(true);
+        }}
+        onBackToLanding={() => {
+          releaseSelectionMemory();
+          navigateToHome();
+        }}
       />
     );
   }
@@ -1151,7 +1557,22 @@ export default function App() {
                   {analysis.display_name}
                 </span>
                 <span className="status-sep" style={{ flexShrink: 0 }}>&middot;</span>
-                <span style={{ flexShrink: 0 }}>{analysis.width} &times; {analysis.height} px</span>
+                {selectionInfo && !selectionInfo.isWholeImage && !analysis.is_demo ? (
+                  <button
+                    type="button"
+                    className="header-selected-area-pill"
+                    onClick={hasOriginalFile() ? handleChangeArea : undefined}
+                    title={hasOriginalFile() ? "Click to change selected area" : "Reselect by choosing another image"}
+                    aria-label={`Selected area, ${selectionInfo.width} by ${selectionInfo.height} pixels from ${selectionInfo.originalWidth} by ${selectionInfo.originalHeight} pixels`}
+                  >
+                    <Crop size={12} className="text-sandstone" />
+                    <span>
+                      Selected area, {selectionInfo.width} &times; {selectionInfo.height} px (from {selectionInfo.originalWidth} &times; {selectionInfo.originalHeight})
+                    </span>
+                  </button>
+                ) : (
+                  <span style={{ flexShrink: 0 }}>{analysis.width} &times; {analysis.height} px</span>
+                )}
                 <span className="status-sep" style={{ flexShrink: 0 }}>&middot;</span>
                 <span style={{ flexShrink: 0 }}>Local Workspace</span>
               </>
@@ -1210,7 +1631,7 @@ export default function App() {
           />
           <button
             className="btn-secondary"
-            onClick={() => fileInputRef.current?.click()}
+            onClick={navigateToImport}
             disabled={loading}
             style={{ whiteSpace: 'nowrap', flexShrink: 0 }}
           >
@@ -1219,7 +1640,7 @@ export default function App() {
           {(!analysis || !analysis.is_demo) && (
             <button
               className={analysis ? "btn-secondary" : "btn-primary btn-magnetic"}
-              onClick={loadDemoStone}
+              onClick={navigateToImport}
               disabled={loading}
               style={{ whiteSpace: 'nowrap', flexShrink: 0 }}
               title="Load the Nagavara demonstration hero stone"
@@ -1318,6 +1739,134 @@ export default function App() {
             <Info size={15} />
             <span className="sidebar-text" style={{ marginLeft: '8px' }}>About & Docs</span>
           </a>
+
+          {/* Small "Selected area" card (collapsible, bottom of the left sidebar) */}
+          {analysis && !analysis.is_demo && selectionInfo && !selectionInfo.isWholeImage && (
+            <div
+              className={`selected-area-card ${sidebarCollapsed ? 'sidebar-collapsed' : ''}`}
+            >
+              <div
+                className="selected-area-card-header"
+                onClick={() => {
+                  if (sidebarCollapsed) {
+                    toggleSidebar();
+                  } else {
+                    setSelectedAreaCardCollapsed(prev => !prev);
+                  }
+                }}
+                title={sidebarCollapsed ? "Expand sidebar to view selected area" : "Toggle selected area card"}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    if (sidebarCollapsed) toggleSidebar();
+                    else setSelectedAreaCardCollapsed(prev => !prev);
+                  }
+                }}
+              >
+                <div className="selected-area-card-title">
+                  <Crop size={14} className="text-sandstone" style={{ flexShrink: 0 }} />
+                  {!sidebarCollapsed && <span>Selected Area</span>}
+                </div>
+                {!sidebarCollapsed && (
+                  <button
+                    type="button"
+                    className="selected-area-collapse-btn"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setSelectedAreaCardCollapsed(prev => !prev);
+                    }}
+                    aria-label={selectedAreaCardCollapsed ? "Expand selected area details" : "Collapse selected area details"}
+                  >
+                    <ChevronDown
+                      size={14}
+                      style={{
+                        transform: selectedAreaCardCollapsed ? 'rotate(-90deg)' : 'rotate(0deg)',
+                        transition: 'transform 0.15s ease'
+                      }}
+                    />
+                  </button>
+                )}
+              </div>
+
+              {!sidebarCollapsed && !selectedAreaCardCollapsed && (
+                <div className="selected-area-card-body">
+                  {/* Thumbnail of original image with selection rectangle outlined */}
+                  <div
+                    className="selected-area-thumb-container"
+                    style={{
+                      aspectRatio: `${selectionInfo.originalWidth || 4} / ${selectionInfo.originalHeight || 3}`
+                    }}
+                  >
+                    {originalThumbUrl ? (
+                      <img
+                        src={originalThumbUrl}
+                        alt="Original photograph overview"
+                        className="selected-area-thumb-img"
+                      />
+                    ) : (
+                      <div className="selected-area-thumb-fallback">
+                        Original Image
+                      </div>
+                    )}
+                    {/* Selected rectangle outline overlay */}
+                    {selectionInfo.originalWidth > 0 && selectionInfo.originalHeight > 0 && (
+                      <div
+                        className="selected-area-rect-overlay"
+                        style={{
+                          left: `${(selectionInfo.x / selectionInfo.originalWidth) * 100}%`,
+                          top: `${(selectionInfo.y / selectionInfo.originalHeight) * 100}%`,
+                          width: `${(selectionInfo.width / selectionInfo.originalWidth) * 100}%`,
+                          height: `${(selectionInfo.height / selectionInfo.originalHeight) * 100}%`
+                        }}
+                      />
+                    )}
+                  </div>
+
+                  <div className="selected-area-dimensions-readout">
+                    <div className="selected-area-dim-row">
+                      <span>Selected:</span>
+                      <strong className="selected-area-dim-val">
+                        {selectionInfo.width} &times; {selectionInfo.height} px
+                      </strong>
+                    </div>
+                    <div className="selected-area-dim-row">
+                      <span>Original:</span>
+                      <span>
+                        {selectionInfo.originalWidth} &times; {selectionInfo.originalHeight} px
+                      </span>
+                    </div>
+                  </div>
+
+                  {hasOriginalFile() ? (
+                    <button
+                      type="button"
+                      className="btn-secondary change-area-btn"
+                      onClick={handleChangeArea}
+                      title="Adjust the selected crop area on the original image"
+                    >
+                      <Crop size={13} /> Change area
+                    </button>
+                  ) : (
+                    <div className="reselect-notice-wrap">
+                      <button
+                        type="button"
+                        className="btn-secondary change-area-btn"
+                        disabled
+                        title="Reselect by choosing another image"
+                      >
+                        <Crop size={13} /> Change area
+                      </button>
+                      <span className="reselect-notice-text">
+                        Reselect by choosing another image
+                      </span>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
 
           <div style={{ marginTop: 'auto', borderTop: '1px solid var(--border-subtle)', paddingTop: '16px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.78rem', color: 'var(--text-muted)', justifyContent: sidebarCollapsed ? 'center' : 'flex-start' }} title="Local Python Worker - No cloud OCR service used.">
@@ -1527,6 +2076,18 @@ export default function App() {
                                 <div style={{ fontSize: '0.68rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '6px' }}>
                                   Export
                                 </div>
+                                <button
+                                  type="button"
+                                  className="popover-action-item"
+                                  onClick={() => {
+                                    setViewDropdownOpen(false);
+                                    setReportDialogOpen(true);
+                                  }}
+                                  title="Open printable analysis report preview (Save as PDF)"
+                                  style={{ background: 'transparent', border: 'none', width: '100%', textAlign: 'left', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', padding: '6px 10px', fontSize: '0.8rem', color: 'var(--text-primary)' }}
+                                >
+                                  <FileText size={13} /> PDF report...
+                                </button>
                                 <a
                                   href={analysis.mask_url}
                                   download={`mask_${analysis.id}.png`}
@@ -1686,6 +2247,18 @@ export default function App() {
                               </button>
                               {exportMenuOpen && (
                                 <div className="toolbar-popover-menu right-aligned" style={{ minWidth: '160px', padding: '6px' }}>
+                                  <button
+                                    type="button"
+                                    className="popover-action-item"
+                                    onClick={() => {
+                                      setExportMenuOpen(false);
+                                      setReportDialogOpen(true);
+                                    }}
+                                    title="Open printable analysis report preview (Save as PDF)"
+                                    style={{ background: 'transparent', border: 'none', width: '100%', textAlign: 'left', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', padding: '6px 10px', fontSize: '0.8rem', color: 'var(--text-primary)' }}
+                                  >
+                                    <FileText size={13} /> PDF report...
+                                  </button>
                                   <a
                                     href={analysis.mask_url}
                                     download={`mask_${analysis.id}.png`}
@@ -1709,6 +2282,18 @@ export default function App() {
                       ref={viewportRef}
                       onMouseDown={handleViewportMouseDown}
                     >
+                      {/* Floating Redraw Toolbar (Step R2) */}
+                      {isRedrawMode && selectedBoxIndex !== null && (
+                        <RedrawFloatingBar
+                          candidateNumber={selectedBoxIndex + 1}
+                          layer={redrawLayer}
+                          onLayerChange={setRedrawLayer}
+                          onReset={resetRedrawnBox}
+                          onCancel={cancelRedrawMode}
+                          onApply={applyRedrawAndCompare}
+                        />
+                      )}
+
                       {/* Transformed Stage */}
                       <div
                         className="canvas-stage"
@@ -1740,7 +2325,7 @@ export default function App() {
                           {/* Overlay: Shilalekhya Mask */}
                           <div
                             className="curtain-overlay"
-                            style={{ width: `${sliderPos}%` }}
+                            style={{ width: `${isRedrawMode ? (redrawLayer === 'mask' ? 100 : 0) : sliderPos}%` }}
                           >
                             <img
                               src={analysis.mask_url}
@@ -1753,30 +2338,36 @@ export default function App() {
                           </div>
 
                           {/* Floating Labels */}
-                          <div className="curtain-label curtain-label-mask">Mask</div>
-                          <div className="curtain-label curtain-label-original">Original</div>
+                          {!isRedrawMode && (
+                            <>
+                              <div className="curtain-label curtain-label-mask">Mask</div>
+                              <div className="curtain-label curtain-label-original">Original</div>
+                            </>
+                          )}
 
                           {/* Slider Handle (Keyboard Accessible, Touch & Draggable) */}
-                          <div
-                            className={`curtain-handle ${isCurtainDragging ? 'dragging' : ''}`}
-                            style={{ left: `${sliderPos}%` }}
-                            tabIndex={0}
-                            role="slider"
-                            aria-label="Mask and original image curtain comparison"
-                            aria-valuenow={Math.round(sliderPos)}
-                            aria-valuemin={0}
-                            aria-valuemax={100}
-                            onMouseDown={handleCurtainHandleMouseDown}
-                            onTouchStart={handleCurtainTouchStart}
-                            onKeyDown={handleCurtainKeyDown}
-                          >
-                            <div className="curtain-handle-knob">
-                              <Sliders size={14} />
+                          {!isRedrawMode && (
+                            <div
+                              className={`curtain-handle ${isCurtainDragging ? 'dragging' : ''}`}
+                              style={{ left: `${sliderPos}%` }}
+                              tabIndex={0}
+                              role="slider"
+                              aria-label="Mask and original image curtain comparison"
+                              aria-valuenow={Math.round(sliderPos)}
+                              aria-valuemin={0}
+                              aria-valuemax={100}
+                              onMouseDown={handleCurtainHandleMouseDown}
+                              onTouchStart={handleCurtainTouchStart}
+                              onKeyDown={handleCurtainKeyDown}
+                            >
+                              <div className="curtain-handle-knob">
+                                <Sliders size={14} />
+                              </div>
                             </div>
-                          </div>
+                          )}
 
                           {/* Candidate Boxes as Scalable SVG Overlay with Status Styling */}
-                          {showBoxes && (
+                          {(showBoxes || isRedrawMode) && (
                             <svg
                               viewBox={`0 0 ${analysis.width} ${analysis.height}`}
                               className="svg-overlay"
@@ -1789,7 +2380,7 @@ export default function App() {
                                 pointerEvents: 'none'
                               }}
                             >
-                              {allCandidatesInfo.map((cand) => {
+                              {!isRedrawMode && allCandidatesInfo.map((cand) => {
                                 const isSelected = selectedBoxIndex === cand.idx;
                                 const isHiddenByFilter = hideTiny && cand.isTiny;
                                 if (isHiddenByFilter) return null;
@@ -1841,6 +2432,17 @@ export default function App() {
                                   </rect>
                                 );
                               })}
+
+                              {/* Interactive Redraw Layer (Step R2) */}
+                              {isRedrawMode && redrawnBbox && selectedBoxIndex !== null && (
+                                <RedrawOverlay
+                                  originalBbox={analysis.boxes[selectedBoxIndex]}
+                                  redrawnBbox={redrawnBbox}
+                                  onChange={setRedrawnBbox}
+                                  imageBounds={{ width: analysis.width, height: analysis.height }}
+                                  scale={scale}
+                                />
+                              )}
                             </svg>
                           )}
                         </div>
@@ -2098,6 +2700,26 @@ export default function App() {
                             )}
                           </div>
                         </div>
+
+                        {/* Redraw and Compare Card (Step R2 & R3) */}
+                        {analysis && selectedBoxIndex !== null && (
+                          <CompareCard
+                            candidateIndex={selectedBoxIndex}
+                            candidateNumber={selectedBoxIndex + 1}
+                            analysis={analysis}
+                            scriptMode={scriptMode}
+                            modernLetters={modernLetters}
+                            highAccuracy={highAccuracy}
+                            isComparing={isComparing}
+                            comparisonData={comparisonData}
+                            onStartRedraw={() => startRedrawMode()}
+                            onRedrawAgain={() => startRedrawMode(comparisonData?.redrawn?.bbox || redrawnBbox)}
+                            onDiscard={handleDiscardComparison}
+                            onRetryAuto={retryAutoPrediction}
+                            onRetryRedrawn={retryRedrawnPrediction}
+                            onOpenSavedDrawer={() => setSavedDrawerOpen(true)}
+                          />
+                        )}
 
                         {/* Verification & Expert Review Section */}
                         <div className="inspector-section">
@@ -2668,6 +3290,34 @@ export default function App() {
           )}
         </main>
       </div>
+
+      {/* Printable Analysis Report Preview Dialog (Steps E1 & E2) */}
+      {reportDialogOpen && analysis && (
+        <ReportPreviewDialog
+          isOpen={reportDialogOpen}
+          onClose={() => setReportDialogOpen(false)}
+          analysis={analysis}
+          selectionInfo={selectionInfo}
+          batchRegions={batchRegions}
+          predictionCache={predictionCache}
+          reviewsList={reviewsList}
+          highAccuracy={highAccuracy}
+          scriptMode={scriptMode}
+          initialModernLetters={modernLetters}
+          onClassifyAll={runBatchRecognize}
+          isClassifying={isClassifying}
+        />
+      )}
+
+      {/* Saved Comparisons Drawer (Step R3) */}
+      <SavedComparisonsDrawer
+        isOpen={savedDrawerOpen}
+        onClose={() => setSavedDrawerOpen(false)}
+        currentRunId={analysis?.id || null}
+        scriptMode={scriptMode}
+        modernLetters={modernLetters}
+        onOpenCandidate={handleOpenSavedCandidate}
+      />
     </div>
   );
 }

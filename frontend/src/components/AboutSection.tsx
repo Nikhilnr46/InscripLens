@@ -27,6 +27,10 @@ const FAQ_ITEMS = [
   {
     q: 'Can I export results?',
     a: 'Use the download options available in the Studio. Review records and localized candidate boxes can be exported as structured JSON datasets.'
+  },
+  {
+    q: 'How do candidate coordinates relate to selected image regions?',
+    a: 'Candidate coordinates, saved reviews and history refer to the selected area image, not the original photograph.'
   }
 ];
 

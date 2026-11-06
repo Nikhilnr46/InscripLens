@@ -1,0 +1,832 @@
+/* ==========================================================================
+   InscripLens Studio Analysis Report Stylesheet (Step E1)
+   Designed for A4 / Letter portrait print fidelity & interactive modal preview
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   Interactive Modal Preview Styles
+   -------------------------------------------------------------------------- */
+.report-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background-color: rgba(18, 18, 20, 0.88);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  overflow: hidden;
+}
+
+.report-options-panel {
+  width: 320px;
+  flex-shrink: 0;
+  background-color: var(--bg-surface);
+  border-right: 1px solid var(--border-subtle);
+  display: flex;
+  flex-direction: column;
+  z-index: 10;
+  box-shadow: 4px 0 24px rgba(0, 0, 0, 0.25);
+}
+
+.options-panel-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.options-title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.options-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.options-close-icon-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--dur-fast) var(--ease-out);
+}
+
+.options-close-icon-btn:hover {
+  color: var(--text-primary);
+  background-color: var(--accent-subtle);
+}
+
+.options-scroll-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.option-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.option-label,
+.option-group-title {
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.option-input-text {
+  width: 100%;
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--border-subtle);
+  background-color: var(--bg-base);
+  color: var(--text-primary);
+  font-size: 0.85rem;
+  font-family: inherit;
+  outline: none;
+  transition: border-color var(--dur-fast) var(--ease-out);
+}
+
+.option-input-text:focus {
+  border-color: var(--accent-sandstone);
+  box-shadow: 0 0 0 2px var(--accent-subtle);
+}
+
+.option-help-text {
+  font-size: 0.72rem;
+  color: var(--text-subtle);
+  line-height: 1.35;
+}
+
+.option-toggle-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  user-select: none;
+  padding: 4px 0;
+}
+
+.option-checkbox {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  accent-color: var(--accent-sandstone);
+}
+
+.option-toggle-label {
+  font-size: 0.82rem;
+  color: var(--text-primary);
+}
+
+.option-segmented {
+  width: 100%;
+  display: flex;
+  background-color: var(--bg-base);
+  border: 1px solid var(--border-subtle);
+  border-radius: 6px;
+  padding: 2px;
+}
+
+.option-segmented .segmented-btn {
+  flex: 1;
+  padding: 6px 10px;
+  font-size: 0.78rem;
+  font-weight: 500;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all var(--dur-fast) var(--ease-out);
+}
+
+.option-segmented .segmented-btn.active {
+  background-color: var(--bg-surface);
+  color: var(--accent-sandstone);
+  font-weight: 600;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+}
+
+.option-destination-notice {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  background-color: var(--accent-subtle);
+  border: 1px solid rgba(201, 166, 107, 0.3);
+  padding: 10px 12px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  color: var(--text-primary);
+  line-height: 1.4;
+}
+
+.options-panel-actions {
+  padding: 16px 20px;
+  border-top: 1px solid var(--border-subtle);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background-color: var(--bg-surface);
+}
+
+.options-save-btn {
+  width: 100%;
+  height: 38px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.options-cancel-btn {
+  width: 100%;
+  height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.82rem;
+}
+
+/* --------------------------------------------------------------------------
+   Preview Scroll Area
+   -------------------------------------------------------------------------- */
+.report-preview-scroll-area {
+  flex: 1;
+  background-color: #3b3d40;
+  overflow-y: auto;
+  padding: 36px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+}
+
+.report-loading-indicator {
+  position: absolute;
+  top: 16px;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(0, 0, 0, 0.75);
+  color: #ededec;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  z-index: 20;
+}
+
+/* --------------------------------------------------------------------------
+   Step E2: Unclassified Banner in Preview Area
+   -------------------------------------------------------------------------- */
+.report-unclassified-banner {
+  width: 210mm;
+  max-width: 100%;
+  background-color: var(--bg-surface);
+  border: 1px solid var(--accent-sandstone);
+  border-radius: 8px;
+  padding: 16px 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+  box-sizing: border-box;
+}
+
+.unclassified-banner-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.unclassified-banner-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.unclassified-banner-desc {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+  margin: 0 0 12px 0;
+}
+
+.unclassified-banner-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.unclassified-action-btn {
+  height: 32px;
+  font-size: 0.8rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 14px;
+}
+
+/* --------------------------------------------------------------------------
+   Report Sheet (Paper Rendering)
+   -------------------------------------------------------------------------- */
+.inscriplens-report-root {
+  background-color: #ffffff !important;
+  color: #111111 !important;
+  font-family: 'Inter', 'Noto Sans Kannada', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  box-sizing: border-box;
+  margin: 0 auto;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
+  border-radius: 2px;
+  line-height: 1.45;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* A4 dimensions: 210mm x 297mm */
+.inscriplens-report-root[data-paper="a4"] {
+  width: 210mm;
+  min-height: 297mm;
+  padding: 14mm;
+}
+
+/* Letter dimensions: 215.9mm x 279.4mm */
+.inscriplens-report-root[data-paper="letter"] {
+  width: 215.9mm;
+  min-height: 279.4mm;
+  padding: 14mm;
+}
+
+/* --------------------------------------------------------------------------
+   Report Header & Branding
+   -------------------------------------------------------------------------- */
+.report-header {
+  border-bottom: 1.5pt solid #111111;
+  padding-bottom: 8pt;
+  margin-bottom: 12pt;
+}
+
+.report-brand-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.report-wordmark {
+  font-size: 14pt;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: #111111;
+}
+
+.report-wordmark-studio {
+  color: #9A7330;
+  font-weight: 600;
+  font-size: 12pt;
+}
+
+.report-type-badge {
+  font-size: 9pt;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #555555;
+}
+
+.report-meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6pt;
+  font-size: 8pt;
+  color: #666666;
+  margin-top: 4pt;
+}
+
+.report-meta-sep {
+  color: #aaaaaa;
+}
+
+.report-selection-note {
+  font-weight: 500;
+  color: #9A7330;
+}
+
+/* --------------------------------------------------------------------------
+   Stone Title & Provenance
+   -------------------------------------------------------------------------- */
+.report-stone-header {
+  margin-bottom: 14pt;
+}
+
+.report-stone-title {
+  font-size: 18pt;
+  font-weight: 700;
+  color: #111111;
+  margin: 0 0 3pt 0;
+  letter-spacing: -0.01em;
+  line-height: 1.25;
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+
+.report-stone-provenance {
+  font-size: 8.5pt;
+  color: #666666;
+  font-style: italic;
+}
+
+/* --------------------------------------------------------------------------
+   Figures (Side-by-Side Images)
+   -------------------------------------------------------------------------- */
+.report-images-section {
+  margin-bottom: 16pt;
+}
+
+.report-figures-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12pt;
+}
+
+.report-figure {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.report-img-frame {
+  width: 100%;
+  height: 180pt;
+  background-color: #f5f4f0;
+  border: 0.75pt solid #d8d4cc;
+  border-radius: 3pt;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.report-img-frame.mask-frame {
+  background-color: #000000 !important;
+  border-color: #333333 !important;
+}
+
+.report-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+.report-img-placeholder {
+  font-size: 8pt;
+  color: #888888;
+}
+
+.report-figcaption {
+  margin-top: 4pt;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-size: 7.5pt;
+  color: #555555;
+  padding: 0 2pt;
+}
+
+.figcaption-title {
+  font-weight: 600;
+}
+
+.figcaption-dims {
+  color: #777777;
+}
+
+/* --------------------------------------------------------------------------
+   Detected Characters Section
+   -------------------------------------------------------------------------- */
+.report-characters-section {
+  margin-bottom: 16pt;
+}
+
+.report-section-heading {
+  font-size: 11pt;
+  font-weight: 700;
+  color: #111111;
+  margin: 0 0 3pt 0;
+  border-bottom: 0.75pt solid #e0dcd4;
+  padding-bottom: 3pt;
+}
+
+.report-characters-intro {
+  font-size: 8pt;
+  color: #666666;
+  margin-bottom: 8pt;
+  line-height: 1.35;
+}
+
+.report-unclassified-box {
+  padding: 16pt;
+  background-color: #f7f6f2;
+  border: 0.75pt dashed #c8c4bc;
+  border-radius: 4pt;
+  font-size: 9pt;
+  color: #666666;
+  text-align: center;
+  font-style: italic;
+}
+
+.report-candidates-grid {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 5pt;
+}
+
+.report-candidate-card {
+  border: 0.75pt solid #e2ded7;
+  border-radius: 3pt;
+  padding: 4pt 3pt;
+  background-color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-sizing: border-box;
+  text-align: center;
+}
+
+.report-candidate-card.is-uncertain {
+  border: 0.75pt dashed #a8a29a;
+  background-color: #fdfcfb;
+}
+
+.report-candidate-card.is-reviewed {
+  border: 0.75pt solid #9a7330;
+  background-color: #fbf9f4;
+}
+
+.card-top-row {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2pt;
+  font-size: 6pt;
+  line-height: 1;
+}
+
+.cand-num {
+  font-weight: 700;
+  color: #666666;
+}
+
+.cand-tag {
+  font-size: 5.5pt;
+  font-weight: 600;
+  padding: 1pt 2pt;
+  border-radius: 2pt;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.cand-tag.tag-uncertain {
+  color: #7a6e60;
+  background-color: #eee9e0;
+}
+
+.cand-tag.tag-reviewed {
+  color: #9a7330;
+  background-color: #faebd7;
+}
+
+.cand-thumb-frame {
+  width: 100%;
+  height: 28pt;
+  background-color: #000000 !important;
+  border-radius: 2pt;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 3pt;
+}
+
+.cand-thumb-img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+.cand-thumb-empty {
+  width: 100%;
+  height: 100%;
+  background-color: #111111;
+}
+
+.cand-labels-wrap {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.cand-kannada-letter {
+  font-family: 'Noto Sans Kannada', sans-serif !important;
+  font-size: 13pt;
+  font-weight: 700;
+  line-height: 1.1;
+  color: #111111;
+  min-height: 15pt;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cand-lossy-marker {
+  font-size: 8pt;
+  color: #9a7330;
+  vertical-align: super;
+  margin-left: 1pt;
+}
+
+.cand-roman-label {
+  font-size: 6.5pt;
+  color: #555555;
+  font-weight: 500;
+  line-height: 1.1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+.cand-confidence {
+  font-size: 6pt;
+  color: #888888;
+  margin-top: 1pt;
+}
+
+.cand-reviewer-name {
+  font-size: 5.5pt;
+  color: #777777;
+  font-style: italic;
+  margin-top: 2pt;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+.cand-dash {
+  color: #aaaaaa;
+}
+
+.report-tiny-omitted-note {
+  margin-top: 6pt;
+  font-size: 7.5pt;
+  color: #777777;
+  font-style: italic;
+}
+
+/* --------------------------------------------------------------------------
+   Story Section
+   -------------------------------------------------------------------------- */
+.report-story-section {
+  margin-bottom: 14pt;
+  background-color: #faf9f6;
+  border: 0.75pt solid #e6e2d8;
+  border-radius: 4pt;
+  padding: 8pt 10pt;
+}
+
+.story-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4pt;
+}
+
+.curated-text-badge {
+  font-size: 6.5pt;
+  font-weight: 600;
+  color: #855b18;
+  background-color: #f7ebd7;
+  padding: 1pt 4pt;
+  border-radius: 2pt;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.report-story-body {
+  font-size: 8pt;
+  color: #333333;
+  line-height: 1.45;
+  margin: 0 0 4pt 0;
+}
+
+.report-story-source {
+  font-size: 7pt;
+  color: #777777;
+  font-style: italic;
+}
+
+/* --------------------------------------------------------------------------
+   Notes and Credits Section
+   -------------------------------------------------------------------------- */
+.report-credits-section {
+  margin-top: 14pt;
+  padding-top: 8pt;
+  border-top: 0.75pt solid #e0dcd4;
+}
+
+.report-disclaimer-p {
+  font-size: 8pt;
+  font-weight: 600;
+  color: #333333;
+  margin-bottom: 4pt;
+  font-style: italic;
+}
+
+.report-licence-text {
+  font-size: 7pt;
+  color: #666666;
+  line-height: 1.4;
+  margin-bottom: 4pt;
+}
+
+.report-developer-line {
+  font-size: 7pt;
+  font-weight: 500;
+  color: #888888;
+}
+
+/* --------------------------------------------------------------------------
+   Fixed Print Footer (Hidden on screen preview, visible on print)
+   -------------------------------------------------------------------------- */
+.report-print-footer {
+  display: none;
+}
+
+/* --------------------------------------------------------------------------
+   Print Media Query Rules
+   -------------------------------------------------------------------------- */
+@page {
+  size: A4 portrait;
+  margin: 14mm;
+}
+
+@media print {
+  html, body {
+    background: #ffffff !important;
+    color: #111111 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    height: auto !important;
+  }
+
+  /* Hide everything outside report */
+  body > * {
+    visibility: hidden !important;
+  }
+
+  .report-modal-overlay,
+  .report-options-panel,
+  .options-panel-header,
+  .options-panel-actions,
+  .report-loading-indicator,
+  .studio-header,
+  .studio-sidebar,
+  .app-container {
+    display: none !important;
+    visibility: hidden !important;
+  }
+
+  /* Make report root and children strictly visible */
+  .inscriplens-report-root,
+  .inscriplens-report-root * {
+    visibility: visible !important;
+  }
+
+  .report-preview-scroll-area {
+    background: transparent !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    width: 100% !important;
+    overflow: visible !important;
+  }
+
+  .inscriplens-report-root {
+    position: absolute !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 100% !important;
+    min-height: auto !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    box-shadow: none !important;
+    border: none !important;
+    border-radius: 0 !important;
+    background: #ffffff !important;
+    color: #111111 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Page Break Avoidance on cards, figures, headings */
+  .report-candidate-card,
+  .report-figure,
+  .report-section-heading,
+  .report-header,
+  .report-stone-header,
+  .report-story-section,
+  .report-credits-section {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+
+  .report-img {
+    max-width: 100% !important;
+  }
+
+  /* Fixed Footer on every printed page */
+  .report-print-footer {
+    display: flex !important;
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    justify-content: space-between !important;
+    font-size: 7.5pt !important;
+    color: #777777 !important;
+    border-top: 0.5pt solid #cccccc !important;
+    padding-top: 3pt !important;
+    background-color: #ffffff !important;
+    z-index: 1000 !important;
+  }
+}
+
+.print-footer-stone {
+  max-width: 45%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

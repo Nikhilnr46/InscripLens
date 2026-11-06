@@ -1,5 +1,215 @@
 # InscripLens Studio Handover and Technical Guide
 
+## 6 November: Glyph Inspector Save, Drawer & JSON Export (Step R3 of 3)
+
+Delivered complete client-side persistence, comparison history drawer, and standardized JSON export for redrawn candidate comparisons:
+
+- **Active Save Comparison Workflow**:
+  - The "Save comparison" button in `CompareCard.jsx` activates dynamically once both automatic and redrawn crop predictions have loaded successfully.
+  - Generates aspect-ratio preserved 96 px data URL thumbnails using `generateThumbnailFromUrl` for instant off-canvas rendering.
+  - Persists comparisons into `localStorage` under the versioned key `"inscriplens.comparisons.v1"`.
+  - Every click creates a distinct record with a unique identifier (`comp_<timestamp>_<random>`), ensuring all iterative attempts for a candidate are preserved.
+  - Provides instant user feedback with a confirmation banner *"Saved in this browser only"* and a live counter badge (e.g. *"3 saved for this candidate"*).
+
+- **Storage Key and Schema Contract**:
+  - **Storage Key**: `"inscriplens.comparisons.v1"`
+  - **Record Schema (`CURRENT_SCHEMA_VERSION = 1`)**:
+    ```typescript
+    interface ComparisonRecord {
+      id: string;                          // Unique record ID (comp_<timestamp>_<random>)
+      schema_version: 1;                   // Schema version number
+      saved_at: string;                    // ISO-8601 timestamp
+      timestamp: string;                   // ISO-8601 timestamp alias
+      run_id: string;                      // Active analysis run ID
+      candidate_number: number;            // 1-based candidate number (#N)
+      candidate_index: number;             // 0-based candidate index
+      image_size: { width: number; height: number }; // Stone image dimensions
+      enhancement_mode: string;            // 'high_accuracy' | 'standard'
+      automatic: {
+        bbox: [number, number, number, number]; // [x1, y1, x2, y2] original image pixels
+        prediction: string;                // Roman label (e.g. 'ma')
+        prediction_kannada: string;        // Kannada Unicode form (e.g. 'ಮ')
+        alternatives: Array<string | { label: string; confidence?: number }>; // Top 3
+        confidence: number | null;         // Recognizer confidence score (0.0 to 1.0)
+        model_sha256: string;              // Model checkpoint SHA-256 hash
+      };
+      redrawn: {
+        bbox: [number, number, number, number]; // [x1, y1, x2, y2] original image pixels
+        prediction: string;
+        prediction_kannada: string;
+        alternatives: Array<string | { label: string; confidence?: number }>;
+        confidence: number | null;
+        model_sha256: string;
+      };
+      model_hashes_differ: boolean;        // Flagged true if model versions differed
+      proposed_reading: {
+        text: string;                      // User reading
+        script: 'kannada' | 'roman';
+        tentative: true;                   // Marked tentative
+      };
+      outcome: 'improved' | 'worse' | 'unchanged' | 'unknown';
+      rank_note: string;                   // Evaluation explanation
+      automatic_thumbnail?: string;        // 96 px data URL (omitted from file export)
+      redrawn_thumbnail?: string;          // 96 px data URL (omitted from file export)
+    }
+    ```
+
+- **Saved Comparisons Drawer (`SavedComparisonsDrawer.jsx`)**:
+  - Accessible via "View saved comparisons (N)" in the Glyph Inspector card.
+  - **Tabs**: *"This run"* (filtered by loaded run ID) and *"All runs"*, each showing dynamic count badges.
+  - **Summary Bar**: Displays real-time aggregate counts for Improved, Worse, Unchanged, and Unknown outcomes.
+  - **Cards**: Displays candidate number `#N`, dual 96 px thumbnails with dashed neutral / solid sandstone badges, dual first predictions formatted per active Script setting and modern letters preference, outcome badge, tentative reading, formatted timestamp, "Open", and "Delete".
+  - **Open Action**: Switches to and focuses candidate in Studio viewer, loading the redrawn box and side-by-side comparison. Disabled with tooltip if record belongs to another run.
+  - **Delete Action**: Includes inline confirmation ("Delete this comparison? [Delete] [Cancel]") to prevent accidental deletion.
+
+- **Clean JSON Export (`inscriplens-comparisons-<date>.json`)**:
+  - Triggered via split menu offering *"This run"* and *"All saved"*.
+  - File header envelope:
+    ```json
+    {
+      "software_name": "InscripLens",
+      "schema_version": 1,
+      "export_date": "2026-11-06T...",
+      "count": 3,
+      "run_filter": "run_id_or_null",
+      "records": [ ... ]
+    }
+    ```
+  - **Privacy & Security Guarantee**: Completely strips internal file paths (`/outputs/...`, `/app_data/...`), crop URLs, and base64 thumbnail data URIs from the exported JSON.
+
+- **Architectural Boundary & Future Proposal (Awaiting Approval)**:
+  - *Current Limitation*: The existing backend character classifier (`POST /api/predict-crop`) hardcodes a return limit of top-3 alternatives. Readings outside the top 3 cannot be ranked precisely; `rank_note` explicitly highlights that ranks beyond 3 are unavailable.
+  - *Proposed Backend Feature*: Add an optional query or body parameter `top_k: int = 3` (configurable to 5 or 10) to `POST /api/predict-crop` and `POST /api/recognize-all`. This will allow epigraphists to evaluate deeper rankings without altering core PyTorch weights. Per strict UI-only rules, this proposal is documented here awaiting backend approval.
+
+- **Storage Quota & Blocked Storage Resilience**:
+  - When browser storage is blocked or quota is exceeded, the UI catches `QuotaExceededError` and surfaces an error banner with a prominent *"Download JSON now"* button.
+  - Storage usage is checked via `getStorageUsage()` and displays a warning banner if >4 MB is utilized.
+  - Corrupted JSON in `localStorage` recovers gracefully to an empty array without crashing.
+
+## 6 November: Glyph Inspector Redraw and Compare (Step R2 of 3)
+
+Integrated the interactive candidate redrawing workflow and side-by-side comparison inspector:
+
+- **Redraw Mode & Interactive SVG Canvas Stage Overlay (`RedrawOverlay.jsx`)**:
+  - Automatically zooms to the candidate with a generous margin (~2.5x the bounding box size on each side, clamped between scale limits 0.1 and 5.0).
+  - Switches off the curtain wiper to display the selected layer directly (Mask by default, Photo optional).
+  - Renders the original candidate box as a dashed neutral outline (`#A8A29A`) and the active redrawn box as a solid sandstone accent (`#C9A66B`) with 8 interactive resize handles.
+  - Supports pointer capture for drag-to-move and edge/corner resizing, touch/pointer event support (`touch-action: none`), live pixel dimensions badge (`w x h px`), boundary clamping within image dimensions, and minimum size enforcement (8 x 8 px).
+  - Preserves full canvas zoom and pan interactions (scroll wheel, pinch, background drag) while keeping image-space coordinates aligned.
+  - Comprehensive keyboard controls:
+    - `Enter`: Applies redrawn rectangle and initiates comparison.
+    - `Escape`: Cancels redraw mode and restores previous curtain position and view.
+    - `Arrow keys`: Nudge box position 1 px (`Shift + Arrow`: 10 px).
+    - `Alt + Arrow keys`: Resize box dimensions 1 px (`Shift + Alt + Arrow`: 10 px).
+    - Candidate arrow navigation and `R` shortcut are disabled during redraw mode and while typing in form fields.
+
+- **Floating Viewport Toolbar (`RedrawFloatingBar.jsx`)**:
+  - Floats above the viewer stage with backdrop blur.
+  - Displays candidate badge `Redrawing #N`.
+  - Photo / Mask segmented control defaulting to Mask with tooltip *"The classifier reads the mask"*.
+  - Action buttons: "Reset" (reverts redrawn rectangle to original candidate boundary), "Cancel" (Esc), and "Apply" (Enter).
+
+- **Inspector "Redraw and compare" Card (`CompareCard.jsx`)**:
+  - Positioned in the inspector sidebar between Alternatives and Verification & Expert Review.
+  - **Initial State**: Renders "Redraw and compare" card with secondary button "Redraw box" and subtitle *"Outline the full glyph, then compare."* Enabled for all candidates (including tiny regions).
+  - **Loading State**: Dispatches parallel `predictCrop` requests for both automatic candidate and redrawn box with `requestId` guard against stale network responses. Shows two pulsing skeleton columns. Dedicated "Retry" button available on individual columns if either request fails.
+  - **Compared State**:
+    - Context stone overview image displaying both boxes outlined (dashed neutral and solid accent) with Photo/Mask switch.
+    - Two equal columns ("Automatic" with dashed neutral chip, "Redrawn" with solid accent chip) displaying crop image, primary prediction in Kannada or Roman (governed by scriptMode and modern letters), confidence bar/percentage, and top 3 suggestion chips.
+    - "Your reading (tentative)" input field accepting Kannada or Roman, with live Kannada transliteration preview when Roman text is entered.
+    - Per-column rank text (*"Your reading is 1st"*, *"2nd"*, *"3rd"*, or *"not in the top 3"*) and overall outcome badge (*Improved*, *Worse*, *Unchanged*, or *Unknown*) with explanation note *"Only the top three suggestions are available."*
+    - Actions: "Redraw again" (re-enters redraw mode preserving last redrawn rectangle), "Discard" (clears comparison), and disabled "Save comparison" button with tooltip *"Coming in the next step"*.
+
+- **Non-Destructive Guarantee**: Redraw and compare operations strictly never mutate `analysis.boxes`, candidate strip chips, Classify All results, `predictionCache`, or human review records.
+
+## 6 November: Glyph Inspector Redraw, Compare, and Save Foundation (Step R1 of 3)
+
+Implemented the core architectural foundation for glyph region redrawing, prediction comparison, and versioned local persistence (`frontend/src/compare/`):
+
+- **Candidate #16 and Normal-Size Crop Diagnosis**:
+  - Investigated why Candidate #16 (index 15, bbox `[265, 147, 287, 173]`, dimensions 22x26 px) and other normal-sized candidates show *"Alternatives unavailable"* in the inspector.
+  - Root Cause Analysis:
+    1. Architectural Decoupling: The inspector decouples the primary candidate label (`knownCandidateLabel`, populated from `/api/recognize-all` batch regions or review records) from the inspector alternatives (`cropPrediction.alternatives`, populated exclusively by `POST /api/predict-crop`).
+    2. Batch Recognition Omission: `/api/recognize-all` computes single top predictions for candidate chips and saves `automatic_regions.json`, but does not populate per-candidate alternative lists or crop URLs in memory.
+    3. Navigation Invalidation Guard: When users rapidly navigate candidates or re-click candidates, `predictRequestIdRef.current` increments. In-flight requests matching `requestId !== predictRequestIdRef.current` are discarded, leaving `cropPrediction` null.
+    4. Model Missing / Unreachable Fallback: When the server or recognition models are unavailable (HTTP 503 or timeout >8s), `predictingCrop` is set to false while `cropPrediction` remains null.
+    5. Inspector Fallback Rendering: When `isMatchingPrediction` is false and `predictingCrop` is false, `App.jsx` falls back to `knownCandidateLabel` for the character header while the alternatives container renders the placeholder banner *"Alternatives unavailable"*.
+  - Execution Metrics: Single-crop prediction (`POST /api/predict-crop`) takes ~10–25ms when models are pre-cached in memory via `get_loaded_bundle` (historically was 2.6s when unpickled on every request). Response payload returns: `run_id`, `bbox`, `prediction`, `prediction_kannada`, `alternatives` (top 3 ranked list), `crop_url`, `model`, `model_sha256`, `reference_examples`, `confidence`, `uncertain`, `models_agree`, and `confidence_scores`.
+
+- **Compare Module Architecture (`frontend/src/compare/`)**:
+  - `apiClient.js`: `predictCrop(runId, bbox, options)` invokes `POST /api/predict-crop` with integer bounding box coordinates in original image pixel space. Features 8-second timeout guard, optional AbortSignal linking, typed result formatting (`{ cropUrl, prediction, predictionKannada, alternatives, confidence, modelSha256 }`), and automatic single retry on transient failures. Strictly avoids persisting or leaking filesystem paths.
+  - `coordinates.js`: Provides `screenToImage`, `imageToScreen`, and `normalizeBbox` mapping between screen viewport space and image pixel coordinates using the viewer's CSS stage transform (`translate(${pan.x}px, ${pan.y}px) scale(${scale})`). Clamps strictly within image boundaries, rounds all coordinates to integers, ensures `x1 < x2` and `y1 < y2` (handling inverted drag gestures), and enforces a strict minimum dimension of 8 x 8 px across both full-stone images and selected-area crops.
+  - `outcome.js`: `evaluateComparisonOutcome(proposedReading, automatic, redrawn)` determines whether an expert redraw improved recognition. Evaluates rank position (1 to 3, or null for "not in top 3") by comparing trimmed, NFC-normalised Kannada Unicode forms (with Roman transliterations converted via `toKannada`). Outcomes are strictly categorized as `"improved"`, `"worse"`, `"unchanged"`, or `"unknown"`. `rank_note` explicitly notes in every branch that ranks beyond 3 are unavailable.
+  - `store.js`: Manages local persistence in `localStorage` under versioned key `"inscriplens.comparisons.v1"`. Every operation is wrapped in `try/catch`. Schema holds: `id`, `schema_version: 1`, `saved_at`, `run_id`, `candidate_number`, `candidate_index`, `image_size`, `enhancement_mode`, `automatic`, `redrawn`, `proposed_reading`, `outcome`, `rank_note`, and dual 96 px data URL thumbnails. Includes corrupted JSON recovery (falls back to empty list without crashing) and storage threshold warnings (>4 MB used).
+  - `thumbnail.js`: Offscreen canvas utility generating compact 96 px JPEG data URLs with aspect-ratio-preserving centering for visual representation in comparison lists.
+  - `__tests__/`: Comprehensive unit tests covering coordinate round-trips across zoom/pan states, edge clamping, inverted boxes, outcome evaluation matrices, store CRUD operations, corrupted JSON recovery, and quota limit handling.
+
+## 6 November: PDF Report Integration & Run History Investigation (Step E2 of 2)
+
+Integrated PDF report trigger actions and investigated Run History report capabilities:
+- Toolbar Integration: Added "PDF report..." above "Download mask" in the Studio Export popover and compact View dropdown.
+- Interactive Classification Flow: When characters have not yet been classified, the preview modal surfaces a clear prompt ("Characters have not been classified.") with two actions:
+  - "Classify all now": Invokes `runBatchRecognize()` with live progress tracking, dynamically updating the report grid upon completion.
+  - "Export without labels": Dismisses the prompt and renders the publication report with an unclassified indicator.
+- Read-Only Run History Endpoint Investigation:
+  - Examined `/api/history`, `/api/export/{run_id}`, and `/api/reviews/{run_id}`.
+  - Available for past runs: input image (`/app_data/{id}/input.png`), binary mask (`/app_data/{id}/mask.png`), and human reviews (`/api/reviews/{id}`).
+  - Missing for past runs: candidate bounding boxes (`boxes`) and batch model predictions (`automatic_regions.json`) are not persisted in SQLite or returned by existing GET endpoints.
+  - Per strict boundary instructions, the backend was left untouched, Run History retains its existing JSON export, and Studio export is shipped exclusively.
+- Stone Profile Registry Extension Architecture:
+  - Confirmed `ReportView.jsx` exclusively reads stone identity and narrative fields via `getStoneProfile()`.
+  - Future registry lookups should be plugged directly into `frontend/src/report/stoneProfile.js`. The expected data contract is:
+    ```typescript
+    interface StoneProfileResult {
+      name: string;              // Official or archaeological title (e.g. "Begur Hero Stone")
+      nameSource: 'demo' | 'user' | 'registry' | 'unidentified';
+      story: string | null;      // Curated historical context or narrative summary
+      storySource: string | null;// Archival citation or epigraphist reference
+    }
+    ```
+- Edge Cases Verified:
+  - Uploaded photo with region selection displays "Selected area" with dimension readouts in header and figure captions.
+  - Empty filter states gracefully render "No candidate regions match current filters".
+  - Long stone names wrap without clipping via `word-break: break-word`.
+  - Fixed print footers repeat cleanly on every physical/PDF page via `@media print`.
+
+## 6 November: Printable Analysis Report (Step E1 of 2)
+
+Integrated full-fidelity printable analysis report generation directly within Studio using the browser's native print engine:
+- Report Module Architecture (`frontend/src/report/`):
+  - `stoneProfile.js`: Implements `getStoneProfile({ run, isDemo, userEnteredName })` returning `{ name, nameSource, story: null, storySource: null }`. Preserves demo identity ("Nagavara demonstration stone") and user-entered names with explicit registry lookup extension points; zero synthesized stories.
+  - `buildReportData.js`: Extracts Studio state without new backend calls, preparing 1600 px downscaled photo/mask copies and 96 px clipped mask thumbnails for all candidate character regions. Translates Roman labels to Kannada glyphs via `formatDisplayLabel` with faithful or modern orthography. Correctly flags unclassified runs ("Characters have not been classified") without triggering unsolicited inference.
+  - `ReportView.jsx`: A4/Letter portrait printable report rendered with bundled Inter and Noto Sans Kannada. Includes wordmark, metadata, side-by-side photo and mask figures, 8-column candidate character cards (displaying sequence number, stroke thumbnail, large Kannada glyph, Roman label, confidence score, and reviewer initials/name), conditional curated story section, licence attributions, and fixed print footers.
+  - `ReportPreviewDialog.jsx`: Full-screen modal with interactive options panel (stone name, include uncertain characters, include tiny characters, include reviewer names, Kannada style, paper size) and a live scrollable white-paper preview. Pre-print hooks await `document.fonts.ready` and image decoding before invoking `window.print()` with automatic document title synchronization (`InscripLens report - <stone name> - <YYYY-MM-DD>`).
+  - `report.css`: Print media rules (`@page A4 with 14mm margins`, `print-color-adjust: exact`, `break-inside: avoid` on cards and figures, fixed print footers, and complete isolation from site dark theme).
+
+## 6 November: Studio Integration of the Selected Area (Step S3 of 3)
+
+Integrated selected region awareness, metadata synchronization, and re-selection flows into the Epigraphy Studio:
+- Header Selected Area Pill: When an active analysis originated from a region selection, the header status line renders an interactive pill: `Selected area, {w} × {h} px (from {origW} × {origH})`. For full-resolution images or the Nagavara demo stone, standard image dimensions are preserved.
+- Collapsible "Selected Area" Sidebar Card: Displays a live thumbnail of the original photograph with the crop rectangle outlined in gold (`var(--accent-sandstone)`) and dimmed surroundings, accompanied by live pixel dimension readouts for both selected crop and full photo.
+- In-Memory "Change Area" Flow: Clicking "Change area" (or the header pill) navigates back to the `/import` selection stage with the original file and existing crop coordinates intact. Adjusting and re-submitting seamlessly replaces the active run in Studio.
+- Graceful Store Expiration & Reload Safety: The in-memory store remains strictly unpersisted across page reloads. If the store expires or is lost upon reload, the "Change area" button is safely disabled with the guidance notice: *"Reselect by choosing another image"*.
+- Non-Destructive "Try Another" Navigation: Navigating to `/import` preserves the active run; pressing browser Back returns to the Studio session intact.
+- Strict Coordinate Semantics: Candidate coordinates, saved reviews and history refer to the selected area image, not the original photograph. Documented across `HANDOVER.md` and the About page FAQ.
+- Memory Lifecycle Management: Switching between selected photo crops and demo stone clears stale selection metadata. All File references and object URLs are revoked and garbage-collected when navigating to the landing overview.
+
+## 6 November: Region Selection (Step S2 of 3)
+
+Integrated in-browser region selection (`frontend/src/components/RegionSelector.jsx`) within the `/import` workflow before dispatching to Studio:
+- 3-Step Import Progress: Visual indicator (`1. Choose` -> `2. Select area` -> `3. Studio`). Uploaded photographs enter region selection; demo stone bypasses selection directly to Studio.
+- EXIF-Aware Bitmap Decoding: Uses `createImageBitmap(file, { imageOrientation: "from-image" })` to correctly orient smartphone captures, preserving the full-resolution bitmap in memory.
+- Interactive SVG Selection Stage: Dimming scrim outside selection, 8 resize handles, drag to move, drag to draw, keyboard arrow adjustments (1% step, Shift to resize), pointer events for touch devices, live original pixel readout, 64x64 minimum constraint, and <300px resolution warning.
+- Zoom & Pan: Cursor-centered wheel/pinch zoom (0.1x to 5.0x), middle-mouse/Space-key pan, Fit-to-view, and 100% controls.
+- Lossless PNG Crop & Handoff: Selections covering >=99% or "Use whole image" pass original File without re-encoding. Cropped selections cap long side at 3200 px (supersampling the backend 1600 px limit) and export as `selected-area.png`. In-memory store retains original File, crop File, selection bounding box, and dimensions for S3.
+
+## 6 November: Import Screen (Step S1 of 3)
+
+Added dedicated `/import` workspace route allowing users to choose between uploading a field photograph and loading the curated Nagavara demonstration stone before entering Studio:
+- Route Navigation: Added `/import` to `frontend/src/App.jsx`. SlideToEnter control and keyboard shortcuts on `/` route to `/import`. Studio header "Try another" and demo button route back to `/import`.
+- Import Component (`frontend/src/pages/ImportPage.jsx`): Two side-by-side cards with drag-and-drop upload (PNG/JPG, 20 MP limit check) and demo stone thumbnail selection (/api/demo/image) with full responsive stacking.
+- In-Memory File Store (`frontend/src/utils/fileStore.ts`): File objects are held strictly in memory during transition to `/studio`, invoking the unmodified enhancement upload handler on arrival without localStorage persistence.
+
 ## 5 November: Studio UI batch 2 layout of controls
 
 Reorganized Studio viewer toolbar and bottom gallery strip:
@@ -283,6 +493,7 @@ All binary checkpoints, large model bundles, datasets, and runtime images are ex
 ### Pages and Single-Page Landing Sections
 The client application is built as a single-page application (SPA) with two primary view states managed in `frontend/src/App.jsx`:
 - Route `/`: Single-page landing site containing four sequential sections:
+- Route `/import`: Dedicated stone image selection workspace (Step S1) featuring drag-and-drop/browse upload and demonstration stone loading cards.
   1. `#overview`: Hero banner, epigraphy badge, offline privacy guarantee, interactive stone tablet illustration with proximity glow, and "Slide to enter Studio" control.
   2. `#workflow`: Three-stage methodology cards ("Capture & Select", "Enhance & Localize", "Inspect & Verify") with 3D tilt and cursor spotlights, plus the demo stone trigger button.
   3. `#about`: Centered single-column documentation including "What is InscripLens", "Why it exists", the 5-stage pipeline, "Privacy", interactive FAQ accordion, and "Credits and licences".
